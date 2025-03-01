@@ -1,4 +1,4 @@
-# scmoannofe
+# SCGADS: Smart Computing Genomic Analysis & Display System
 
 ## Project setup
 ```
