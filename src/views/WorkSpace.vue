@@ -25,7 +25,7 @@
         </el-table-column>
         <el-table-column prop="endTime" label="Complete Time" sortable>
           <template #default="{ row }">
-            {{ formatDate(row.endTime) }}
+            {{ row.endTime ? formatDate(row.endTime) : "Not completed yet" }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="Status" sortable>
