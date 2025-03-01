@@ -23,6 +23,9 @@
                 <el-form-item>
                   <el-button type="primary" @click="submitForm" class="submit-button">Send Message</el-button>
                 </el-form-item>
+                <!-- <el-form-item>
+                  <el-button type="primary" @click="pytest" class="test">py test</el-button>
+                </el-form-item> -->
               </el-form>
             </div>
           </el-card>
@@ -53,6 +56,9 @@ export default {
     };
   },
   methods: {
+    // async pytest(){
+    //   await axios.post("/api/pytest?pyid="+this.feedbackForm.subject)
+    // },
     async submitForm() {
       console.log('Feedback submitted:', this.feedbackForm);
       if (this.feedbackForm.subject === '' || this.feedbackForm.message === '') {

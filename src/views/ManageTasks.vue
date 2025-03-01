@@ -62,12 +62,15 @@
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" label="Operations" width="240">
+        <el-table-column fixed="right" label="Operations" width="320">
           <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
+              AutoProgress
+            </el-button>
             <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
               Download
             </el-button>
-            <el-button link type="primary" size="small" @click="showDetailDialog(row)">
+            <el-button link type="info" size="small" @click="showDetailDialog(row)">
               Detail
             </el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
@@ -87,6 +90,17 @@
       </el-pagination>
     </section>
 
+    <!-- 自动处理对话框 -->
+    <el-dialog v-model="autoProgressDialogVisible" title="Auto Progress" width="500" align-center>
+      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be auto progressed</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="autoProgressDialogVisible = false">Cancel</el-button>
+          <el-button type="success" @click="autoProgressDialogVisible = false; autoProgress()">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 批量下载确认对话框 -->
     <el-dialog v-model="batchDownloadDialogVisible" title="Download" width="500">
       <span>The selected tasks will be downloaded. Are you sure?</span>
@@ -104,9 +118,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="downloadDialogVisible = false">Cancel</el-button>
-          <el-button type="success" @click="downloadDialogVisible = false; download()">
-            Confirm
-          </el-button>
+          <el-button type="success" @click="downloadDialogVisible = false; download()">Confirm</el-button>
         </div>
       </template>
     </el-dialog>
@@ -117,9 +129,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">
-            Confirm
-          </el-button>
+          <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
         </div>
       </template>
     </el-dialog>
@@ -150,9 +160,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">
-            Confirm
-          </el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">Confirm</el-button>
         </div>
       </template>
     </el-dialog>
@@ -162,9 +170,7 @@
       <span>{{ selectedTask.details }}</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="detailDialogVisible = false">
-            Confirm
-          </el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
         </div>
       </template>
     </el-dialog>
@@ -278,6 +284,7 @@ export default {
       batchEditDialogVisible: false,
       batchDownloadDialogVisible: false,
       downloadDialogVisible: false,
+      autoProgressDialogVisible: false,
       selectedTask: null,
       batchEditData: { status: null },
       currentPage: 1,
@@ -375,6 +382,10 @@ export default {
       this.showTaskNameDialog = false; // 成功上传后关闭对话框
       //ElMessage.success('The file upload was successful.');
     },
+    showAutoProgressDialog(task) {
+      this.autoProgressDialogVisible = true;
+      this.selectedTask = task;
+    },
     showDownloadFileDialog(task) {
       this.downloadDialogVisible = true;
       this.selectedTask = task;
@@ -426,6 +437,13 @@ export default {
         this.fetchTaskList();
       } catch (error) {
         console.error("Delete failed:", error);
+      }
+    },
+    async autoProgress(){
+      try {
+        await axios.post("/api/progress?taskName=" + this.selectedTask.task_name)
+      } catch (error) {
+        console.error("Progress failed:", error);
       }
     },
     async download() {
