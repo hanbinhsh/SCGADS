@@ -1,8 +1,27 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
+    <!-- 侧边栏 -->
+    <el-aside class="sidebar">
+      <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect">
+        <el-menu-item index="annotation">
+          <el-icon><Edit /></el-icon>
+          <span>Annotation</span>
+        </el-menu-item>
+        <el-menu-item index="training">
+          <el-icon><Cpu /></el-icon>
+          <span>Training</span>
+        </el-menu-item>
+        <el-menu-item index="denoising">
+          <el-icon><Filter /></el-icon>
+          <span>Denoising</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
     <section class="upload-section">
-      <div class="upload-row" id="upload-row">
+
+      <!-- 训练页面 -->
+      <div v-if="activeTask === 'training'" class="upload-row" id="upload-row">
         <!-- 文件上传组件 -->
         <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
           <el-icon class="el-icon--upload">
@@ -47,10 +66,12 @@
       </div>
 
       <!-- 按钮行 -->
-      <div class="button-row">
-        <el-button type="default" class="action-button" @click="open = true" ref="ref3">Tutorial</el-button>
-        <el-button type="warning" class="action-button" @click="handleResetClick">Reset</el-button>
-        <el-button type="success" class="action-button" id="button-row" @click="handleUploadClick">Upload</el-button>
+      <div class="footer">
+        <div class="button-row">
+          <el-button type="primary" class="action-button" @click="open = true" ref="ref3">Tutorial</el-button>
+          <el-button type="warning" class="action-button" @click="handleResetClick">Reset</el-button>
+          <el-button type="success" class="action-button" id="button-row" @click="handleUploadClick">Upload</el-button>
+        </div>
       </div>
     </section>
   </div>
@@ -182,6 +203,11 @@ import { ref } from 'vue';
 
 const open = ref(false);
 const file = ref();
+const activeTask = ref('annotation');
+
+const handleTaskSelect = (task) => {
+  activeTask.value = task;
+};
 </script>
 
 
@@ -244,16 +270,13 @@ const file = ref();
 
 .button-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
+  justify-content: flex-end;
   gap: 20px;
 }
 
 .action-button {
-  flex: 1;
   transition: all 0.3s ease;
+  width: 120px;
 }
 
 .action-button:hover {
@@ -268,5 +291,34 @@ const file = ref();
   .button-row {
     flex-direction: column;
   }
+}
+
+.dark-mode .sidebar {
+  box-shadow: 2px 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .footer {
+  box-shadow: 0 -2px 5px rgba(255, 255, 255, 0.1);
+  background-color: #3f3f3f;
+}
+
+.sidebar {
+  display: flex;
+  height: 100vh;
+  float: left;
+  flex-direction: column;
+  justify-content: center; /* 垂直居中 */
+  width: 150px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 </style>
