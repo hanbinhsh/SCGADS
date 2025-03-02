@@ -19,50 +19,76 @@
       </el-menu>
     </el-aside>
     <section class="upload-section">
+      <!-- 注释页面 -->
+      <div class="left-container">
+        <el-row :gutter="20">
+          <!-- 左侧：文件上传 -->
+          <el-col :span="14">
+            <el-card class="upload-card">
+              <el-row :gutter="20">
+                <el-col :span="activeTask === 'training' ? 8 : 12">
+                  <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
+                    <el-icon class="el-icon--upload">
+                      <UploadFilled />
+                    </el-icon>
+                    <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                    <template #tip>
+                      <div class="el-upload__tip">Upload scRNA-seq file (.h5/.h5ad/.npy)</div>
+                    </template>
+                  </el-upload>
+                </el-col>
+                <el-col :span="activeTask === 'training' ? 8 : 12">
+                  <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
+                    <el-icon class="el-icon--upload">
+                      <UploadFilled />
+                    </el-icon>
+                    <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                    <template #tip>
+                      <div class="el-upload__tip">Upload scATAC-seq file (.h5/.h5ad/.npy)</div>
+                    </template>
+                  </el-upload>
+                </el-col>
+                <el-col :span="8" v-if="activeTask === 'training'">
+                  <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
+                    <el-icon class="el-icon--upload">
+                      <UploadFilled />
+                    </el-icon>
+                    <div class="el-upload__text">
+                      Drop file here or <em>click to upload</em>
+                    </div>
+                    <template #tip>
+                      <div class="el-upload__tip">Upload Tag file (.csv/.npy)</div>
+                    </template>
+                  </el-upload>
+                </el-col>
+              </el-row>
+              <el-row justify="center" class="image-container">
+                <img src="@/assets/model.png" alt="Example" class="example-image" />
+              </el-row>
+            </el-card>
+          </el-col>
 
-      <!-- 训练页面 -->
-      <div v-if="activeTask === 'training'" class="upload-row" id="upload-row">
-        <!-- 文件上传组件 -->
-        <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
-          <el-icon class="el-icon--upload">
-            <UploadFilled />
-          </el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">upload scRNA-seq file (.h5/.h5ad/.npy)</div>
-          </template>
-        </el-upload>
+          <!-- 右侧：参数设置 -->
+          <el-col :span="10">
+            <el-card class="form-card">
+              <el-form :model="form" label-width="40%">
+                <!-- 模型选择 -->
+                <el-form-item label="Select Models">
+                  <el-select v-model="parameters.model" placeholder="Select Models" class="full-width">
+                    <el-option label="scLTH" value="scLTH" />
+                    <el-option label="scTCHCN" value="scTCHCN" />
+                    <el-option label="scMoAnno" value="scMoAnno" />
+                  </el-select>
+                </el-form-item>
 
-        <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
-          <el-icon class="el-icon--upload">
-            <UploadFilled />
-          </el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">upload scATAC-seq file (.h5/.h5ad/.npy)</div>
-          </template>
-        </el-upload>
-
-        <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
-          <el-icon class="el-icon--upload">
-            <UploadFilled />
-          </el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">upload Tag file (.csv/.npy)</div>
-          </template>
-        </el-upload>
-      </div>
-
-      <!-- 显示图像 -->
-      <div class="image-row" id="image-row">
-        <img src="@/assets/model.png" alt="Example" class="example-image" />
+                <!-- 参数输入框 -->
+                <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
+                  <el-input v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
+                </el-form-item>
+              </el-form>
+            </el-card>
+          </el-col>
+        </el-row>
       </div>
 
       <!-- 按钮行 -->
@@ -116,6 +142,29 @@ export default {
       open: false,
       showTaskNameDialog: false, // 控制任务名输入框显示状态
       taskName: "", // 存储任务名称
+      parameters: {
+        model: "scLTH", // 设置默认选中 scLTH
+        n_epochs: 96,
+        dropout: 0.05,
+        batch_size: 128,
+        patience: 8,
+        input_dim: 512,
+        num_layers: 8,
+        nhead: 16,
+        lr: 5e-4,
+        weight_decay: 5e-3
+      },
+      parameterDefaults: {
+        n_epochs: 96,
+        dropout: 0.05,
+        batch_size: 128,
+        patience: 8,
+        input_dim: 512,
+        num_layers: 8,
+        nhead: 16,
+        lr: 5e-4,
+        weight_decay: 5e-3
+      },
     };
   },
   methods: {
@@ -217,80 +266,8 @@ const handleTaskSelect = (task) => {
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  margin-top: 30px;
+  margin-top: 36px;
   gap: 20px;
-}
-
-.upload-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  gap: 20px;
-  margin-top: 40px;
-  flex-wrap: wrap;
-}
-
-.upload {
-  flex: 1;
-  border: 2px dashed #d9d9d9;
-  border-radius: 8px;
-  padding: 30px;
-  text-align: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.upload:hover {
-  border-color: #409eff;
-  background-color: #f0f9ff;
-}
-
-.dark-mode .upload:hover {
-  background-color: #333;
-}
-
-.image-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 700px;
-}
-
-.example-image {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.button-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 20px;
-}
-
-.action-button {
-  transition: all 0.3s ease;
-  width: 120px;
-}
-
-.action-button:hover {
-  transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-  .upload-row {
-    flex-direction: column;
-  }
-
-  .button-row {
-    flex-direction: column;
-  }
 }
 
 .dark-mode .sidebar {
@@ -303,6 +280,7 @@ const handleTaskSelect = (task) => {
 }
 
 .sidebar {
+  position: fixed;
   display: flex;
   height: 100vh;
   float: left;
@@ -320,5 +298,93 @@ const handleTaskSelect = (task) => {
   background-color: #fff;
   padding: 10px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 容器样式 */
+.left-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding-top: 20px;
+}
+
+/* 卡片样式 */
+.upload-card, .form-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover, .form-card:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* 上传框样式 */
+.upload {
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.upload:hover {
+  border-color: #409eff;
+  background-color: #f0f9ff;
+}
+
+.dark-mode .upload:hover {
+  background-color: #333;
+}
+
+/* 图片展示 */
+.image-container {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px;
+}
+
+.example-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮样式 */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-button {
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  transform: scale(1.05);
+}
+
+/* 全宽组件 */
+.full-width {
+  width: 100%;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .el-row {
+    flex-direction: column;
+  }
+
+  .button-row {
+    justify-content: center;
+  }
 }
 </style>
