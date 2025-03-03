@@ -67,8 +67,11 @@
                   </el-upload>
                 </el-col>
               </el-row>
+              <!-- 模型图 -->
               <el-row justify="center" class="image-container" id="image-row">
-                <img src="@/assets/model.png" alt="Example" class="example-image" />
+                <img v-if="parameters.model === 'scLTH'" src="@/assets/model_scLTH.png" alt="scLTH Model" class="example-image" />
+                <img v-else-if="parameters.model === 'scTCHCN'" src="@/assets/model_scTCHCN.png" alt="scTCHCN Model" class="example-image" />
+                <img v-else src="@/assets/model_scMoAnno.png" alt="scMoAnno Model" class="example-image" />
               </el-row>
             </el-card>
           </el-col>
