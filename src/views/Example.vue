@@ -144,7 +144,7 @@ export default {
 
       this.applySorting();
       this.updatePaginatedData();
-      initializeChart(false, true, newData, newPieces);
+      initializeChart(false, true, newData, newPieces, newLabel);
     },
     handlePageChange(page) {
       this.currentPage = page;
