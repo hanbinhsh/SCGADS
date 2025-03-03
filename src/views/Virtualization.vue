@@ -53,7 +53,7 @@ import axios from 'axios';
 import { pieces } from "@/assets/example_data/config";
 import * as echarts from 'echarts';
 export default {
-  name: "Example",
+  name: "Virtualization",
   components: {
     MainHeader,
     ElTable,

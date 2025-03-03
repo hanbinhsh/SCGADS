@@ -121,7 +121,7 @@ export default {
       this.selectedTask = task;
     },
     showCharts(taskName) {  
-      this.$router.push({ name: "Example", query: { taskName } });  
+      this.$router.push({ name: "Virtualization", query: { taskName } });  
     },
     showDetailDialog(task) {
       this.detailDialogVisible = true;

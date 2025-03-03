@@ -47,8 +47,8 @@
             <el-menu-item index="Upload" :class="{ 'is-active': activeIndex === 'Upload' }" v-if="userData.userName">
                 Upload
             </el-menu-item>
-            <el-menu-item index="Example" :class="{ 'is-active': activeIndex === 'Example' }">
-                Example
+            <el-menu-item index="Virtualization" :class="{ 'is-active': activeIndex === 'Virtualization' }">
+                Virtualization
             </el-menu-item>
             <el-menu-item index="Feedback" :class="{ 'is-active': activeIndex === 'Feedback' }"
                 v-if="userData.userName">
