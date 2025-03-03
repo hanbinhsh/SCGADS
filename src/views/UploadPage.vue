@@ -25,19 +25,24 @@
           <!-- 左侧：文件上传 -->
           <el-col :span="14">
             <el-card class="upload-card">
-              <el-row :gutter="20">
-                <el-col :span="activeTask === 'training' ? 8 : 12">
+              <el-row :gutter="20" id="upload-row">
+                <el-col :span="activeTask === 'denoising' ? 24 : activeTask === 'training' ? 8 : 12">
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
                     </el-icon>
                     <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
                     <template #tip>
-                      <div class="el-upload__tip">Upload scRNA-seq file (.h5/.h5ad/.npy)</div>
+                      <div class="el-upload__tip" v-if="activeTask === 'training' || activeTask === 'annotation' ">
+                        Upload scRNA-seq file (.h5/.h5ad/.npy)
+                      </div>
+                      <div class="el-upload__tip" v-if="activeTask === 'denoising'">
+                        Upload sc-seq file (.h5/.h5ad/.npy)
+                      </div>
                     </template>
                   </el-upload>
                 </el-col>
-                <el-col :span="activeTask === 'training' ? 8 : 12">
+                <el-col :span="activeTask === 'training' ? 8 : 12" v-if="activeTask === 'training' || activeTask === 'annotation' ">
                   <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -62,7 +67,7 @@
                   </el-upload>
                 </el-col>
               </el-row>
-              <el-row justify="center" class="image-container">
+              <el-row justify="center" class="image-container" id="image-row">
                 <img src="@/assets/model.png" alt="Example" class="example-image" />
               </el-row>
             </el-card>
@@ -70,18 +75,25 @@
 
           <!-- 右侧：参数设置 -->
           <el-col :span="10">
-            <el-card class="form-card">
-              <el-form :model="form" label-width="40%">
+            <el-card class="form-card" style="height: 70px;">
+              <el-form label-width="40%">
                 <!-- 模型选择 -->
-                <el-form-item label="Select Models">
+                <el-form-item label="Model Select">
                   <el-select v-model="parameters.model" placeholder="Select Models" class="full-width">
                     <el-option label="scLTH" value="scLTH" />
                     <el-option label="scTCHCN" value="scTCHCN" />
                     <el-option label="scMoAnno" value="scMoAnno" />
                   </el-select>
                 </el-form-item>
-
+              </el-form>
+            </el-card>
+            <el-card class="form-card">
+              <el-form label-width="40%">
                 <!-- 参数输入框 -->
+                <el-alert type="info" show-icon :closable="false" v-if="activeTask === 'annotation'">
+                  <p>Do not change the parameters if you are using the built-in models.</p>
+                </el-alert>
+                <br v-if="activeTask === 'annotation'">
                 <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
                   <el-input v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
                 </el-form-item>
@@ -317,6 +329,7 @@ const handleTaskSelect = (task) => {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  margin-bottom: 30px;
 }
 
 .upload-card:hover, .form-card:hover {

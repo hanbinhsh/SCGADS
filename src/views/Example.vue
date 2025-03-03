@@ -21,12 +21,12 @@
                 <el-col :span="12">
                   <el-table :data="paginatedData" stripe style="width: 100%;" @sort-change="handleSortChange">
                     <el-table-column prop="index" label="ID" width="70" sortable></el-table-column>
-                    <el-table-column prop="coord" label="Position" sortable>
-                      <template #default="{ row }">
-                        {{ `(${row.coord[0]}, ${row.coord[1]})` }}
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="label" label="Label" width="120" sortable></el-table-column>
+                      <el-table-column prop="coord" label="Position" sortable>
+                        <template #default="{ row }">
+                          {{ `(${row.coord[0]}, ${row.coord[1]})` }}
+                        </template>
+                      </el-table-column>
+                    <el-table-column prop="label" label="Label" width="200" sortable></el-table-column>
                   </el-table>
                   <el-pagination background layout="prev, pager, next" :total="totalItems" :page-size="pageSize"
                     :current-page="currentPage" @current-change="handlePageChange" class="page-control">
@@ -124,13 +124,14 @@ export default {
 
         const match = response3.data.match(/export const pieces = (.*?);/);
 
+        let newPieces = pieces;
+
         if (match && match[1]) {
           let piecesString = match[1].trim();
           piecesString = piecesString.replace(/'/g, '"');
           
-          let pieces = JSON.parse(piecesString);
-          console.log(pieces); // 打印出 pieces 数组
-          
+          newPieces = JSON.parse(piecesString);
+          // console.log(pieces); // 打印出 pieces 数组
         } else {
             console.error('未找到 pieces 的内容');
         }
@@ -143,7 +144,7 @@ export default {
 
       this.applySorting();
       this.updatePaginatedData();
-      initializeChart(false, true, newData, pieces);
+      initializeChart(false, true, newData, newPieces);
     },
     handlePageChange(page) {
       this.currentPage = page;

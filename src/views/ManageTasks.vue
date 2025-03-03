@@ -334,7 +334,7 @@ export default {
       this.fileList[file.name] = fileList;
       this.checkAllFilesUploaded();
     },
-    confirmUpload() {
+    async confirmUpload() {
       // 确认上传后，更新任务状态并关闭对话框
       // 检查文件是否为空或类型不正确
       const isConfigjsFileValid = this.configjsFile.length > 0 && this.configjsFile.every(file => file.name.endsWith('.js'));
@@ -350,7 +350,7 @@ export default {
       }
       if (this.canUpload) {
         this.updateTaskStatus(this.selectedTask.task_id, 2);
-        this.UploadFiles();
+        await this.UploadFiles();
         this.uploadDialogVisible = false;
         this.editDialogVisible = false; // 关闭编辑对话框
         window.location.reload()
@@ -358,10 +358,10 @@ export default {
       }
     },
     async UploadFiles() {
-      const response = await axios.post('/api/findResultByTaskName?taskName=' + this.selectedTask.task_name);
-      if (response.data.code === 1) {
-        await axios.post('/api/insertResult', { taskName: this.selectedTask.task_name });
-      }
+      //const response = await axios.post('/api/findResultByTaskName?taskName=' + this.selectedTask.task_name);
+      //if (response.data.code === 1) {
+      await axios.post('/api/insertResult', { taskName: this.selectedTask.task_name });
+      //}
       const files = [
         { file: this.configjsFile[0].raw, fileType: 'configjsFile' },
         { file: this.datajsFile[0].raw, fileType: 'datajsFile' },
