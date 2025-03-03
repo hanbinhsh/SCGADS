@@ -18,7 +18,7 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
-    <section class="upload-section">
+    <section class="fullscreen-section">
       <!-- 注释页面 -->
       <div class="left-container">
         <el-row :gutter="20">
@@ -111,7 +111,7 @@
         <div class="button-row">
           <el-button type="primary" class="action-button" @click="open = true" ref="ref3">Tutorial</el-button>
           <el-button type="warning" class="action-button" @click="handleResetClick">Reset</el-button>
-          <el-button type="success" class="action-button" id="button-row" @click="handleUploadClick">Upload</el-button>
+          <el-button type="success" class="action-button" @click="handleUploadClick">Upload</el-button>
         </div>
       </div>
     </section>
@@ -276,45 +276,6 @@ const handleTaskSelect = (task) => {
 
 
 <style scoped>
-.upload-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  margin-top: 36px;
-  gap: 20px;
-}
-
-.dark-mode .sidebar {
-  box-shadow: 2px 0 10px rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .footer {
-  box-shadow: 0 -2px 5px rgba(255, 255, 255, 0.1);
-  background-color: #3f3f3f;
-}
-
-.sidebar {
-  position: fixed;
-  display: flex;
-  height: 100vh;
-  float: left;
-  flex-direction: column;
-  justify-content: center; /* 垂直居中 */
-  width: 150px;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #fff;
-  padding: 10px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
 /* 容器样式 */
 .left-container {
   display: flex;
