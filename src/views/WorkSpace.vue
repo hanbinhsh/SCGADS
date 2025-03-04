@@ -16,8 +16,12 @@
       <el-table :data="paginatedTaskList" style="width: 100%" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
         <!-- 多选框 -->
         <el-table-column type="selection" width="55"></el-table-column>
-
-        <el-table-column prop="taskName" label="Task Name" sortable></el-table-column>
+        <el-table-column prop="taskName" label="Task Name" sortable>
+          <template #default="{ row }">
+            <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+            {{ row.taskName }}
+          </template>
+        </el-table-column>
         <el-table-column prop="startTime" label="Request Time" sortable>
           <template #default="{ row }">
             {{ formatDate(row.startTime) }}
@@ -33,8 +37,11 @@
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="200">
+        <el-table-column fixed="right" label="Operations" width="300">
           <template #default="{ row }">
+            <el-button link type="success" size="small" @click="showCharts( row.taskName )" :disabled="row.status !== 2">
+              Virtualization
+            </el-button>
             <el-button link type="primary" size="small" @click="showDetailDialog(row)">
               Detail
             </el-button>
@@ -82,7 +89,7 @@
     <span>{{ selectedTask.details }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button v-if="selectedTask.status===2" type="primary" @click="showCharts( selectedTask.taskName )">Show charts</el-button>
+        <el-button v-if="selectedTask.status===2" type="primary" @click="showCharts( selectedTask.taskName )">Virtualization</el-button>
         <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
       </div>
     </template>
@@ -116,6 +123,16 @@ export default {
     };
   },
   methods: {
+    getStatusColor(status) {
+      const colors = {
+        0: "#E6A23C",
+        1: "#409EFF",
+        2: "#67C23A",
+        3: "#F56C6C",
+        4: "#909399"
+      };
+      return colors[status] || "#909399";
+    },
     showDeleteDialog(task) {
       this.deleteDialogVisible = true;
       this.selectedTask = task;
