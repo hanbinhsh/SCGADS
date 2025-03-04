@@ -128,6 +128,7 @@ export default {
         const formData = new FormData();
         formData.append('taskName', taskName);
         formData.append('type', 'data');
+        formData.append('userNmae', 'admin');
         const response = await axios.post('/api/downloadResult', formData);
 
         let newData = response.data.replace('export const data = ', '');
