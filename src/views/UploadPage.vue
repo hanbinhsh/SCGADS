@@ -94,7 +94,7 @@
               <el-form label-width="40%">
                 <!-- 参数输入框 -->
                 <el-alert type="info" show-icon :closable="false" v-if="activeTask === 'annotation'">
-                  <p>Do not change the parameters if you are using the built-in models.</p>
+                  <p>Do not change the parameters if you are using built-in models.</p>
                 </el-alert>
                 <br v-if="activeTask === 'annotation'">
                 <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
