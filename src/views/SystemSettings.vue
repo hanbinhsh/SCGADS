@@ -12,7 +12,7 @@
             </template>
             <el-form label-width="30%">
               <el-alert type="info" show-icon :closable="false">
-                <p>Only set Auto Progress off when you have not put models online.</p>
+                <p>Only set Auto Progress off if you have not put models online.</p>
               </el-alert>
               <br>
               <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
