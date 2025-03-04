@@ -372,6 +372,7 @@ export default {
         formData.append('file', file);
         formData.append('taskName', this.selectedTask.task_name);
         formData.append('fileType', fileType);
+        formData.append('userName', this.selectedTask.user_name);
         return axios.post('/api/uploadResult', formData);
       });
       await Promise.all(uploadPromises);
