@@ -44,10 +44,10 @@ const routes = [
     meta: { title: 'Register' }
   },
   {
-    path: '/Example',
-    name: 'Example',
-    component: () => import('../views/Example.vue'),
-    meta: { title: 'Example' }
+    path: '/Virtualization',
+    name: 'Virtualization',
+    component: () => import('../views/Virtualization.vue'),
+    meta: { title: 'Virtualization' }
   },
   {
     path: '/Profile',

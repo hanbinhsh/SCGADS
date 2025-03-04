@@ -1,20 +1,38 @@
 <template>
   <el-container class="main-page">
     <MainHeader></MainHeader>
+    <!-- 侧边栏 -->
+    <el-aside class="sidebar">
+      <el-menu :default-active="activeChart" class="chart-menu" @select="handleChartSelect">
+        <el-menu-item index="tsne">
+          <el-icon><PieChart /></el-icon>
+          <span>T-SNE</span>
+        </el-menu-item>
+        <el-menu-item index="a">
+          <el-icon><Cpu /></el-icon>
+          <span>Lock</span>
+        </el-menu-item>
+        <el-menu-item index="b">
+          <el-icon><Filter /></el-icon>
+          <span>Lock</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
     <el-main class="fullscreen-section">
       <el-row type="flex" justify="center">
         <el-col :span="20">
           <el-card shadow="always">
             <template #header>
               <div slot="header" class="card-header">
-                <span>Data Visualization</span>
-                <el-button type="primary" style="float: right;" @click="download()">Download</el-button>
+                <el-text class="mx-1" size="large"></el-text>
+                <span style="color: #000000AA">Data Visualization</span>
+                <!-- <el-button type="primary" style="float: right;" @click="download()">Download</el-button> -->
               </div>
             </template>
             <div class="card-body">
               <el-row type="flex" justify="space-between">
                 <!-- 图表容器 -->
-                <el-col :span="11">
+                <el-col :span="12">
                   <div id="main" class="chart"></div>
                 </el-col>
                 <!-- 表格和分页容器 -->
@@ -26,7 +44,7 @@
                           {{ `(${row.coord[0]}, ${row.coord[1]})` }}
                         </template>
                       </el-table-column>
-                    <el-table-column prop="label" label="Label" width="200" sortable></el-table-column>
+                    <el-table-column prop="label" label="Label" width="290" sortable></el-table-column>
                   </el-table>
                   <el-pagination background layout="prev, pager, next" :total="totalItems" :page-size="pageSize"
                     :current-page="currentPage" @current-change="handlePageChange" class="page-control">
@@ -38,6 +56,14 @@
         </el-col>
       </el-row>
     </el-main>
+    <!-- 按钮行 -->
+    <div class="footer">
+        <div class="button-row">
+          <el-button type="primary" class="action-button" @click="">Download Data</el-button>
+          <el-button type="warning" class="action-button" @click="">Download Charts</el-button>
+          <el-button type="success" class="action-button" @click="">Download Report</el-button>
+        </div>
+      </div>
   </el-container>
 </template>
 
@@ -53,7 +79,7 @@ import axios from 'axios';
 import { pieces } from "@/assets/example_data/config";
 import * as echarts from 'echarts';
 export default {
-  name: "Example",
+  name: "Virtualization",
   components: {
     MainHeader,
     ElTable,
@@ -74,6 +100,7 @@ export default {
       paginatedData: [],
       taskName: this.$route.params.taskName,
       isDarkMode:false,
+      activeChart: "tsne",
     };
   },
   computed: {
@@ -101,6 +128,7 @@ export default {
         const formData = new FormData();
         formData.append('taskName', taskName);
         formData.append('type', 'data');
+        formData.append('userNmae', 'admin');
         const response = await axios.post('/api/downloadResult', formData);
 
         let newData = response.data.replace('export const data = ', '');
@@ -144,10 +172,13 @@ export default {
 
       this.applySorting();
       this.updatePaginatedData();
-      initializeChart(false, true, newData, newPieces);
+      initializeChart(false, true, newData, newPieces, newLabel);
     },
     handlePageChange(page) {
       this.currentPage = page;
+    },
+    handleTaskSelect(task) {
+      activeTask.value = task;
     },
     handleSortChange({ prop, order }) {
       this.sortProp = prop;
@@ -257,5 +288,20 @@ export default {
   bottom: 0;
   right: 0;
   position: absolute;
+}
+
+/* 按钮样式 */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-button {
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  transform: scale(1.05);
 }
 </style>
