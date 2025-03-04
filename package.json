@@ -16,6 +16,7 @@
     "echarts-stat": "^1.2.0",
     "element-plus": "^2.8.2",
     "vue": "^3.2.13",
+    "vue-cli-service": "^5.0.10",
     "vue-router": "^4.0.3",
     "vue3-puzzle-vcode": "^1.1.7"
   },
