@@ -73,6 +73,12 @@ const routes = [
     component: () => import('../views/ManageTasks.vue'),
     meta: { title: 'ManageTasks', requiresAuth:true, requiresLogin:true }
   },
+  {
+    path: '/SystemSettings',
+    name: 'SystemSettings',
+    component: () => import('../views/SystemSettings.vue'),
+    meta: { title: 'SystemSettings', requiresAuth:true, requiresLogin:true }
+  },
 ]
 
 const router = createRouter({
