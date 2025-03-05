@@ -442,7 +442,11 @@ export default {
     },
     async autoProgress(){
       try {
-        await axios.post("/api/progress?taskName=" + this.selectedTask.task_name)
+        const params = new URLSearchParams();
+        params.append('type', this.selectedTask.type);
+        params.append('userName', this.selectedTask.user_name);
+        params.append('taskName', this.selectedTask.task_name);
+        await axios.post("/api/tsneProgress", params)
       } catch (error) {
         console.error("Progress failed:", error);
       }
