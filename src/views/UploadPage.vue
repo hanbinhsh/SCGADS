@@ -26,7 +26,7 @@
           <el-col :span="14">
             <el-card class="upload-card">
               <el-row :gutter="20" id="upload-row">
-                <el-col :span="(activeTask === 'denoising' || selectedModel.modelType !== 'multi') ? 24 : activeTask === 'training' ? 8 : 12">
+                <el-col :span="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation') ) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12">
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -55,7 +55,7 @@
                   </el-upload>
                 </el-col>
 
-                <el-col :span="8" v-if="activeTask === 'training'">
+                <el-col :span="selectedModel.modelType !== 'multi'? 12 : 8" v-if="activeTask === 'training'">
                   <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />

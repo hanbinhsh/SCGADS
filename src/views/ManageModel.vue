@@ -47,7 +47,7 @@
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
-      <span>Model <strong style="color: #e74c3c;">{{ selectedData.subject }}</strong> will be deleted</span>
+      <span>Model <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong> will be deleted</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
@@ -71,12 +71,45 @@
       </template>
     </el-dialog>
 
+    <!-- 编辑对话框 -->
+    <el-dialog v-model="editDialogVisible" title="Edit" width="500" align-center>
+      <el-form>
+        <!-- 输入框 -->
+        <el-form :model="selectedData" label-width="150px" label-position="left">
+          <el-form-item label="Model Name" class="form-item">
+            <el-input v-model="selectedData.modelName" class="form-input"></el-input>
+          </el-form-item>
+          <el-form-item label="Model Type" class="form-item">
+            <el-input v-model="selectedData.modelType" class="form-input"></el-input>
+          </el-form-item>
+          <el-form-item label="Model Path" class="form-item">
+            <el-input v-model="selectedData.modelPath" class="form-input"></el-input>
+          </el-form-item>
+          <el-form-item label="Predict File Path" class="form-item">
+            <el-input v-model="selectedData.predictFilePath" class="form-input"></el-input>
+          </el-form-item>
+          <el-form-item label="Train File Path" class="form-item">
+            <el-input v-model="selectedData.trainFilePath" class="form-input"></el-input>
+          </el-form-item>
+          <el-form-item label="Figure Path" class="form-item">
+            <el-input v-model="selectedData.figurePath" class="form-input"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="" @click="editDialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="parametersDialogSave()">Save</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 详情对话框 -->
     <el-dialog v-model="parametersDialogVisible" title="Parameters" width="500" align-center>
-      <el-form label-width="40%">
+      <el-form label-width="150px" label-position="left">
         <!-- 参数输入框 -->
         <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
-          <el-input v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
+          <el-input v-model.number="parameters[key]" :placeholder="value.toString()"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -105,6 +138,7 @@ export default {
       listData: [],
       paginatedListData: [], // 当前页的反馈数据
       deleteDialogVisible: false,
+      editDialogVisible: false,
       batchDeleteDialogVisible: false,
       parametersDialogVisible: false,
       selectedData: {},
@@ -118,10 +152,6 @@ export default {
     };
   },
   methods: {
-    showDeleteDialog(data) {
-      this.deleteDialogVisible = true;
-      this.selectedData = data;
-    },
     parametersDialogSave(){
       // TODO
     },
@@ -130,6 +160,14 @@ export default {
     },
     showBatchDeleteDialog() {
       this.batchDeleteDialogVisible = true;
+    },
+    showDeleteDialog(data) {
+      this.deleteDialogVisible = true;
+      this.selectedData = data;
+    },
+    showEditDialog(data) {
+      this.editDialogVisible = true;
+      this.selectedData = data;
     },
     showParametersDialog(data) {
       const paramObj = {};
