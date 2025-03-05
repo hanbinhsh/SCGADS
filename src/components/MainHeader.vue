@@ -29,15 +29,19 @@
                 </template>
                 <el-menu-item index="ManageUser" :class="{ 'is-active': activeIndex === 'ManageUser' }"
                     v-if="userData?.isAdmin">
-                    ManageUsers
+                    Manage Users
                 </el-menu-item>
                 <el-menu-item index="ManageTasks" :class="{ 'is-active': activeIndex === 'ManageTasks' }"
                     v-if="userData?.isAdmin">
-                    ManageTasks
+                    Manage Tasks
                 </el-menu-item>
                 <el-menu-item index="ManageFeedback" :class="{ 'is-active': activeIndex === 'ManageFeedback' }"
                     v-if="userData.userName && userData.isAdmin">
-                    ManageFeedbacks
+                    Manage Feedbacks
+                </el-menu-item>
+                <el-menu-item index="SystemSettings" :class="{ 'is-active': activeIndex === 'SystemSettings' }"
+                    v-if="userData.userName && userData.isAdmin">
+                    System Settings
                 </el-menu-item>
             </el-sub-menu>
             <el-menu-item index="WorkSpace" :class="{ 'is-active': activeIndex === 'WorkSpace' }" id="WorkSpase"
