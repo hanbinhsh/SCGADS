@@ -5,15 +5,15 @@
     <el-aside class="sidebar">
       <el-menu :default-active="activeChart" class="chart-menu" @select="handleChartSelect">
         <el-menu-item index="tsne">
-          <el-icon><PieChart /></el-icon>
+          <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
           <span>T-SNE</span>
         </el-menu-item>
         <el-menu-item index="a">
-          <el-icon><Cpu /></el-icon>
+          <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>Lock</span>
         </el-menu-item>
         <el-menu-item index="b">
-          <el-icon><Filter /></el-icon>
+          <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>Lock</span>
         </el-menu-item>
       </el-menu>
@@ -25,7 +25,7 @@
             <template #header>
               <div slot="header" class="card-header">
                 <el-text class="mx-1" size="large"></el-text>
-                <span style="color: #000000AA">Data Visualization</span>
+                <span class="page-name">Data Visualization</span>
                 <!-- <el-button type="primary" style="float: right;" @click="download()">Download</el-button> -->
               </div>
             </template>
@@ -58,12 +58,29 @@
     </el-main>
     <!-- 按钮行 -->
     <div class="footer">
-        <div class="button-row">
-          <el-button type="primary" class="action-button" @click="">Download Data</el-button>
-          <el-button type="warning" class="action-button" @click="">Download Charts</el-button>
-          <el-button type="success" class="action-button" @click="">Download Report</el-button>
-        </div>
+      <div class="download-setting">
+        <el-button type="info" class="action-button" @click="settingVisible = true">Settings</el-button>
       </div>
+      <div class="button-row">
+        <el-button type="primary" class="action-button" @click="">Download Data</el-button>
+        <el-button type="warning" class="action-button" @click="download()">Download Charts</el-button>
+        <el-button type="success" class="action-button" @click="">Download Report</el-button>
+      </div>
+    </div>
+
+    <!-- 下载设置对话框 -->
+    <el-dialog v-model="settingVisible" title="Download Settings" width="500" align-center>
+      <el-form :model="selectedUser" label-width="200px" label-position="left">
+        <el-form-item label="Chart Magnify Ratio" class="form-item">
+          <el-input-number v-model="magnifyRatio" :precision="2" :step="0.5" :max="10" :min="0" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="settingVisible = false">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -103,6 +120,8 @@ export default {
       activeChart: "tsne",
       loading:false,
       userData: JSON.parse(sessionStorage.getItem('userData')) || {},
+      magnifyRatio: 1,
+      settingVisible: false,
     };
   },
   computed: {
@@ -217,7 +236,7 @@ export default {
       var img = new Image();
       img.src = myChart1.getDataURL({
         type: "png",
-        pixelRatio: 1, //放大2倍
+        pixelRatio: this.magnifyRatio, //放大2倍
         backgroundColor: "#fff",
       });
       img.onload = function () {
@@ -298,6 +317,11 @@ export default {
 .button-row {
   display: flex;
   justify-content: flex-end;
+}
+
+.download-setting{
+  display: flex;
+  float: left;
 }
 
 .action-button {
