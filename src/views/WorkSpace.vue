@@ -159,7 +159,7 @@ export default {
     },
     async deleteTask() {
       try {
-        await axios.get("/api/deleteTaskByID?taskID=" + this.selectedTask.taskId);
+        await axios.get("/api/deleteTaskByTaskName?taskName=" + this.selectedTask.taskName);
         ElMessage.success("Delete success.");
         this.fetchTaskList();
       } catch (error) {
@@ -170,14 +170,14 @@ export default {
     async confirmBatchDelete() {
       this.batchDeleteDialogVisible = false;
       for (const task of this.selectedTasks) {
-        await this.deleteTaskByID(task.taskId);
+        await this.deleteTaskByTaskName(task.taskName);
       }
       ElMessage.success("Batch delete completed.");
       this.fetchTaskList();
     },
-    async deleteTaskByID(taskId) {
+    async deleteTaskByTaskName(taskId) {
       try {
-        await axios.get("/api/deleteTaskByID?taskID=" + taskId);
+        await axios.get("/api/deleteTaskByTaskName?taskID=" + taskId);
       } catch (error) {
         console.error("Delete failed:", error);
       }
