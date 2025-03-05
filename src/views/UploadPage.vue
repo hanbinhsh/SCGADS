@@ -69,9 +69,7 @@
               </el-row>
               <!-- 模型图 -->
               <el-row justify="center" class="image-container" id="image-row">
-                <img v-if="parameters.model === 'scLTH'" src="@/assets/model_scLTH.png" alt="scLTH Model" class="example-image" />
-                <img v-else-if="parameters.model === 'scTCHCN'" src="@/assets/model_scTCHCN.png" alt="scTCHCN Model" class="example-image" />
-                <img v-else src="@/assets/model_scMoAnno.png" alt="scMoAnno Model" class="example-image" />
+                <img :src="figure" alt="Model" class="example-image" />
               </el-row>
             </el-card>
           </el-col>
@@ -82,10 +80,8 @@
               <el-form label-width="40%">
                 <!-- 模型选择 -->
                 <el-form-item label="Model Select">
-                  <el-select v-model="parameters.model" placeholder="Select Models" class="full-width">
-                    <el-option label="scLTH" value="scLTH" />
-                    <el-option label="scTCHCN" value="scTCHCN" />
-                    <el-option label="scMoAnno" value="scMoAnno" />
+                  <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
+                    <el-option v-for="model in models" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
                   </el-select>
                 </el-form-item>
               </el-form>
@@ -149,6 +145,9 @@ export default {
   components: {
     MainHeader,
   },
+  mounted() {
+    this.fetchModels()
+  },
   data() {
     return {
       scRNASeqFile: [], // 存储 scRNA-seq 文件的数组  
@@ -157,32 +156,41 @@ export default {
       open: false,
       showTaskNameDialog: false, // 控制任务名输入框显示状态
       taskName: "", // 存储任务名称
-      parameters: {
-        model: "scLTH", // 设置默认选中 scLTH
-        n_epochs: 96,
-        dropout: 0.05,
-        batch_size: 128,
-        patience: 8,
-        input_dim: 512,
-        num_layers: 8,
-        nhead: 16,
-        lr: 5e-4,
-        weight_decay: 5e-3
-      },
-      parameterDefaults: {
-        n_epochs: 96,
-        dropout: 0.05,
-        batch_size: 128,
-        patience: 8,
-        input_dim: 512,
-        num_layers: 8,
-        nhead: 16,
-        lr: 5e-4,
-        weight_decay: 5e-3
-      },
+      models: [],  // 存储数据库中的模型数据
+      figure: '', // 选中的模型图片
+      parameters: {}, // 选中的模型参数
+      parameterDefaults: {}, // 默认参数
     };
   },
   methods: {
+    async fetchModels() {
+      try {
+        const response = await axios.get('/api/models/list'); // 调用后端API
+        this.models = response.data;
+
+        // 设置默认选中的模型
+        if (this.models.length > 0) {
+          this.selectModel(this.models[0].modelName);
+        }
+      } catch (error) {
+        console.error("Failed to fetch models:", error);
+      }
+    },
+    selectModel(modelName) {
+      const selectedModel = this.models.find(m => m.modelName === modelName);
+      if (selectedModel) {
+        // 解析 defaultParameters 字符串
+        const paramObj = {};
+        selectedModel.defaultParameters.split(',').forEach(param => {
+          const [key, value] = param.split(':');
+          paramObj[key.trim()] = isNaN(value) ? value.trim() : parseFloat(value);
+        });
+        const base64Image = `data:image/png;base64,${selectedModel.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
+        this.figure = base64Image;
+        this.parameters = { model: modelName, ...paramObj };
+        this.parameterDefaults = paramObj;
+      }
+    },
     handleResetClick() {
       this.tagFile = [];
       this.scATACSeqFile = [];
