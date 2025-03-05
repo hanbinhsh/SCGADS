@@ -26,7 +26,7 @@
           <el-col :span="14">
             <el-card class="upload-card">
               <el-row :gutter="20" id="upload-row">
-                <el-col :span="activeTask === 'denoising' ? 24 : activeTask === 'training' ? 8 : 12">
+                <el-col :span="(activeTask === 'denoising' || selectedModel.modelType !== 'multi') ? 24 : activeTask === 'training' ? 8 : 12">
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -42,7 +42,8 @@
                     </template>
                   </el-upload>
                 </el-col>
-                <el-col :span="activeTask === 'training' ? 8 : 12" v-if="activeTask === 'training' || activeTask === 'annotation' ">
+
+                <el-col :span="activeTask ===  'training' ? 8 : 12" v-if="selectedModel.modelType === 'multi' && (activeTask === 'training' || activeTask === 'annotation')">
                   <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -53,6 +54,7 @@
                     </template>
                   </el-upload>
                 </el-col>
+
                 <el-col :span="8" v-if="activeTask === 'training'">
                   <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
@@ -160,6 +162,7 @@ export default {
       figure: '', // 选中的模型图片
       parameters: {}, // 选中的模型参数
       parameterDefaults: {}, // 默认参数
+      selectedModel: '',
     };
   },
   methods: {
@@ -176,8 +179,10 @@ export default {
         console.error("Failed to fetch models:", error);
       }
     },
-    selectModel(modelName) {
+    async selectModel(modelName) {
       const selectedModel = this.models.find(m => m.modelName === modelName);
+      this.selectedModel = selectedModel;
+      console.log(this.selectedModel)
       if (selectedModel) {
         // 解析 defaultParameters 字符串
         const paramObj = {};
