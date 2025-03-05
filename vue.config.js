@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+
 module.exports = defineConfig({
   transpileDependencies: true,
   // 设置在保存文件时禁用ESLint自动检查
@@ -24,5 +25,7 @@ module.exports = defineConfig({
         pathRewrite: { '^/api': '' },
       }
     }
-  }
+  },
+
+  publicPath: 'production'? './': './',
 })
