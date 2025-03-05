@@ -47,7 +47,7 @@
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
-      <span>Feedback <strong style="color: #e74c3c;">{{ selectedData.subject }}</strong> will be deleted</span>
+      <span>Model <strong style="color: #e74c3c;">{{ selectedData.subject }}</strong> will be deleted</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
@@ -60,7 +60,7 @@
 
     <!-- 批量删除确认对话框 -->
     <el-dialog v-model="batchDeleteDialogVisible" title="Batch Delete Confirmation" width="500" align-center>
-      <span>Are you sure you want to delete the selected feedbacks?</span>
+      <span>Are you sure you want to delete the selected models?</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
