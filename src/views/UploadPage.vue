@@ -241,6 +241,7 @@ export default {
     async UploadFiles() {
       const userId = JSON.parse(sessionStorage.getItem('userData')).userId;
       const response = await axios.post('/api/insertTask', { taskName: this.taskName, userId });
+      console.log(response);
 
       if (response.data.code === 1) {
         await axios.post('/api/insertFile', { taskName: this.taskName });
@@ -252,11 +253,28 @@ export default {
         ];
 
         const uploadPromises = files.map(({ file, fileType }) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('taskName', this.taskName);
-          formData.append('fileType', fileType);
-          return axios.post('/api/uploadOneFile', formData);
+          const taskName = this.taskName;
+          // 获取文件的ArrayBuffer并计算MD5
+          const fileReader = new FileReader();
+          const spark = new SparkMD5.ArrayBuffer();
+          // 获取文件二进制数据
+          fileReader.readAsArrayBuffer(file);
+          fileReader.onload = async e =>{
+          spark.append(e.target.result);
+            const hash = spark.end();
+            console.log(hash,"文件哈希值");
+            console.log(this.taskName,"任务名称");
+            const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
+            console.log(response);
+            if (response.data.code === 1){
+              const formData = new FormData();
+              formData.append('file', file);
+              formData.append('taskName', taskName);
+              formData.append('fileType', fileType);
+              formData.append('hash', hash);
+              return axios.post('/api/uploadOneFile', formData);
+            }
+          };
         });
 
         await Promise.all(uploadPromises);
@@ -276,6 +294,7 @@ export default {
 <script setup>
 import { UploadFilled } from "@element-plus/icons-vue";
 import { ref } from 'vue';
+import SparkMD5 from "spark-md5";
 
 const open = ref(false);
 const file = ref();
