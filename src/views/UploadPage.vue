@@ -168,7 +168,7 @@ export default {
   methods: {
     async fetchModels() {
       try {
-        const response = await axios.get('/api/models/list'); // 调用后端API
+        const response = await axios.get('/api/models/findAllModels'); // 调用后端API
         this.models = response.data;
 
         // 设置默认选中的模型
@@ -182,7 +182,6 @@ export default {
     async selectModel(modelName) {
       const selectedModel = this.models.find(m => m.modelName === modelName);
       this.selectedModel = selectedModel;
-      console.log(this.selectedModel)
       if (selectedModel) {
         // 解析 defaultParameters 字符串
         const paramObj = {};
