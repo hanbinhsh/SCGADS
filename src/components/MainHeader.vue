@@ -39,6 +39,10 @@
                     v-if="userData.userName && userData.isAdmin">
                     Manage Feedbacks
                 </el-menu-item>
+                <el-menu-item index="ManageModel" :class="{ 'is-active': activeIndex === 'ManageModel' }"
+                    v-if="userData.userName && userData.isAdmin">
+                    Manage Model
+                </el-menu-item>
                 <el-menu-item index="SystemSettings" :class="{ 'is-active': activeIndex === 'SystemSettings' }"
                     v-if="userData.userName && userData.isAdmin">
                     System Settings

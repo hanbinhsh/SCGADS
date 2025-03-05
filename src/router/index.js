@@ -74,6 +74,12 @@ const routes = [
     meta: { title: 'ManageTasks', requiresAuth:true, requiresLogin:true }
   },
   {
+    path: '/ManageModel',
+    name: 'ManageModel',
+    component: () => import('../views/ManageModel.vue'),
+    meta: { title: 'ManageModel', requiresAuth:true, requiresLogin:true }
+  },
+  {
     path: '/SystemSettings',
     name: 'SystemSettings',
     component: () => import('../views/SystemSettings.vue'),
