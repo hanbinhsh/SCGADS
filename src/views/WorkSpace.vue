@@ -13,7 +13,11 @@
       </div>
 
       <!-- 任务列表表格 -->
-      <el-table :data="paginatedTaskList" style="width: 100%" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+      <el-table :data="paginatedTaskList" 
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+        v-loading="loading">
         <!-- 多选框 -->
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="taskName" label="Task Name" sortable>
@@ -126,6 +130,7 @@ export default {
       pageSize: 10, // 每页显示条数
       sortOrder: '', // 当前排序方向
       sortProp: '', // 当前排序属性
+      loading:false,
     };
   },
   methods: {
@@ -184,6 +189,7 @@ export default {
     },
     async fetchTaskList() {
       try {
+        this.loading = true;
         const response = await axios.get("/api/findTasksByUserID?userID=" + this.userData.userId);
         if (response.data.code === 200) {
           this.taskList = response.data.data;
@@ -191,6 +197,7 @@ export default {
         } else {
           console.error("Failed to fetch task list:", response.data.msg);
         }
+        this.loading = false;
       } catch (error) {
         console.error("Failed to fetch task list:", error);
       }

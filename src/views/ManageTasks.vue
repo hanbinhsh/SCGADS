@@ -21,8 +21,11 @@
       </div>
 
       <!-- 任务列表表格 -->
-      <el-table :data="paginatedTaskList" style="width: 100%" @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange">
+      <el-table :data="paginatedTaskList" 
+        style="width: 100%" 
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+        v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
 
@@ -268,7 +271,6 @@ export default {
   },
   data() {
     return {
-
       uploadDialogVisible: false, // 新增状态，用于控制文件上传对话框的显示
       configjsFile: [],
       datajsFile: [],
@@ -292,6 +294,7 @@ export default {
       sortProp: '', // 当前排序属性
       sortOrder: '', // 当前排序顺序
       defaultAvatar: logo,
+      loading:false,
     };
   },
   methods: {
@@ -566,6 +569,7 @@ export default {
     },
     async fetchTaskList() {
       try {
+        this.loading = true;
         const response = await axios.get("/api/findAllTasksWithUserInformation");
         if (response.data.code === 200) {
           const dataObject = response.data.data;
@@ -574,6 +578,7 @@ export default {
         } else {
           console.error("Failed to fetch task list:", response.data.msg);
         }
+        this.loading = false;
       } catch (error) {
         console.error("Failed to fetch task list:", error);
       }

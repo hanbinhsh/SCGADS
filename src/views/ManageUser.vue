@@ -15,8 +15,11 @@
       </div>
 
       <!-- 用户列表表格 -->
-      <el-table :data="paginatedUserList" style="width: 100%" @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange">
+      <el-table :data="paginatedUserList"
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+        v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
         <!-- 用户头像列 -->
@@ -133,6 +136,7 @@ export default {
       sortProp: '', // 当前排序属性
       sortOrder: '', // 当前排序方向
       defaultAvatar: logo,
+      loading:false,
     };
   },
   methods: {
@@ -218,6 +222,7 @@ export default {
     // 获取用户数据
     async fetchUserList() {
       try {
+        this.loading = true;
         const response = await axios.get("/api/findUsers");
         if (response.data.code === 200) {
           this.userList = response.data.data;
@@ -225,6 +230,7 @@ export default {
         } else {
           console.error("Failed to fetch user list:", response.data.msg);
         }
+        this.loading = false;
       } catch (error) {
         console.error("Failed to fetch user list:", error);
       }

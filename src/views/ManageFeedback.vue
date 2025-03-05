@@ -17,6 +17,7 @@
         style="width: 100%"
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
+        v-loading="loading"
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
@@ -112,6 +113,7 @@ export default {
       pageSize: 10,
       sortProp: '',
       sortOrder: '',
+      loading:false,
     };
   },
   methods: {
@@ -166,6 +168,7 @@ export default {
     },
     async fetchFeedbacks() {
       try {
+        this.loading = true;
         const response = await axios.get('/api/findAllFeedbackWithUserInformation');
         if (response.data.code === 200) {
           const dataObject = response.data.data;
@@ -174,6 +177,7 @@ export default {
         } else {
           console.error('Failed to fetch feedbacks:', response.data.msg);
         }
+        this.loading = false;
       } catch (error) {
         console.error('Failed to fetch feedbacks:', error);
       }

@@ -21,7 +21,7 @@
     <el-main class="fullscreen-section">
       <el-row type="flex" justify="center">
         <el-col :span="20">
-          <el-card shadow="always">
+          <el-card shadow="always" v-loading="loading">
             <template #header>
               <div slot="header" class="card-header">
                 <el-text class="mx-1" size="large"></el-text>
@@ -101,6 +101,8 @@ export default {
       taskName: this.$route.params.taskName,
       isDarkMode:false,
       activeChart: "tsne",
+      loading:false,
+      userData: JSON.parse(sessionStorage.getItem('userData')) || {},
     };
   },
   computed: {
@@ -124,11 +126,10 @@ export default {
   },
   methods: {
     async downloadResult(taskName) {
-
         const formData = new FormData();
         formData.append('taskName', taskName);
         formData.append('type', 'data');
-        formData.append('userNmae', 'admin');
+        formData.append('userName', this.userData.userName);
         const response = await axios.post('/api/downloadResult', formData);
 
         let newData = response.data.replace('export const data = ', '');
@@ -138,6 +139,7 @@ export default {
         const formData2 = new FormData();
         formData2.append('taskName', taskName);
         formData2.append('type', 'label');
+        formData2.append('userName', this.userData.userName);
         const response2 = await axios.post('/api/downloadResult', formData2);
 
         let newLabel = response2.data.replace('export const labels = ', '');
@@ -148,6 +150,7 @@ export default {
         const formData3 = new FormData();
         formData3.append('taskName', taskName);
         formData3.append('type', 'config');
+        formData3.append('userName', this.userData.userName);
         const response3 = await axios.post('/api/downloadResult', formData3);
 
         const match = response3.data.match(/export const pieces = (.*?);/);
@@ -185,6 +188,7 @@ export default {
       this.sortOrder = order;
     },
     applySorting() {
+      this.loading = true;
       if (this.sortProp && this.sortOrder) {
         this.tableData.sort((a, b) => {
           const valueA = a[this.sortProp];
@@ -199,6 +203,7 @@ export default {
         });
       }
       this.updatePaginatedData();
+      this.loading = false;
     },
     updatePaginatedData() {
       const start = (this.currentPage - 1) * this.pageSize;
@@ -243,7 +248,6 @@ export default {
   },
   mounted() {
     this.applySorting();
-    this.updatePaginatedData();
     this.isDarkMode = JSON.parse(localStorage.getItem('isDarkMode')) || false;
     // BUG
     initializeChart(false, false);

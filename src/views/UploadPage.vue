@@ -18,7 +18,7 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
-    <section class="fullscreen-section">
+    <section class="fullscreen-section" v-loading="loading">
       <!-- 注释页面 -->
       <div class="left-container">
         <el-row :gutter="20">
@@ -163,11 +163,13 @@ export default {
       parameters: {}, // 选中的模型参数
       parameterDefaults: {}, // 默认参数
       selectedModel: '',
+      loading:false,
     };
   },
   methods: {
     async fetchModels() {
       try {
+        this.loading = true;
         const response = await axios.get('/api/models/findAllModels'); // 调用后端API
         this.models = response.data;
 
@@ -175,6 +177,7 @@ export default {
         if (this.models.length > 0) {
           this.selectModel(this.models[0].modelName);
         }
+        this.loading = false;
       } catch (error) {
         console.error("Failed to fetch models:", error);
       }
@@ -241,7 +244,6 @@ export default {
     async UploadFiles() {
       const userId = JSON.parse(sessionStorage.getItem('userData')).userId;
       const response = await axios.post('/api/insertTask', { taskName: this.taskName, userId });
-      console.log(response);
 
       if (response.data.code === 1) {
         await axios.post('/api/insertFile', { taskName: this.taskName });
@@ -262,10 +264,7 @@ export default {
           fileReader.onload = async e =>{
           spark.append(e.target.result);
             const hash = spark.end();
-            console.log(hash,"文件哈希值");
-            console.log(this.taskName,"任务名称");
             const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
-            console.log(response);
             if (response.data.code === 1){
               const formData = new FormData();
               formData.append('file', file);

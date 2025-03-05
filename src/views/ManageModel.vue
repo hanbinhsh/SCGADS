@@ -17,6 +17,7 @@
         style="width: 100%"
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
+        v-loading="loading"
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
@@ -149,6 +150,7 @@ export default {
       sortOrder: '',
       parameters: {}, // 选中的模型参数
       parameterDefaults: {}, // 默认参数
+      loading:false,
     };
   },
   methods: {
@@ -220,9 +222,11 @@ export default {
     },
     async fetchFeedbacks() {
       try {
+        this.loading = true;
         const response = await axios.get('/api/models/findAllModels'); // 调用后端API
         this.listData = response.data;
         this.applySorting();
+        this.loading = false;
       } catch (error) {
         console.error('Failed to fetch models:', error);
       }
