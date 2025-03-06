@@ -106,13 +106,6 @@
     height: auto;
 }
 
-/* 添加批量操作按钮的样式 */
-.batch-actions {
-    margin-bottom: 15px;
-    display: flex;
-    gap: 10px;
-}
-
 /* 分页组件样式 */
 .pagination {
     z-index: 100;
@@ -173,4 +166,44 @@
   padding: 10px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   z-index: 2;
+}
+
+/* 按钮样式 */
+.footer-button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer-action-button {
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.footer-action-button:hover {
+  transform: scale(1.05);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .el-row {
+    flex-direction: column;
+  }
+
+  .footer-button-row {
+    justify-content: center;
+  }
+}
+
+.bottom-left-setting{
+  display: flex;
+  float: left;
+}
+
+.bottom-left-action-button {
+  width: 120px;
+  transition: all 0.3s ease;
+}
+
+.bottom-left-action-button:hover {
+  transform: scale(1.05);
 }

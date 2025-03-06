@@ -4,16 +4,6 @@
     <section class="fullscreen-section">
       <h1 class="page-name">Manage Users</h1>
       <el-divider />
-      <!-- 批量删除按钮 -->
-      <div class="batch-actions">
-        <el-button type="success" @click="fetchUserList">
-          Refresh
-        </el-button>
-        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedUsers.length === 0">
-          Batch Delete
-        </el-button>
-      </div>
-
       <!-- 用户列表表格 -->
       <el-table :data="paginatedUserList"
         style="width: 100%"
@@ -56,6 +46,18 @@
         layout="total, sizes, prev, pager, next, jumper" :total="userList.length">
       </el-pagination>
     </section>
+
+    <!-- 按钮行 -->
+    <div class="footer">
+      <div class="footer-button-row">
+        <el-button type="success" @click="fetchUserList">
+        Refresh
+      </el-button>
+      <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedUsers.length === 0">
+        Batch Delete
+      </el-button>
+      </div>
+    </div>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>

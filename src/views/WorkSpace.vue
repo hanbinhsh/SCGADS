@@ -2,16 +2,6 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <section class="fullscreen-section">
-      <!-- 批量操作按钮 -->
-      <div class="batch-actions">
-        <el-button type="success" @click="fetchTaskList">
-          Refresh
-        </el-button>
-        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-          Batch Delete
-        </el-button>
-      </div>
-
       <!-- 任务列表表格 -->
       <el-table :data="paginatedTaskList" 
         style="width: 100%"
@@ -65,9 +55,20 @@
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="taskList.length"></el-pagination>
-
     </section>
   </div>
+
+  <!-- 按钮行 -->
+  <div class="footer">
+      <div class="footer-button-row">
+        <el-button type="success" @click="fetchTaskList">
+          Refresh
+        </el-button>
+        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
+          Batch Delete
+        </el-button>
+      </div>
+    </div>
 
   <!-- 批量删除确认对话框 -->
   <el-dialog v-model="batchDeleteDialogVisible" title="Warning" width="500">

@@ -58,13 +58,13 @@
     </el-main>
     <!-- 按钮行 -->
     <div class="footer">
-      <div class="download-setting">
-        <el-button type="info" class="action-button" @click="settingVisible = true">Settings</el-button>
+      <div class="bottom-left-setting">
+        <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">Settings</el-button>
       </div>
-      <div class="button-row">
-        <el-button type="primary" class="action-button" @click="">Download Data</el-button>
-        <el-button type="warning" class="action-button" @click="download()">Download Charts</el-button>
-        <el-button type="success" class="action-button" @click="">Download Report</el-button>
+      <div class="footer-button-row">
+        <el-button type="primary" class="footer-action-button" @click="">Download Data</el-button>
+        <el-button type="warning" class="footer-action-button" @click="download()">Download Charts</el-button>
+        <el-button type="success" class="footer-action-button" @click="">Download Report</el-button>
       </div>
     </div>
 
@@ -311,25 +311,5 @@ export default {
   bottom: 0;
   right: 0;
   position: absolute;
-}
-
-/* 按钮样式 */
-.button-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.download-setting{
-  display: flex;
-  float: left;
-}
-
-.action-button {
-  width: 120px;
-  transition: all 0.3s ease;
-}
-
-.action-button:hover {
-  transform: scale(1.05);
 }
 </style>

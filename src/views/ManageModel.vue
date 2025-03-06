@@ -4,14 +4,6 @@
     <section class="fullscreen-section">
       <h1 class="page-name">Manage Model</h1>
       <el-divider />
-      <div class="batch-actions">
-        <el-button type="success" @click="fetchFeedbacks">
-          Refresh
-        </el-button>
-        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedDatas.length === 0">
-          Batch Delete
-        </el-button>
-      </div>
       <el-table 
         :data="paginatedListData" 
         style="width: 100%"
@@ -45,6 +37,18 @@
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="listData.length"></el-pagination>
     </section>
+
+    <!-- 按钮行 -->
+    <div class="footer">
+      <div class="footer-button-row">
+        <el-button type="success" @click="fetchFeedbacks">
+          Refresh
+        </el-button>
+        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedDatas.length === 0">
+          Batch Delete
+        </el-button>
+      </div>
+    </div>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>

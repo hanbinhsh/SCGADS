@@ -106,10 +106,10 @@
 
       <!-- 按钮行 -->
       <div class="footer">
-        <div class="button-row">
-          <el-button type="primary" class="action-button" @click="open = true" ref="ref3">Tutorial</el-button>
-          <el-button type="warning" class="action-button" @click="handleResetClick">Reset</el-button>
-          <el-button type="success" class="action-button" @click="handleUploadClick">Upload</el-button>
+        <div class="footer-button-row">
+          <el-button type="primary" class="footer-action-button" @click="open = true" ref="ref3">Tutorial</el-button>
+          <el-button type="warning" class="footer-action-button" @click="handleResetClick">Reset</el-button>
+          <el-button type="success" class="footer-action-button" @click="handleUploadClick">Upload</el-button>
         </div>
       </div>
     </section>
@@ -364,34 +364,8 @@ const handleTaskSelect = (task) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* 按钮样式 */
-.button-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.action-button {
-  width: 120px;
-  transition: all 0.3s ease;
-}
-
-.action-button:hover {
-  transform: scale(1.05);
-}
-
 /* 全宽组件 */
 .full-width {
   width: 100%;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .el-row {
-    flex-direction: column;
-  }
-
-  .button-row {
-    justify-content: center;
-  }
 }
 </style>

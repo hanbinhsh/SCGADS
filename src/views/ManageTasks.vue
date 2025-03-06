@@ -4,22 +4,6 @@
     <section class="fullscreen-section">
       <h1 class="page-name">Manage Tasks</h1>
       <el-divider />
-      <!-- 批量操作按钮 -->
-      <div class="batch-actions">
-        <el-button type="success" @click="fetchTaskList">
-          Refresh
-        </el-button>
-        <el-button type="primary" @click="showBatchEditDialog" :disabled="selectedTasks.length === 0">
-          Batch Edit
-        </el-button>
-        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-          Batch Delete
-        </el-button>
-        <el-button type="success" @click="showBatchDownloadDialog" :disabled="selectedTasks.length === 0">
-          Batch Download
-        </el-button>
-      </div>
-
       <!-- 任务列表表格 -->
       <el-table :data="paginatedTaskList" 
         style="width: 100%" 
@@ -92,6 +76,24 @@
         layout="total, sizes, prev, pager, next, jumper" :total="taskList.length">
       </el-pagination>
     </section>
+
+    <!-- 按钮行 -->
+    <div class="footer">
+      <div class="footer-button-row">
+        <el-button type="success" @click="fetchTaskList">
+          Refresh
+        </el-button>
+        <el-button type="primary" @click="showBatchEditDialog" :disabled="selectedTasks.length === 0">
+          Batch Edit
+        </el-button>
+        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
+          Batch Delete
+        </el-button>
+        <el-button type="success" @click="showBatchDownloadDialog" :disabled="selectedTasks.length === 0">
+          Batch Download
+        </el-button>
+      </div>
+    </div>
 
     <!-- 自动处理对话框 -->
     <el-dialog v-model="autoProgressDialogVisible" title="Auto Progress" width="500" align-center>
