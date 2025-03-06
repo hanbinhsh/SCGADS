@@ -269,12 +269,65 @@ export default {
     removeParameter(index) {
       this.modelAdding.parameters.splice(index, 1);
     },
-    modelSave() {// TODO
+    async modelSave() {// TODO
       // console.log("Saving model:", this.modelAdding);
+      const data = this.modelAdding;
+      const paramString = data.parameters.map(param => {
+        // 如果值是数字，不需要转换，否则使用 toString()
+        const value = typeof param.value === 'number' ? param.value : param.value.toString();
+        return `${param.name}:${value}`;
+      }).join(',');
+      const formData = new FormData();
+      formData.append('modelName', data.modelName);
+      formData.append('modelType', data.modelType);
+      formData.append('modelPath', data.modelPath);
+      formData.append('predictFilePath', data.predictFilePath);
+      formData.append('trainFilePath', data.trainFilePath);
+      formData.append('figurePath', data.figurePath);
+      formData.append('defaultParameters', paramString);
+      const response = await axios.post('api/models/addModel', formData);
+      if (response.data.code === 1) {
+        ElMessage({
+          message: 'Model add successfully',
+          type: 'success',
+        });
+      } else {
+        ElMessage({
+          message: 'Failed to add Model',
+          type: 'error',
+        });
+      }
       this.addDialogVisible = false;
       this.modelAddingReset();
     },
-    modelEditingSave() {// TODO
+    async modelEditingSave() {// TODO
+      const formData = new FormData();
+      const data = this.selectedData;
+      const paramString = this.parameters.map(param => {
+        // 如果值是数字，不需要转换，否则使用 toString()
+        const value = typeof param.value === 'number' ? param.value : param.value.toString();
+        return `${param.name}:${value}`;
+      }).join(',');
+      formData.append('modelId', data.modelId);
+      formData.append('modelName', data.modelName);
+      formData.append('modelType', data.modelType);
+      formData.append('modelPath', data.modelPath);
+      formData.append('predictFilePath', data.predictFilePath);
+      formData.append('trainFilePath', data.trainFilePath);
+      formData.append('figurePath', data.figurePath);
+      formData.append('defaultParameters', paramString);
+      const response = await axios.post('api/models/updateModel', formData);
+      if (response.data.code === 1) {
+        ElMessage({
+          message: 'Model update successfully',
+          type: 'success',
+        });
+      } else {
+        ElMessage({
+          message: 'Failed to update Model',
+          type: 'error',
+        });
+      }
 
       this.editDialogVisible = false;
     },
