@@ -23,8 +23,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="User Email" sortable></el-table-column>
-        <el-table-column prop="phone" label="User Phone" sortable></el-table-column>
+        <el-table-column prop="email" label="Email" sortable></el-table-column>
+        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
         <el-table-column prop="subject" label="Subject" sortable></el-table-column>
         <el-table-column prop="created_time" label="Create Time" width="180" sortable>
           <template #default="{ row }">
