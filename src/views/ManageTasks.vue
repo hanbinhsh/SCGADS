@@ -13,15 +13,16 @@
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
 
-        <!-- 用户头像列 -->
-        <el-table-column label="Avatar" width="80">
+        <el-table-column prop="user_name" label="User" sortable>
           <template #default="{ row }">
-            <el-avatar :size="24"
-              :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar"></el-avatar>
+            <div style="display: flex; align-items: center;">
+              <el-avatar :size="24"
+                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
+              </el-avatar>
+              <span style="margin-left: 8px;">{{ row.user_name }}</span>
+            </div>
           </template>
         </el-table-column>
-        <!-- 显示上传者的用户名 -->
-        <el-table-column prop="user_name" label="Uploader Name" sortable></el-table-column>
         <!-- 显示上传者的电子邮件 -->
         <el-table-column prop="email" label="Email" sortable></el-table-column>
         <!-- 显示上传者的电话 -->

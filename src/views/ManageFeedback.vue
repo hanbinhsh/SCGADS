@@ -13,13 +13,16 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <!-- 用户头像列 -->
-        <el-table-column label="Avatar" width="80">
+        <el-table-column prop="user_name" label="User" sortable>
           <template #default="{ row }">
-            <el-avatar :size="24" :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : ''"></el-avatar>
+            <div style="display: flex; align-items: center;">
+              <el-avatar :size="24"
+                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
+              </el-avatar>
+              <span style="margin-left: 8px;">{{ row.user_name }}</span>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="user_name" label="User Name" sortable></el-table-column>
         <el-table-column prop="email" label="User Email" sortable></el-table-column>
         <el-table-column prop="phone" label="User Phone" sortable></el-table-column>
         <el-table-column prop="subject" label="Subject" sortable></el-table-column>

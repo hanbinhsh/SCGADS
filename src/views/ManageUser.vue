@@ -12,14 +12,16 @@
         v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <!-- 用户头像列 -->
-        <el-table-column label="Avatar" width="80">
+        <el-table-column prop="userName" label="User" sortable>
           <template #default="{ row }">
-            <el-avatar :size="24"
-              :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar"></el-avatar>
+            <div style="display: flex; align-items: center;">
+              <el-avatar :size="24"
+                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
+              </el-avatar>
+              <span style="margin-left: 8px;">{{ row.userName }}</span>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="userName" label="User Name" sortable></el-table-column>
         <el-table-column prop="email" label="Email" sortable></el-table-column>
         <el-table-column prop="phone" label="Phone" sortable></el-table-column>
         <el-table-column prop="isAdmin" label="Admin" sortable></el-table-column>
