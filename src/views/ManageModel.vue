@@ -19,8 +19,9 @@
         <el-table-column prop="predictFilePath" label="Predict File Path" sortable></el-table-column>
         <el-table-column prop="trainFilePath" label="Train File Path" sortable></el-table-column>
         <el-table-column prop="figurePath" label="Figure Path" sortable></el-table-column>
-        <el-table-column fixed="right" label="Operations" width="200">
+        <el-table-column fixed="right" label="Operations" width="250">
           <template #default="{ row }">
+            <el-button link type="info" size="small" @click="showFigureDialog(row)">Figure</el-button>
             <el-button link type="success" size="small" @click="showParametersDialog(row)">Parameters</el-button>
             <el-button link type="primary" size="small" @click="showEditDialog(row)">Edit</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
@@ -55,7 +56,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteData(selectedData.feedback_id)">
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteData(selectedData.modelId)">
             Confirm
           </el-button>
         </div>
@@ -213,6 +214,18 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 模型图对话框 -->
+    <el-dialog v-model="figureDialogVisible" title="Figure" align-center>
+      <el-row justify="center" class="image-container" id="image-row" style="margin-top: 0;">
+        <img :src="figure" alt="Model" class="example-image" />
+      </el-row>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="figureDialogVisible = false;">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -234,6 +247,8 @@ export default {
       editDialogVisible: false,
       batchDeleteDialogVisible: false,
       parametersDialogVisible: false,
+      figureDialogVisible: false,
+      figure: "",
       addDialogVisible: false,
       selectedData: {},
       selectedDatas: [],
@@ -298,6 +313,7 @@ export default {
         });
       }
       this.addDialogVisible = false;
+      this.fetchListData();
       this.modelAddingReset();
     },
     async modelEditingSave() {
@@ -328,8 +344,8 @@ export default {
           type: 'error',
         });
       }
-
       this.editDialogVisible = false;
+      this.fetchListData();
     },
     modelAddingReset(){
       this.modelAdding.parameters = [];
@@ -355,6 +371,11 @@ export default {
     showParametersDialog(data) {
       this.paramTrans(data)
       this.parametersDialogVisible = true;
+    },
+    showFigureDialog(data){
+      this.figureDialogVisible = true;
+      const base64Image = `data:image/png;base64,${data.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
+      this.figure = base64Image;
     },
     paramTrans(data){
       const paramArray = data.defaultParameters.split(',').map(param => {
@@ -419,21 +440,21 @@ export default {
     },
     async deleteData(dataId) {
       try {
-        const response = await axios.delete(`/api/deleteFeedback/${dataId}`);
+        const response = await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
         if (response.data.code === 1) {
           ElMessage.success('Model deleted successfully');
           this.fetchListData();
         } else {
-          console.error('Failed to delete feedback:', response.data.msg);
+          console.error('Failed to delete:', response.data.msg);
           ElMessage.error(response.data.msg);
         }
       } catch (error) {
-        console.error('Failed to delete feedback:', error);
+        console.error('Failed to delete:', error);
       }
     },
     async deleteDataID(dataId) {
       try {
-        await axios.delete(`/api/deleteFeedback/${dataId}`);
+        await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
       } catch (error) {
         console.error("Delete failed:", error);
       }
@@ -441,7 +462,7 @@ export default {
     async confirmBatchDelete() {
       this.batchDeleteDialogVisible = false;
       for (const data of this.selectedDatas) {
-        await this.deleteDataID(data.feedback_id);
+        await this.deleteDataID(data.modelId);
       }
       ElMessage.success('Batch delete success.');
       this.fetchListData();

@@ -348,22 +348,6 @@ const handleTaskSelect = (task) => {
   background-color: #333;
 }
 
-/* 图片展示 */
-.image-container {
-  margin-top: 20px;
-  text-align: center;
-  padding: 10px;
-}
-
-.example-image {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 /* 全宽组件 */
 .full-width {
   width: 100%;
