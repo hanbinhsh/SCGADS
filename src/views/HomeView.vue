@@ -18,12 +18,12 @@
         <div class="logo-container" style="z-index: 999;">
           <img src="@/assets/logo.png" alt="Logo" class="logo" />
         </div>
-        <h1 style="margin-left: 20px; color: #ffffff; z-index: 999;">scMoAnno: A Pre-trained Cell Type Annotation Method
-          for Single-cell Multi-omics Data</h1>
+        <h1 style="margin-left: 20px; color: #ffffff; z-index: 999;">SCGADS: Smart Computing Genomic Analysis & Display System
+          for Single-cell Data</h1>
         <div class="scroll-indicator" style="z-index: 999;">
-          <el-icon>
-            <ArrowDownBold />
-          </el-icon>
+        <el-icon>
+          <ArrowDownBold />
+        </el-icon>
         </div>
       </section>
       <section class="intro-section">

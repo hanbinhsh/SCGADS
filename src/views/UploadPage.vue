@@ -33,10 +33,10 @@
                     </el-icon>
                     <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
                     <template #tip>
-                      <div class="el-upload__tip" v-if="activeTask === 'training' || activeTask === 'annotation' ">
+                      <div class="el-upload__tip" v-if="(activeTask === 'training' || activeTask === 'annotation') && selectedModel.modelType === 'multi'">
                         Upload scRNA-seq file (.h5/.h5ad/.npy)
                       </div>
-                      <div class="el-upload__tip" v-if="activeTask === 'denoising'">
+                      <div class="el-upload__tip" v-else>
                         Upload sc-seq file (.h5/.h5ad/.npy)
                       </div>
                     </template>
@@ -164,9 +164,13 @@ export default {
       parameterDefaults: {}, // 默认参数
       selectedModel: '',
       loading:false,
+      activeTask: 'annotation' // 默认选中的任务
     };
   },
   methods: {
+    handleTaskSelect(task) {
+      this.activeTask = task;
+    },
     async fetchModels() {
       try {
         this.loading = true;
@@ -206,16 +210,58 @@ export default {
     },
     handleUploadClick() {
       // 检查文件是否为空或类型不正确
+      // single(单模态注释) multi(双模态注释) eno(降噪)
+      // TODO 下拉框增加一级菜单显示是什么类型的模型
+      // 此处单模态模型仅上传一种模态的数据
+      //        单模态    多模态    降噪
+      // 注释   R/A       R+A      /
+      // 训练   R/A+T     R+A+T    /
+      // 降噪   /         /        R/A
+      
+      let requiresScRNASeq = false;
+      let requiresScATACSeq = false;
+      let requiresTagFile = false;
       const isScRNASeqFileValid = this.scRNASeqFile.length > 0 && this.scRNASeqFile.every(file => file.name.endsWith('.h5') || file.name.endsWith('.h5ad') || file.name.endsWith('.npy'));
       const isScATACSeqFileValid = this.scATACSeqFile.length > 0 && this.scATACSeqFile.every(file => file.name.endsWith('.h5') || file.name.endsWith('.h5ad') || file.name.endsWith('.npy'));
       const isTagFileValid = this.tagFile.length > 0 && this.tagFile.every(file => file.name.endsWith('.npy') || file.name.endsWith('.csv'));
 
-      if (this.scRNASeqFile.length === 0 || this.scATACSeqFile.length === 0 || this.tagFile.length === 0) {
-        ElMessage.error('Please upload all required files.');
+      let isValid = false;
+      let errorMessage = '';
+
+      if (this.activeTask === 'annotation') {
+        if (this.selectedModel.modelType === 'single') {
+          requiresScRNASeq = true;// 此处不检查是rna或者atac文件
+          isValid = (this.scRNASeqFile.length > 0);
+          errorMessage = 'For single-modality annotation, please upload either sc-RNAseq File or sc-ATACseq File.';
+        } else if (this.selectedModel.modelType === 'multi') {
+          requiresScRNASeq = true; requiresScATACSeq = true;
+          isValid = (this.scRNASeqFile.length > 0 && this.scATACSeqFile.length > 0);
+          errorMessage = 'For multi-modality annotation, please upload both sc-RNAseq File and sc-ATACseq File.';
+        }
+      } 
+      else if (this.activeTask === 'training') {
+        if (this.selectedModel.modelType === 'single') {
+          requiresScRNASeq = true; requiresTagFile = true;
+          isValid = (this.scRNASeqFile.length > 0) && this.tagFile.length > 0;
+          errorMessage = 'For single-modality training, please upload sc-RNAseq File or sc-ATACseq File and Tag File.';
+        } else if (this.selectedModel.modelType === 'multi') {
+          requiresScRNASeq = true; requiresScATACSeq = true; requiresTagFile = true;
+          isValid = (this.scRNASeqFile.length > 0 && this.scATACSeqFile.length > 0) && this.tagFile.length > 0;
+          errorMessage = 'For multi-modality training, please upload sc-RNAseq File, sc-ATACseq File, and Tag File.';
+        }
+      } 
+      else if (this.activeTask === 'denoising') {
+        isValid = (this.scRNASeqFile.length > 0) && this.tagFile.length === 0;
+        requiresScRNASeq = true;
+        errorMessage = 'For denoising, please upload either sc-RNAseq File or sc-ATACseq File, but not Tag File.';
+      }
+
+      if (!isValid) {
+        ElMessage.error(errorMessage);
         return;
       }
 
-      if (!isScRNASeqFileValid || !isScATACSeqFileValid || !isTagFileValid) {
+      if ((requiresScRNASeq&&!isScRNASeqFileValid) || (requiresScATACSeq&&!isScATACSeqFileValid) || (requiresTagFile&&!isTagFileValid)) {
         ElMessage.error('Incorrect file type. Please upload the correct file types.');
         return;
       }
@@ -249,9 +295,9 @@ export default {
         await axios.post('/api/insertFile', { taskName: this.taskName });
 
         const files = [
-          { file: this.scRNASeqFile[0].raw, fileType: 'scRNASeqFile' },
-          { file: this.scATACSeqFile[0].raw, fileType: 'scATACSeqFile' },
-          { file: this.tagFile[0].raw, fileType: 'tagFile' }
+          { file: this.scRNASeqFile[0]?.raw, fileType: 'scRNASeqFile' },
+          { file: this.scATACSeqFile[0]?.raw, fileType: 'scATACSeqFile' },
+          { file: this.tagFile[0]?.raw, fileType: 'tagFile' }
         ];
 
         const uploadPromises = files.map(({ file, fileType }) => {
@@ -260,20 +306,22 @@ export default {
           const fileReader = new FileReader();
           const spark = new SparkMD5.ArrayBuffer();
           // 获取文件二进制数据
-          fileReader.readAsArrayBuffer(file);
-          fileReader.onload = async e =>{
-          spark.append(e.target.result);
-            const hash = spark.end();
-            const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
-            if (response.data.code === 1){
-              const formData = new FormData();
-              formData.append('file', file);
-              formData.append('taskName', taskName);
-              formData.append('fileType', fileType);
-              formData.append('hash', hash);
-              return axios.post('/api/uploadOneFile', formData);
-            }
-          };
+          if (file instanceof Blob){
+            fileReader.readAsArrayBuffer(file);
+            fileReader.onload = async e =>{
+            spark.append(e.target.result);
+              const hash = spark.end();
+              const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
+              if (response.data.code === 1){
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('taskName', taskName);
+                formData.append('fileType', fileType);
+                formData.append('hash', hash);
+                return axios.post('/api/uploadOneFile', formData);
+              }
+            };
+          }
         });
 
         await Promise.all(uploadPromises);
@@ -296,12 +344,6 @@ import { ref } from 'vue';
 import SparkMD5 from "spark-md5";
 
 const open = ref(false);
-const file = ref();
-const activeTask = ref('annotation');
-
-const handleTaskSelect = (task) => {
-  activeTask.value = task;
-};
 </script>
 
 

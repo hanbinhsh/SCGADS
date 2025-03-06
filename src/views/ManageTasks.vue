@@ -27,7 +27,6 @@
         <el-table-column prop="email" label="Email" sortable></el-table-column>
         <!-- 显示上传者的电话 -->
         <el-table-column prop="phone" label="Phone" sortable></el-table-column>
-
         <!-- 显示任务名 -->
         <el-table-column prop="task_name" label="Task Name" sortable></el-table-column>
         <!-- 显示任务开始时间 -->
@@ -50,7 +49,7 @@
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" label="Operations" width="320">
+        <el-table-column fixed="right" label="Operations" width="420">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
               AutoProgress
@@ -58,14 +57,17 @@
             <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
               Download
             </el-button>
-            <el-button link type="info" size="small" @click="showDetailDialog(row)">
+            <el-button link type="" size="small" @click="showDetailDialog(row)">
               Detail
             </el-button>
-            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-              Delete
+            <el-button link type="" size="small" @click="showCharts( row.task_name )" :disabled="row.status !== 2">
+              Virtualization
             </el-button>
             <el-button link type="warning" size="small" @click="showEditDialog(row)">
               Edit
+            </el-button>
+            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
+              Delete
             </el-button>
           </template>
         </el-table-column>
@@ -328,7 +330,9 @@ export default {
       // 所有检查通过，显示任务名称输入框
       this.canUpload = true;
     },
-
+    showCharts(taskName) {  
+      this.$router.push({ name: "Virtualization", query: { taskName } });  
+    },
     handleStatusChange(value) {
       if (value === 2) { // 当选择Completed状态时
         this.uploadDialogVisible = true; // 显示文件上传对话框
@@ -360,14 +364,14 @@ export default {
         this.uploadDialogVisible = false;
         this.editDialogVisible = false; // 关闭编辑对话框
         window.location.reload()
-        ElMessage.success('The file upload was successful.');
+        ElMessage.success('File upload was successful.');
       }
     },
     async UploadFiles() {
-      //const response = await axios.post('/api/findResultByTaskName?taskName=' + this.selectedTask.task_name);
-      //if (response.data.code === 1) {
-      await axios.post('/api/insertResult', { taskName: this.selectedTask.task_name });
-      //}
+      const response = await axios.post('/api/findResultByTaskName?taskName=' + this.selectedTask.task_name);
+      if (response.data.code === 1) {
+        await axios.post('/api/insertResult', { taskName: this.selectedTask.task_name });
+      }
       const files = [
         { file: this.configjsFile[0].raw, fileType: 'configjsFile' },
         { file: this.datajsFile[0].raw, fileType: 'datajsFile' },

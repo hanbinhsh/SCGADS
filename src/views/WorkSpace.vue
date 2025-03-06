@@ -99,7 +99,6 @@
     <span>{{ selectedTask.details }}</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button v-if="selectedTask.status===2" type="primary" @click="showCharts( selectedTask.taskName )">Virtualization</el-button>
         <el-button type="primary" @click="">Parameters</el-button><!-- TODO -->
         <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
       </div>
@@ -181,9 +180,9 @@ export default {
       ElMessage.success("Batch delete completed.");
       this.fetchTaskList();
     },
-    async deleteTaskByTaskName(taskId) {
+    async deleteTaskByTaskName(taskName) {
       try {
-        await axios.get("/api/deleteTaskByTaskName?taskID=" + taskId);
+        await axios.get("/api/deleteTaskByTaskName?taskName=" + taskName);
       } catch (error) {
         console.error("Delete failed:", error);
       }
