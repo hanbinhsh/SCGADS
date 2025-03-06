@@ -269,7 +269,7 @@ export default {
     removeParameter(index) {
       this.modelAdding.parameters.splice(index, 1);
     },
-    async modelSave() {// TODO
+    async modelSave() {
       // console.log("Saving model:", this.modelAdding);
       const data = this.modelAdding;
       const paramString = data.parameters.map(param => {
@@ -300,7 +300,7 @@ export default {
       this.addDialogVisible = false;
       this.modelAddingReset();
     },
-    async modelEditingSave() {// TODO
+    async modelEditingSave() {
       const formData = new FormData();
       const data = this.selectedData;
       const paramString = this.parameters.map(param => {
