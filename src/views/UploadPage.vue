@@ -80,13 +80,13 @@
           <el-col :span="10">
             <el-card class="form-card" style="height: 70px;">
               <el-form label-width="40%">
-                <!-- 模型选择 -->
-                <el-form-item label="Model Select">
-                  <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
-                    <el-option v-for="model in models" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
-                  </el-select>
-                </el-form-item>
-              </el-form>
+              <!-- 模型选择 -->
+              <el-form-item label="Model Select">
+                <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
+                  <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
+                </el-select>
+              </el-form-item>
+            </el-form>
             </el-card>
             <el-card class="form-card">
               <el-form label-width="40%">
@@ -333,8 +333,33 @@ export default {
         this.showTaskNameDialog = false; // 成功上传后关闭对话框
       }
     },
-
   },
+  computed: {
+    filteredModels() {
+      return this.models.filter(model => {
+        if (this.activeTask === "annotation") {
+          return model.modelType === "single" || model.modelType === "multi";
+        }
+        if (this.activeTask === "training") {
+          return model.modelType === "single" || model.modelType === "multi";
+        }
+        if (this.activeTask === "denoising") {
+          return model.modelType === "deno";
+        }
+        return false;
+      });
+    }
+  },
+  watch: {
+    activeTask() {
+      // 检查当前选中的 model 是否仍然在 filteredModels 里
+      if (!this.filteredModels.some(model => model.modelName === this.parameters.model)) {
+        // 选中新的 filteredModels 的第一个模型
+        this.parameters.model = this.filteredModels.length > 0 ? this.filteredModels[0].modelName : null;
+        this.selectModel(this.parameters.model)
+      }
+    }
+  }
 };
 </script>
 
