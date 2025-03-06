@@ -77,6 +77,10 @@
 
     <!-- 修改对话框 -->
     <el-dialog v-model="editDialogVisible" title="Edit Model" width="700px" align-center>
+      <!-- 添加提示信息 -->
+      <div class="card-alart">
+        Note: Upload the models into the algorithm folder of back-end.
+      </div>
       <el-form :model="selectedData" label-width="120px" label-position="left">
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->
@@ -135,6 +139,10 @@
 
     <!-- 添加对话框 -->
     <el-dialog v-model="addDialogVisible" title="Add Model" width="700px" align-center>
+      <!-- 添加提示信息 -->
+      <div class="card-alart">
+        Note: Upload the models into the algorithm folder of back-end.
+      </div>
       <el-form :model="modelAdding" label-width="120px" label-position="left">
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->

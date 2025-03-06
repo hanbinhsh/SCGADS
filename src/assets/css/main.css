@@ -207,3 +207,10 @@
 .bottom-left-action-button:hover {
   transform: scale(1.05);
 }
+
+.card-alart{
+  margin-bottom: 15px;
+  margin-left: 2px;
+  color: #e74c3c;
+  font-size: 12px;
+}

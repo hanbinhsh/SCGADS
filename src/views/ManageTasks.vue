@@ -184,7 +184,7 @@
     <!-- 编辑任务对话框 -->
     <el-dialog v-model="editDialogVisible" title="Edit Task Status" width="500" align-center>
       <!-- 添加提示信息 -->
-      <div style="margin-bottom: 15px; color: #e74c3c; font-size: 12px;">
+      <div class="card-alart">
         Note: When setting the status, the end time will be automatically updated.
       </div>
       <el-form :model="selectedTask" label-width="120px">
