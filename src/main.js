@@ -5,6 +5,8 @@ import App from './App.vue'
 import router from './router'
 import "@/assets/css/main.css"
 import "@/assets/css/main-dark.css"
+import 'animate.css';
+import "@/assets/css/animation.css"
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 

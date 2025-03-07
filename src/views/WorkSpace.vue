@@ -6,7 +6,7 @@
       <!-- Left Column with 4 Cards -->
       <div class="left-column" :class="{ 'with-expanded-right': isRightColumnExpanded }">
         <!-- Card 1: Status Chart -->
-        <el-card class="dashboard-card" :body-style="{ height: '100%' }">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }">
           <template #header>
             <div class="card-header">
               <span>Task Status</span>
@@ -66,9 +66,8 @@
           </div>
         </el-card>
 
-        
         <!-- Card 2: Empty for now -->
-        <el-card class="dashboard-card">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
           <template #header>
             <div class="card-header">
               <span>Card 2</span>
@@ -80,7 +79,7 @@
         </el-card>
         
         <!-- Card 3: Empty for now -->
-        <el-card class="dashboard-card">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
           <template #header>
             <div class="card-header">
               <span>Card 3</span>
@@ -92,7 +91,7 @@
         </el-card>
         
         <!-- Card 4: Empty for now -->
-        <el-card class="dashboard-card">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
           <template #header>
             <div class="card-header">
               <span>Card 4</span>
@@ -105,7 +104,8 @@
       </div>
       
       <!-- Right Column with Collapsible Task List -->
-      <div class="right-column" :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
+      <div class="right-column animate__animated animate__fadeInRight"
+        :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
         <div class="column-toggle" @click="toggleRightColumn">
           <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
             {{ isRightColumnExpanded ? 'Collapse' : 'Expand' }}
