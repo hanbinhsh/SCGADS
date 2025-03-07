@@ -275,16 +275,6 @@ export default {
 </script>
 
 <style scoped>
-.card-header {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-}
-
-.dark-mode .card-header {
-  color: #EEE;
-}
-
 .card-body {
   padding: 20px;
 }
