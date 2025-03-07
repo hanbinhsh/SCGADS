@@ -160,7 +160,7 @@ export default {
       taskName: "", // 存储任务名称
       models: [],  // 存储数据库中的模型数据
       figure: '', // 选中的模型图片
-      parameters: {}, // 选中的模型参数
+      parameters: [], // 选中的模型参数
       parameterDefaults: {}, // 默认参数
       selectedModel: '',
       loading:false,
@@ -289,7 +289,25 @@ export default {
     },
     async UploadFiles() {
       const userId = JSON.parse(sessionStorage.getItem('userData')).userId;
-      const response = await axios.post('/api/insertTask', { taskName: this.taskName, userId });
+      const paramString = Object.entries(this.parameters)
+        .filter(([key]) => key !== 'model') // 过滤掉 model 属性
+        .map(([name, value]) => {
+          // 处理值：数字直接使用，其他类型转为字符串
+          const formattedValue = typeof value === 'number' ? value : value.toString();
+          return `${name}:${formattedValue}`;
+        })
+        .join(','); // 用逗号拼接
+      const task = {
+        taskName: this.taskName,
+        details : "Details about " + this.taskName,
+        uploaderId : userId,
+        type : this.selectedModel.modelType,
+        parameters : paramString,
+        model : this.selectedModel.modelName,
+        modelId : this.selectedModel.modelId,
+      }
+      const response = await axios.post('/api/insertTask', task);
+      console.log(response);
 
       if (response.data.code === 1) {
         await axios.post('/api/insertFile', { taskName: this.taskName });
