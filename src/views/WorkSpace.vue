@@ -164,7 +164,7 @@ export default {
     },
     async deleteTask() {
       try {
-        await axios.get("/api/deleteTaskByTaskName?taskName=" + this.selectedTask.taskName);
+        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.taskName);
         ElMessage.success("Delete success.");
         this.fetchTaskList();
       } catch (error) {
@@ -182,7 +182,7 @@ export default {
     },
     async deleteTaskByTaskName(taskName) {
       try {
-        await axios.get("/api/deleteTaskByTaskName?taskName=" + taskName);
+        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.taskName);
       } catch (error) {
         console.error("Delete failed:", error);
       }
