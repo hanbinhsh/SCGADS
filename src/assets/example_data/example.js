@@ -4,7 +4,7 @@ import { data } from './data.js'; // 导入数据
 import { pieces } from './config.js'; // 导入配置
 import { labels } from './label.js'; // 导入标签
 
-export function initializeChart(dark, newChart, newData, newPieces, newLabel) {
+export function initializeChart(dark, newChart, axisSettings, newData, newPieces, newLabel) {
   // 确保 labels 变成数值索引
   const labelMap = {};
   (newChart ? newPieces : pieces).forEach((p, i) => {
@@ -33,6 +33,9 @@ export function initializeChart(dark, newChart, newData, newPieces, newLabel) {
           }
       },
       visualMap: {
+          textStyle: {
+              color: dark ? '#ffffff' : '#000000' // 根据 darkmode 设置文字颜色
+          },
           type: 'piecewise',
           top: 'middle',
           left: 10,
@@ -47,8 +50,36 @@ export function initializeChart(dark, newChart, newData, newPieces, newLabel) {
           }
       },
       grid: { left: 120 },
-      xAxis: {},
-      yAxis: {},
+      xAxis: {
+          show: axisSettings.x.show, // 不显示坐标轴线、坐标轴刻度线和坐标轴上的文字
+          axisTick:{
+              show: axisSettings.x.showTicks // 不显示坐标轴刻度线
+          },
+          axisLine: {
+              show: axisSettings.x.showAxisLine, // 不显示坐标轴线
+          },
+          axisLabel: {
+              show: axisSettings.x.showLabels, // 不显示坐标轴上的文字
+          },
+          splitLine:{
+              show: axisSettings.x.showGridLines // 不显示网格线
+          },
+      },
+      yAxis: {
+          show: axisSettings.y.show, // 不显示坐标轴线、坐标轴刻度线和坐标轴上的文字
+          axisTick:{
+              show: axisSettings.y.showTicks // 不显示坐标轴刻度线
+          },
+          axisLine: {
+              show: axisSettings.y.showAxisLine, // 不显示坐标轴线
+          },
+          axisLabel: {
+              show: axisSettings.y.showLabels, // 不显示坐标轴上的文字
+          },
+          splitLine:{
+              show: axisSettings.y.showGridLines // 不显示网格线
+          },
+      },
       series: {
           type: 'scatter',
           encode: { x: 0, y: 1, tooltip: [0, 1, 2] },
@@ -57,7 +88,7 @@ export function initializeChart(dark, newChart, newData, newPieces, newLabel) {
               borderColor: '#555'
           },
           datasetIndex: 0
-      }
+      },
   };
 
   // 初始化或更新 ECharts
@@ -68,6 +99,7 @@ export function initializeChart(dark, newChart, newData, newPieces, newLabel) {
       myChart1.dispose();
   }
 
-  const myChart = echarts.init(chartDom, dark ? 'dark' : null);
+  const myChart = echarts.init(chartDom, false ? 'dark' : null);
+  //const myChart = echarts.init(chartDom, dark ? 'dark' : null);// 自带的黑暗模式不好看
   myChart.setOption(option);
 }
