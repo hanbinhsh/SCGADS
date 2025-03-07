@@ -2,7 +2,7 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <!-- 侧边栏 -->
-    <el-aside class="sidebar">
+    <el-aside class="sidebar animate__animated animate__fadeInLeft">
       <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect">
         <el-menu-item index="annotation">
           <el-icon><Edit /></el-icon>
@@ -24,7 +24,7 @@
         <el-row :gutter="20">
           <!-- 左侧：文件上传 -->
           <el-col :span="14">
-            <el-card class="upload-card">
+            <el-card class="upload-card animate__animated animate__fadeInLeft">
               <el-row :gutter="20" id="upload-row">
                 <el-col :span="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation') ) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12">
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
@@ -78,7 +78,7 @@
 
           <!-- 右侧：参数设置 -->
           <el-col :span="10">
-            <el-card class="form-card" style="height: 70px;">
+            <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;">
               <el-form label-width="40%">
               <!-- 模型选择 -->
               <el-form-item label="Model Select">
@@ -88,7 +88,7 @@
               </el-form-item>
             </el-form>
             </el-card>
-            <el-card class="form-card">
+            <el-card class="form-card animate__animated animate__fadeInRight">
               <el-form label-width="40%">
                 <!-- 参数输入框 -->
                 <el-alert type="info" show-icon :closable="false" v-if="activeTask === 'annotation'">
@@ -105,7 +105,7 @@
       </div>
 
       <!-- 按钮行 -->
-      <div class="footer">
+      <div class="footer animate__animated animate__fadeInUp">
         <div class="footer-button-row">
           <el-button type="primary" class="footer-action-button" @click="open = true" ref="ref3">Tutorial</el-button>
           <el-button type="warning" class="footer-action-button" @click="handleResetClick">Reset</el-button>

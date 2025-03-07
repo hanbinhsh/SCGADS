@@ -2,7 +2,7 @@
   <el-container class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <el-row type="flex" justify="center">
+      <el-row type="flex" justify="center" class="animate__animated animate__fadeInUp">
         <el-col :span="10">
           <el-card shadow="always">
             <template #header>

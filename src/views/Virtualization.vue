@@ -2,7 +2,7 @@
   <el-container class="main-page">
     <MainHeader></MainHeader>
     <!-- 侧边栏 -->
-    <el-aside class="sidebar">
+    <el-aside class="sidebar animate__animated animate__fadeInLeft">
       <el-menu :default-active="activeChart" class="chart-menu" @select="handleChartSelect">
         <el-menu-item index="tsne">
           <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
@@ -19,7 +19,7 @@
       </el-menu>
     </el-aside>
     <el-main class="fullscreen-section">
-      <el-row type="flex" justify="center">
+      <el-row type="flex" justify="center animate__animated animate__fadeInRight">
         <el-col :span="20">
           <el-card shadow="always" v-loading="loading">
             <template #header>
@@ -57,7 +57,7 @@
       </el-row>
     </el-main>
     <!-- 按钮行 -->
-    <div class="footer">
+    <div class="footer animate__animated animate__fadeInUp">
       <div class="bottom-left-setting">
         <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">Settings</el-button>
       </div>
