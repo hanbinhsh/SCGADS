@@ -441,9 +441,9 @@ export default {
     },
     async deleteTask() {
       try {
-        const taskID = this.selectedTask.task_id;
+        const userName = this.selectedTask.user_name;
         const taskName = this.selectedTask.task_name; 
-        const response = await axios.get(`/api/deleteTaskByID?taskID=${taskID}&taskName=${taskName}`);
+        const response = await axios.get(`/api/deleteTaskByTaskName?userName=${userName}&taskName=${taskName}`);
         ElMessage.success('Delete success.');
         this.fetchTaskList();
       } catch (error) {
@@ -542,13 +542,14 @@ export default {
     async confirmBatchDelete() {
       this.batchDeleteDialogVisible = false;
       for (const task of this.selectedTasks) {
-        await this.deleteTaskByID(task.task_id);
+        await this.deleteTaskByTaskName(task.user_name, task.task_name);
       }
       ElMessage.success('Batch delete success.');
       this.fetchTaskList();
     },
-    async deleteTaskByID(taskID) {
+    async deleteTaskByTaskName(userName, taskName) {
       try {
+        const response = await axios.get(`/api/deleteTaskByTaskName?userName=${userName}&taskName=${taskName}`);
         await axios.get("/api/deleteTaskByID?taskID=" + taskID);
       } catch (error) {
         console.error("Delete failed:", error);
