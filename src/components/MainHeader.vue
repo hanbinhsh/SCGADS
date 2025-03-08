@@ -7,11 +7,11 @@
                 <img style="width: 50px" src="../assets/logo.png" alt="logo" />
             </el-menu-item>
             <el-menu-item index="Login" :class="{ 'is-active': activeIndex === 'Login' }" v-if="!userData.userName">
-                Login
+                {{ $t('navigateBar.Login') }}
             </el-menu-item>
             <el-menu-item index="Register" :class="{ 'is-active': activeIndex === 'Register' }"
                 v-if="!userData.userName">
-                Register
+                {{ $t('navigateBar.Register') }}
             </el-menu-item>
             <el-sub-menu v-if="userData.userName" index="1">
                 <template #title>
@@ -20,52 +20,70 @@
                         size="small"></el-avatar>&nbsp;
                     {{ userData.userName }}
                 </template>
-                <el-menu-item index="Profile" :class="{ 'is-active': activeIndex === 'Profile' }"
-                    id="Profile">Profile</el-menu-item>
-                <el-menu-item @click="logout()">Log out</el-menu-item>
+                <el-menu-item index="Profile" :class="{ 'is-active': activeIndex === 'Profile' }" id="Profile">
+                    {{ $t('navigateBar.Profile') }}
+                </el-menu-item>
+                <el-menu-item @click="logout()">
+                    {{ $t('navigateBar.Logout') }}
+                </el-menu-item>
             </el-sub-menu>
             <el-sub-menu v-if="userData.userName && userData?.isAdmin" index="2">
                 <template #title>
-                    Manage
+                    {{ $t('navigateBar.Manage') }}
                 </template>
                 <el-menu-item index="ManageUser" :class="{ 'is-active': activeIndex === 'ManageUser' }"
                     v-if="userData?.isAdmin">
-                    Manage Users
+                    {{ $t('navigateBar.ManageUsers') }}
                 </el-menu-item>
                 <el-menu-item index="ManageTasks" :class="{ 'is-active': activeIndex === 'ManageTasks' }"
                     v-if="userData?.isAdmin">
-                    Manage Tasks
+                    {{ $t('navigateBar.ManageTasks') }}
                 </el-menu-item>
                 <el-menu-item index="ManageFeedback" :class="{ 'is-active': activeIndex === 'ManageFeedback' }"
                     v-if="userData.userName && userData.isAdmin">
-                    Manage Feedbacks
+                    {{ $t('navigateBar.ManageFeedbacks') }}
                 </el-menu-item>
                 <el-menu-item index="ManageModel" :class="{ 'is-active': activeIndex === 'ManageModel' }"
                     v-if="userData.userName && userData.isAdmin">
-                    Manage Model
+                    {{ $t('navigateBar.ManageModel') }}
                 </el-menu-item>
                 <el-menu-item index="SystemSettings" :class="{ 'is-active': activeIndex === 'SystemSettings' }"
                     v-if="userData.userName && userData.isAdmin">
-                    System Settings
+                    {{ $t('navigateBar.SystemSettings') }}
                 </el-menu-item>
             </el-sub-menu>
             <el-menu-item index="WorkSpace" :class="{ 'is-active': activeIndex === 'WorkSpace' }" id="WorkSpase"
                 v-if="userData.userName">
-                WorkSpace
+                {{ $t('navigateBar.WorkSpace') }}
             </el-menu-item>
             <el-menu-item index="Upload" :class="{ 'is-active': activeIndex === 'Upload' }" v-if="userData.userName">
-                Upload
+                {{ $t('navigateBar.Upload') }}
             </el-menu-item>
             <el-menu-item index="Virtualization" :class="{ 'is-active': activeIndex === 'Virtualization' }">
-                Virtualization
+                {{ $t('navigateBar.Virtualization') }}
             </el-menu-item>
             <el-menu-item index="Feedback" :class="{ 'is-active': activeIndex === 'Feedback' }"
                 v-if="userData.userName">
-                Feedback
+                {{ $t('navigateBar.Feedback') }}
             </el-menu-item>
             <div class="dark-mode-toggle">
                 <el-switch id="dark" v-model="isDarkMode" :active-icon="Sunny" :inactive-icon="Moon" inline-prompt
                     width="15" @click="toggleTheme($event)"></el-switch>
+            </div>
+            <!-- Language Switcher -->
+            <div class="language-switcher">
+                <el-dropdown @command="changeLanguage">
+                    <span class="language-icon">
+                        <font-awesome-icon :icon="['fas', 'language']" size="2x"/>
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item command="en">English</el-dropdown-item>
+                            <el-dropdown-item command="zh">中文</el-dropdown-item>
+                            <!-- 添加更多语言选项 -->
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </el-menu>
 
@@ -74,6 +92,18 @@
             <div class="mobile-header-top">
                 <img style="width: 40px" src="../assets/logo.png" alt="logo" @click="navigateTo('HomeView')" />
                 <div class="mobile-controls">
+                    <el-dropdown @command="changeLanguage" trigger="click">
+                        <span class="language-icon-mobile">
+                            <font-awesome-icon :icon="['fas', 'language']" size="lg"/>
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item command="en">English</el-dropdown-item>
+                                <el-dropdown-item command="zh">中文</el-dropdown-item>
+                                <!-- 添加更多语言选项 -->
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                     <el-switch id="dark-mobile" v-model="isDarkMode" :active-icon="Sunny" :inactive-icon="Moon" inline-prompt
                         width="15" @click="toggleTheme($event)" class="mobile-dark-toggle"></el-switch>
                     <el-button link @click="mobileMenuOpen = !mobileMenuOpen" class="mobile-menu-button">
@@ -87,8 +117,12 @@
             <el-collapse-transition>
                 <div class="mobile-menu-dropdown" v-if="mobileMenuOpen">
                     <template v-if="!userData.userName">
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Login' }" @click="navigateTo('Login')">Login</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Register' }" @click="navigateTo('Register')">Register</div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Login' }" @click="navigateTo('Login')">
+                            {{ $t('navigateBar.Login') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Register' }" @click="navigateTo('Register')">
+                            {{ $t('navigateBar.Register') }}
+                        </div>
                     </template>
                     
                     <template v-else>
@@ -96,27 +130,43 @@
                             <el-avatar :src="userData.avatarBase64 ? 'data:image/jpeg;base64,' + userData.avatarBase64 : defaultAvatar" size="small"></el-avatar>
                             <span>{{ userData.userName }}</span>
                         </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Profile' }" @click="navigateTo('Profile')">Profile</div>
-                        <div class="mobile-menu-item" @click="logout()">Log out</div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Profile' }" @click="navigateTo('Profile')">
+                            {{ $t('navigateBar.Profile') }}
+                        </div>
+                        <div class="mobile-menu-item" @click="logout()">
+                            {{ $t('navigateBar.Logout') }}
+                        </div>
                     </template>
                     
                     <template v-if="userData.userName && userData?.isAdmin">
-                        <div class="mobile-menu-section">Manage</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageUser' }" @click="navigateTo('ManageUser')">Manage Users</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageTasks' }" @click="navigateTo('ManageTasks')">Manage Tasks</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">Manage Feedbacks</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">Manage Model</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">System Settings</div>
+                        <div class="mobile-menu-section">{{ $t('navigateBar.Manage') }}</div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageUser' }" @click="navigateTo('ManageUser')">
+                            {{ $t('navigateBar.ManageUsers') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageTasks' }" @click="navigateTo('ManageTasks')">
+                            {{ $t('navigateBar.ManageTasks') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">
+                            {{ $t('navigateBar.ManageFeedbacks') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
+                            {{ $t('navigateBar.ManageModel') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">
+                            {{ $t('navigateBar.SystemSettings') }}
+                        </div>
                     </template>
 
                     <template v-if="userData.userName">
-                        <div class="mobile-menu-section">Applications</div>
+                        <div class="mobile-menu-section">{{ $t('navigateBar.Applications') }}</div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'WorkSpace' }" @click="navigateTo('WorkSpace')">WorkSpace</div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'Upload' }" @click="navigateTo('Upload')">Upload</div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'Feedback' }" @click="navigateTo('Feedback')">Feedback</div>
                     </template>
                     
-                    <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">Virtualization</div>
+                    <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
+                        {{ $t('navigateBar.Virtualization') }}
+                    </div>
                 </div>
             </el-collapse-transition>
         </div>
@@ -184,9 +234,18 @@ const toggleTheme = (event) => {
 
 <script>
 import logo from '../assets/logo.png';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faLanguage } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+// 注册 Font Awesome 图标
+library.add(faLanguage);
 
 export default {
     name: "MainHeader",
+    components: {
+        FontAwesomeIcon
+    },
     data() {
         return {
             activeIndex: "", // 当前激活的菜单项
@@ -194,6 +253,7 @@ export default {
             userData: JSON.parse(sessionStorage.getItem('userData')) || {},
             isDarkMode: false, // 黑暗模式开关
             mobileMenuOpen: false,
+            currentLanguage: localStorage.getItem('language') || 'zh', // 默认语言
         };
     },
     methods: {
@@ -211,6 +271,16 @@ export default {
             this.activeIndex = route;
             this.$router.push('/' + route);
             this.mobileMenuOpen = false;
+        },
+        changeLanguage(lang) {
+            if (this.currentLanguage !== lang) {
+                this.currentLanguage = lang;
+                localStorage.setItem('language', lang);
+                this.$i18n.locale = lang;
+                // 刷新页面以应用新语言设置
+                // 可选: 如果你不想刷新整个页面，请删除下面这行
+                // window.location.reload();
+            }
         }
     },
     watch: {
@@ -234,6 +304,9 @@ export default {
             document.body.classList.toggle('dark-mode', this.isDarkMode);
             document.documentElement.classList.add('dark');
         }
+        
+        // 设置初始语言
+        this.$i18n.locale = this.currentLanguage;
     },
 };
 </script>
@@ -257,7 +330,21 @@ export default {
 
 .dark-mode-toggle {
     margin: 13px;
-    margin-right: 30px;
+    margin-right: 15px;
+}
+
+.language-switcher {
+    margin: 15px 30px 13px 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.language-icon {
+    color: #409EFF;
+}
+
+.dark-mode .language-icon {
+    color: #79bbff;
 }
 
 .dark-mode .main-header {
@@ -296,6 +383,17 @@ export default {
 
 .mobile-dark-toggle {
     margin-right: 5px;
+}
+
+.language-icon-mobile {
+    font-size: 18px;
+    color: #409EFF;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.dark-mode .language-icon-mobile {
+    color: #79bbff;
 }
 
 .mobile-menu-button {
