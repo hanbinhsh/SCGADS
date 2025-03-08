@@ -5,7 +5,7 @@
         <div class="header-logo">
           <img class="logo" src="../assets/logo.png" alt="Logo" />
         </div>
-        <h1 class="title">Sign in to scMoAnno</h1>
+        <h1 class="title">Sign in to SCGADS</h1>
         <h4 class="subtitle">
           Don't have your account yet?
           <a href="/Register">Register now</a>
@@ -25,7 +25,7 @@
         </el-form>
         <el-divider></el-divider>
         <el-button type="primary" class="submit-button" @click="onShow">Sign in to
-          scMoAnno</el-button>
+          SCGADS</el-button>
         <Vcode :show="isShow" @success="onSuccess" @close="onClose" slider-text="Slide to complete the puzzle"
           success-text="Verification successful!" fail-text="Verification Failed!"/>
         <div class="backHome">

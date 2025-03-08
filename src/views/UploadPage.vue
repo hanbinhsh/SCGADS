@@ -78,7 +78,7 @@
 
           <!-- 右侧：参数设置 -->
           <el-col :span="10">
-            <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;">
+            <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;" id="model-select">
               <el-form label-width="40%">
               <!-- 模型选择 -->
               <el-form-item label="Model Select">
@@ -88,7 +88,7 @@
               </el-form-item>
             </el-form>
             </el-card>
-            <el-card class="form-card animate__animated animate__fadeInRight">
+            <el-card class="form-card animate__animated animate__fadeInRight" id="parameters">
               <el-form label-width="40%">
                 <!-- 参数输入框 -->
                 <el-alert type="info" show-icon :closable="false" v-if="activeTask === 'annotation'">
@@ -109,7 +109,7 @@
         <div class="footer-button-row">
           <el-button type="primary" class="footer-action-button" @click="open = true" ref="ref3">Tutorial</el-button>
           <el-button type="warning" class="footer-action-button" @click="handleResetClick">Reset</el-button>
-          <el-button type="success" class="footer-action-button" @click="handleUploadClick">Upload</el-button>
+          <el-button type="success" class="footer-action-button" @click="handleUploadClick" id="upload">Upload</el-button>
         </div>
       </div>
     </section>
@@ -117,12 +117,14 @@
 
   <!-- Element Plus 的引导教程 -->
   <el-tour v-model="open">
-    <el-tour-step target="#image-row" title="Model" description="Our scMoAnno Model" />
+    <el-tour-step target="#model-select" title="Select Model" description="Select model here." />
+    <el-tour-step target="#image-row" title="Model" description="Check the model figure." />
     <el-tour-step target="#upload-row" title="Upload File">
       <div>Put your files here.</div>
     </el-tour-step>
-    <el-tour-step target="#button-row" title="Upload" description="Click to upload" />
-    <el-tour-step target="#WorkSpase" title="Results" description="Results will be shown here" />
+    <el-tour-step target="#parameters" title="Input Parameters" description="Input parameters if necessary." />
+    <el-tour-step target="#upload" title="Upload" description="Click to upload." />
+    <el-tour-step target="#WorkSpase" title="Results" description="Results will be shown here." />
   </el-tour>
 
   <!-- 任务名输入框 -->
@@ -288,6 +290,7 @@ export default {
       this.taskName = "";
     },
     async UploadFiles() {
+      this.loading = true;
       const userId = JSON.parse(sessionStorage.getItem('userData')).userId;
       const paramString = Object.entries(this.parameters)
         .filter(([key]) => key !== 'model') // 过滤掉 model 属性
@@ -299,9 +302,9 @@ export default {
         .join(','); // 用逗号拼接
       const task = {
         taskName: this.taskName,
-        details : "Details about " + this.taskName,
+        details : '',
         uploaderId : userId,
-        type : this.selectedModel.modelType,
+        type : this.activeTask + ':' +this.selectedModel.modelType,
         parameters : paramString,
         model : this.selectedModel.modelName,
         modelId : this.selectedModel.modelId,
@@ -344,11 +347,12 @@ export default {
 
         await Promise.all(uploadPromises);
 
+        this.showTaskNameDialog = false; // 成功上传后关闭对话框
+        this.loading = false;
         ElMessage.success('Task created successfully.');
         this.tagFile = [];
         this.scATACSeqFile = [];
         this.scRNASeqFile = [];
-        this.showTaskNameDialog = false; // 成功上传后关闭对话框
       }
     },
   },

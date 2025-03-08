@@ -79,7 +79,6 @@ const isDark = useDark();
 const toggleDark = useToggle(isDark);
 const isDarkTag = ref(false);
 const toggleTheme = (event) => {
-  
   const x = event.clientX;
   const y = event.clientY;
   const endRadius = Math.hypot(
@@ -143,6 +142,7 @@ export default {
             this.activeIndex = to.name;
         },
         isDarkMode(newVal) {
+            this.$emit('darkmodeChanged', this.isDarkMode); // 全局通知，此处用于更新图表图例文字
             // 将黑暗模式状态保存到本地存储
             localStorage.setItem('isDarkMode', newVal);
             document.body.classList.toggle('dark-mode', newVal); // 切换 body 的黑暗模式类

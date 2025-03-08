@@ -456,7 +456,7 @@ export default {
         params.append('type', this.selectedTask.type);
         params.append('userName', this.selectedTask.user_name);
         params.append('taskName', this.selectedTask.task_name);
-        await axios.post("/api/tsneProgress", params)
+        await axios.post("/api/chartProgress", params)
       } catch (error) {
         console.error("Progress failed:", error);
       }

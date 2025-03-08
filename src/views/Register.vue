@@ -3,7 +3,7 @@
     <div class="register-box">
       <div class="register-page-header">
         <img class="logo" src="../assets/logo.png" alt="Logo" />
-        <h1 class="title">Sign up for scMoAnno</h1>
+        <h1 class="title">Sign up for SCGADS</h1>
         <p class="subtitle">Create an account to log in to the system</p>
       </div>
       <el-steps :active="activeStep" finish-status="success" class="steps" align-center>
