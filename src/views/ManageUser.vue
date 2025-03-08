@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <section class="fullscreen-section">
+    <el-main class="fullscreen-section">
       <h1 class="page-name">Manage Users</h1>
       <el-divider />
       <!-- 用户列表表格 -->
@@ -47,7 +47,7 @@
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="userList.length">
       </el-pagination>
-    </section>
+    </el-main>
 
     <!-- 按钮行 -->
     <div class="footer">

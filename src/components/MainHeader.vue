@@ -1,5 +1,5 @@
 <template>
-    <div class="header-container">
+    <div>
         <!-- Desktop Menu -->
         <el-menu :default-active="activeIndex" class="el-menu main-header desktop-menu" mode="horizontal" :ellipsis="false"
             @select="handleSelect" :router="true" v-if="!isMobile">
@@ -304,7 +304,6 @@ export default {
             document.body.classList.toggle('dark-mode', this.isDarkMode);
             document.documentElement.classList.add('dark');
         }
-        
         // 设置初始语言
         this.$i18n.locale = this.currentLanguage;
     },

@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <section class="fullscreen-section">
+    <el-main class="fullscreen-section">
       <h1 class="page-name">Manage Model</h1>
       <el-divider />
       <el-table 
@@ -33,7 +33,7 @@
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="listData.length"></el-pagination>
-    </section>
+    </el-main>
 
     <!-- 按钮行 -->
     <div class="footer">
