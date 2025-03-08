@@ -76,7 +76,7 @@
                 <div class="mobile-controls">
                     <el-switch id="dark-mobile" v-model="isDarkMode" :active-icon="Sunny" :inactive-icon="Moon" inline-prompt
                         width="15" @click="toggleTheme($event)" class="mobile-dark-toggle"></el-switch>
-                    <el-button type="text" @click="mobileMenuOpen = !mobileMenuOpen" class="mobile-menu-button">
+                    <el-button link @click="mobileMenuOpen = !mobileMenuOpen" class="mobile-menu-button">
                         <el-icon v-if="!mobileMenuOpen"><Menu /></el-icon>
                         <el-icon v-else><Close /></el-icon>
                     </el-button>
@@ -132,7 +132,6 @@ const toggleDark = useToggle(isDark);
 const isDarkTag = ref(false);
 
 const isMobile = ref(false);
-const mobileMenuOpen = ref(false);
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth < 768;
@@ -194,6 +193,7 @@ export default {
             defaultAvatar: logo,
             userData: JSON.parse(sessionStorage.getItem('userData')) || {},
             isDarkMode: false, // 黑暗模式开关
+            mobileMenuOpen: false,
         };
     },
     methods: {
