@@ -154,9 +154,9 @@
             </el-table-column>
             <el-table-column prop="type" label="Type" sortable>
               <template #default="{ row }">
-                {{ row.type === "single" ? "Single-omic Annotation" :
-                 row.type === "multi" ? "Multi-omics Annotation" :
-                 row.type === "deno" ? "Denoising" : "Unknown" }}
+                {{ (row.type?.split(':')[1] || "") === "single" ? "Single-omic Annotation" :
+                   (row.type?.split(':')[1] || "") === "multi" ? "Multi-omics Annotation" :
+                   (row.type?.split(':')[1] || "") === "deno" ? "Denoising" : "Unknown"}}
               </template>
             </el-table-column>
             <el-table-column prop="model" label="Model" sortable>

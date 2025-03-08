@@ -10,11 +10,11 @@
         </el-menu-item>
         <el-menu-item index="a">
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
-          <span>Lock</span>
+          <span>UMAP</span>
         </el-menu-item>
         <el-menu-item index="b">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
-          <span>Lock</span>
+          <span>Denoising</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -26,7 +26,12 @@
               <div slot="header" class="card-header">
                 <el-text class="mx-1" size="large"></el-text>
                 <span class="page-name">{{ taskName || "Example" }} Data Visualization</span>
-                <!-- <el-button type="primary" style="float: right;" @click="download()">Download</el-button> -->
+                <el-button type="primary" style="float: right;" @click="" :disabled="true"> <!-- TODO -->
+                  <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;Switch&nbsp;
+                  <span v-if="true">True</span> <!-- TODO -->
+                  <span v-if="false">Pred</span> <!-- TODO -->
+                </el-button>
+                
               </div>
             </template>
             <div class="card-body">
@@ -173,6 +178,8 @@ export default {
   },
   data() {
     return {
+      taskType: false, // TODO
+
       tableData: data.map((coord, index) => ({
         index: index + 1,
         coord,
