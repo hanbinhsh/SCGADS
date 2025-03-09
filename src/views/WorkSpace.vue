@@ -134,7 +134,7 @@
           </template>
           <div class="success-tasks-list">
             <div v-if="completedCount === 0" class="empty-state">
-              No recent shares found
+              No recent received shares found
             </div>
             <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
               <div class="success-task-header">
