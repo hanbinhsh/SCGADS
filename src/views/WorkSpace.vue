@@ -6,7 +6,7 @@
       <!-- Left Column with 4 Cards -->
       <div class="left-column" :class="{ 'with-expanded-right': isRightColumnExpanded }">
         <!-- Card 1: Status Chart -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>Task Status</span>
@@ -45,14 +45,7 @@
                     <div class="success-task-header">
                       <font-awesome-icon :style="{ color: '#67C23A' }" :icon="['fas', 'circle']" />
                       <span class="success-task-name">{{ task.taskName }}</span>
-                      <el-button 
-                          link 
-                          type="success" 
-                          size="small" 
-                          @click="showCharts(task.taskName)" 
-                          :disabled="task.status !== 2"
-                          style="margin-left: auto;"
-                        >
+                      <el-button link type="success" size="small" @click="showCharts(task.taskName)" :disabled="task.status !== 2" style="margin-left: auto;">
                         Virtualization
                       </el-button>
                     </div>
@@ -66,15 +59,57 @@
           </div>
         </el-card>
 
-        <!-- Card 2: Empty for now -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
+        <!-- Card 2: Shares -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
-              <span>Card 2</span>
+              <span>My Shares</span>
             </div>
           </template>
-          <div class="empty-state">
-            Under Construction
+          <div class="success-tasks-list">
+            <div v-if="completedCount === 0" class="empty-state">
+              No recent shares found
+            </div>
+            <div v-for="(data, index) in shareList" :key="index" class="success-task-item">
+              <div class="success-task-header">
+                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <span class="success-task-name">{{ data.task_name }}</span>
+
+                <!-- 任务分享时间状态 -->
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> Indefinite </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> Expired </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
+                  Expire: {{ formatDate(data.due_time) }}
+                </span>
+                <el-progress 
+                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
+                  type="line"
+                  style="margin-left: 10px; width: 80px;" 
+                  :stroke-width="12"
+                  :show-text="false"
+                />
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  Copy Link
+                </el-button>
+                <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
+                  Edit
+                </el-button>
+                <el-button link type="danger" size="small" @click="" v-if="!isRightColumnExpanded">
+                  Delete
+                </el-button>
+              </div>
+
+              <div class="success-task-details">
+                {{ formatDate(data.shared_time) }}
+                <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                  Details
+                </el-button>
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                  Virtualization
+                </el-button>
+              </div>
+            </div>
           </div>
         </el-card>
         
@@ -90,15 +125,51 @@
           </div>
         </el-card>
         
-        <!-- Card 4: Empty for now -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
+        <!-- Shares Received -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
-              <span>Card 4</span>
+              <span>Share Received</span>
             </div>
           </template>
-          <div class="empty-state">
-            Under Construction
+          <div class="success-tasks-list">
+            <div v-if="completedCount === 0" class="empty-state">
+              No recent shares found
+            </div>
+            <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
+              <div class="success-task-header">
+                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <span class="success-task-name">{{ data.task_name }}</span>
+
+                <!-- 任务分享时间状态 -->
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> Indefinite </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> Expired </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
+                  Expire: {{ formatDate(data.due_time) }}
+                </span>
+                <el-progress 
+                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
+                  type="line"
+                  style="margin-left: 10px; width: 80px;" 
+                  :stroke-width="12"
+                  :show-text="false"
+                />
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  Copy Link
+                </el-button>
+                <el-button link type="info" size="small" @click=""  v-if="!isRightColumnExpanded">
+                  Details
+                </el-button>
+              </div>
+
+              <div class="success-task-details">
+                {{ formatDate(data.shared_time) }}
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                  Virtualization
+                </el-button>
+              </div>
+            </div>
           </div>
         </el-card>
       </div>
@@ -209,7 +280,7 @@
           <!-- Button Row -->
           <div class="footer">
             <div class="footer-button-row">
-              <el-button type="success" @click="fetchTaskList">
+              <el-button type="success" @click="Refresh">
                 Refresh
               </el-button>
               <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
@@ -271,6 +342,8 @@ export default {
     return {
       userData: JSON.parse(sessionStorage.getItem("userData")) || {},
       taskList: [], // 存储任务数据
+      shareList: [], // 分享数据
+      shareReceivedList: [], // 收到的分享数据
       paginatedTaskList: [], // 当前页的任务数据
       deleteDialogVisible: false,
       batchDeleteDialogVisible: false,
@@ -282,6 +355,7 @@ export default {
       sortOrder: '', // 当前排序方向
       sortProp: '', // 当前排序属性
       loading: false,
+      shareLoading: false,
       isRightColumnExpanded: false, // 控制右侧列表是否展开
       statusChart: null, // 存储ECharts实例
     };
@@ -309,6 +383,22 @@ export default {
     }
   },
   methods: {
+    getShareProgress(startTime, dueTime) {
+      if (!startTime || !dueTime) return 100; // 处理异常情况，默认 100%
+
+      const start = new Date(startTime).getTime();
+      const end = new Date(dueTime).getTime();
+      const now = new Date().getTime();
+
+      if (now >= end) return 100; // 已过期
+      if (now <= start) return 0;  // 刚开始
+
+      return Math.min(100, ((now - start) / (end - start)) * 100); // 计算进度
+    },
+    Refresh() {
+      this.fetchShareList();
+      this.fetchTaskList();
+    },
     // 切换右侧列表的展开/折叠状态
     toggleRightColumn() {
       this.isRightColumnExpanded = !this.isRightColumnExpanded;
@@ -321,6 +411,23 @@ export default {
           this.initStatusChart();
         }, 300); // 延迟 0.3 秒
       });
+    },
+    async fetchShareList() {
+      try {
+        this.shareLoading = true; // ShareLoading
+        const response = await axios.get("/api/share/findSharesByUserId?userID=" + this.userData.userId);
+        const responseReceived = await axios.get("/api/share/findSharesReceivedByUserId?userID=" + this.userData.userId);
+        if (response.data.code === 200 && responseReceived.data.code === 200) {
+          this.shareList = response.data.data;
+          this.shareReceivedList = responseReceived.data.data;
+        } else {
+          console.error("Failed to fetch share list:", response.data.msg + responseReceived.data.msg);
+        }
+        this.shareLoading = false;
+      } catch (error) {
+        console.error("Failed to fetch share list:", error);
+        this.shareLoading = false;
+      }
     },
     // 调整图表大小方法
     resizeCharts() {
@@ -532,6 +639,7 @@ export default {
   },
   mounted() {
     this.fetchTaskList(); // 组件挂载后获取任务数据
+    this.fetchShareList();
     // 设置图表响应式
     window.addEventListener('resize', this.resizeCharts);
   },
@@ -654,6 +762,7 @@ export default {
 }
 
 .success-task-details {
+  display: flex;
   padding-left: 20px;
   color: #606266;
   font-size: 14px;
