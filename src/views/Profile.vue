@@ -152,13 +152,22 @@ export default {
 </script>
 
 <style scoped>
+.main-page {
+  overflow: hidden;
+  height: 100vh;
+  scroll-behavior: smooth;
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
 .profile-section {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
   background-color: #f9f9f9;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
 .dark-mode .profile-section {
@@ -171,6 +180,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0.9;
 }
 
 .user-header {

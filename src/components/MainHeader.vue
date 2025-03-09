@@ -118,10 +118,10 @@
                 <div class="mobile-menu-dropdown" v-if="mobileMenuOpen">
                     <template v-if="!userData.userName">
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'Login' }" @click="navigateTo('Login')">
-                            {{ $t('navigateBar.Login') }}
+                            <font-awesome-icon :icon="['fas', 'right-to-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Login') }}
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'Register' }" @click="navigateTo('Register')">
-                            {{ $t('navigateBar.Register') }}
+                            <font-awesome-icon :icon="['fas', 'registered']" />&nbsp;&nbsp;{{ $t('navigateBar.Register') }}
                         </div>
                     </template>
                     
