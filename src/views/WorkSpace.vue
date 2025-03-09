@@ -86,7 +86,7 @@
                   :percentage="getShareProgress(data.shared_time, data.due_time)" 
                   type="line"
                   style="margin-left: 10px; width: 80px;" 
-                  :stroke-width="12"
+                  :stroke-width="10"
                   :show-text="false"
                 />
                 <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
@@ -152,7 +152,7 @@
                   :percentage="getShareProgress(data.shared_time, data.due_time)" 
                   type="line"
                   style="margin-left: 10px; width: 80px;" 
-                  :stroke-width="12"
+                  :stroke-width="10"
                   :show-text="false"
                 />
                 <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
