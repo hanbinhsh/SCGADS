@@ -36,6 +36,7 @@
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               Message
             </el-button>
+            <el-button link type="success" size="small" @click="showReplyDialog(row)">Reply</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
           </template>
         </el-table-column>
@@ -58,6 +59,27 @@
         </el-button>
       </div>
     </div>
+
+<!-- 回复对话框 -->
+<el-dialog 
+    v-model="replyDialogVisible" 
+    :title="`Reply to ${selectedFeedback.user_name}`" 
+    width="600px"
+  >
+    <el-input
+      v-model="replyContent"
+      type="textarea"
+      :rows="6"
+      placeholder="Please enter your reply..."
+      clearable
+    ></el-input>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelReply">Cancel</el-button>
+        <el-button type="primary" @click="sendReply">Send</el-button>
+      </div>
+    </template>
+  </el-dialog>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
@@ -121,9 +143,54 @@ export default {
       sortProp: '',
       sortOrder: '',
       loading:false,
+      replyDialogVisible: false,
+      replyContent: '',
+      selectedFeedbackId: null,
     };
   },
   methods: {
+
+    showReplyDialog(feedback) {
+      this.selectedFeedback = feedback;
+      this.selectedFeedbackId = feedback.feedback_id;
+      this.replyContent = feedback.reply_content || ''; // 如果有历史回复可以显示
+      this.replyDialogVisible = true;
+    },
+
+    cancelReply() {
+      this.replyDialogVisible = false;
+      this.replyContent = '';
+    },
+
+    async sendReply() {
+      if (!this.replyContent.trim()) {
+        ElMessage.warning('Reply content cannot be empty');
+        return;
+      }
+      
+      try {
+        const feedbackReply = {
+          feedbackId: this.selectedFeedbackId,
+          userId: this.selectedFeedback.user_id,
+          replyContent: this.replyContent,
+        }
+        const response = await axios.post('/api/replyFeedback', feedbackReply);
+        
+        if (response.data.code === 1) {
+          ElMessage.success('Reply sent successfully');
+          // 更新本地数据或刷新列表
+          this.fetchFeedbacks();
+          this.replyDialogVisible = false;
+          this.replyContent = '';
+        } else {
+          ElMessage.error(response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to send reply:', error);
+        ElMessage.error('Failed to send reply');
+      }
+    },
+
     showDeleteDialog(feedback) {
       this.deleteDialogVisible = true;
       this.selectedFeedback = feedback;
@@ -240,5 +307,15 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.el-textarea {
+  margin-bottom: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>
