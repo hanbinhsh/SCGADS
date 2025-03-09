@@ -7,7 +7,7 @@
           <el-card class="form-card">
             <template #header>
               <div slot="header" class="card-header">
-                <span>System Settings</span>
+                <span>{{ $t('navigateBar.SystemSettings') }}</span>
               </div>
             </template>
             <el-form label-width="30%">
@@ -19,7 +19,7 @@
                 <el-switch v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
               </el-form-item>
               <hr>
-              <el-button type="success" @click="submitForm" class="submit-button">Save</el-button>
+              <el-button type="success" @click="submitForm" class="submit-button">{{ $t('Save') }}</el-button>
             </el-form>
           </el-card>
         </el-col>

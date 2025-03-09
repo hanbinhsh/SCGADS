@@ -15,7 +15,7 @@
           <div class="logo-container">
             <img src="@/assets/logo.png" alt="Logo" class="logo" />
           </div>
-          <h1 class="hero-title">SCGADS: Smart Computing Genomic Analysis & Display System for Single-cell Data</h1>
+          <h1 class="hero-title">{{ $t('homeView.title') }}</h1>
           <div class="scroll-indicator">
             <el-icon>
               <ArrowDownBold />
@@ -28,35 +28,12 @@
       <section class="content-section">
         <div class="section-container">
           <div class="content-text">
-            <h2 class="section-title">Introduction to Single-Cell Type Annotation</h2>
-            <p>
-              Single-cell type annotation is a process in bioinformatics used to classify and identify different cell
-              types within a heterogeneous population at the single-cell level. This is crucial in understanding the
-              complex cellular composition of tissues, organs, and entire organisms. With the advent of high-throughput
-              single-cell sequencing technologies, researchers can now examine the transcriptomic and epigenomic
-              profiles of thousands to millions of cells, gaining deeper insights into cellular diversity,
-              differentiation pathways, and disease mechanisms.
-            </p>
-            <h2 class="section-title">What is scRNA-seq?</h2>
-            <p>
-              Single-cell RNA sequencing (scRNA-seq) is a powerful technique used to measure the gene expression levels
-              of individual cells. By capturing and sequencing the messenger RNA (mRNA) from single cells, scRNA-seq
-              enables the construction of comprehensive cellular maps, revealing the identities and states of distinct
-              cell types. This technology has revolutionized our understanding of cell differentiation, development, and
-              the molecular basis of diseases. scRNA-seq helps in discovering new cell types, understanding cell-to-cell
-              heterogeneity, and characterizing rare or transient cell populations that might be masked in bulk RNA
-              sequencing approaches.
-            </p>
-            <h2 class="section-title">What is scATAC-seq?</h2>
-            <p>
-              Single-cell Assay for Transposase-Accessible Chromatin using sequencing (scATAC-seq) is a technique used
-              to analyze the epigenetic landscape of individual cells by mapping open chromatin regions. Unlike
-              scRNA-seq, which focuses on gene expression, scATAC-seq provides information about the accessibility of
-              DNA regions that are potentially regulatory, such as enhancers and promoters. By understanding which
-              regions of the genome are accessible, scATAC-seq helps to elucidate the regulatory mechanisms that control
-              gene expression, providing insights into cell type-specific functions, gene regulatory networks, and the
-              dynamic changes in chromatin states during development or disease progression.
-            </p>
+            <h2 class="section-title">{{ $t('homeView.p21title') }}</h2>
+            <p>{{ $t('homeView.p21text') }}</p>
+            <h2 class="section-title">{{ $t('homeView.p22title') }}</h2>
+            <p>{{ $t('homeView.p22text') }}</p>
+            <h2 class="section-title">{{ $t('homeView.p23title') }}</h2>
+            <p>{{ $t('homeView.p23text') }}</p>
           </div>
           <div class="content-image">
             <img src="@/assets/dna.png" alt="DNA visualization" class="rounded-image" />
@@ -68,42 +45,12 @@
       <section class="content-section alt-bg">
         <div class="section-container">
           <div class="content-text full-width">
-            <h2 class="section-title">Integrating scRNA-seq and scATAC-seq for Cell Type Annotation</h2>
-            <p>
-              By integrating data from scRNA-seq and scATAC-seq, researchers can achieve a more comprehensive view of
-              cellular identity. scRNA-seq provides detailed insights into the transcriptional state of cells, while
-              scATAC-seq sheds light on the regulatory elements that shape these transcriptional programs. Together,
-              these technologies allow for more accurate annotation of cell types and states, understanding of cellular
-              hierarchies, and identification of key regulatory mechanisms driving cell fate decisions.
-            </p>
-            <p>
-              Single-cell type annotation, using both transcriptomic and epigenomic data, is crucial for
-              advancing our understanding of biology, developing new therapeutic strategies, and personalizing medicine
-              based on the cellular makeup of individual patients.
-            </p>
-            <p>
-              Cell type annotation is paramount for subsequent biomedical research endeavors. Recently, supervised
-              classification methods based on deep learning have demonstrated significant advancements in cell type
-              annotation. However, challenges persist regarding how to efficiently leverage single-cell multi omics data
-              for cell type annotation and interpretation and how to endow models with adaptive generalization
-              capabilities for efficient identification of rare cell types.
-            </p>
-            <p>
-              We introduce scMoAnno, a methodology for cell type annotation based on single-cell multi-omics data.
-              Leveraging pre-trained cross-attention networks, scMoAnno facilitates efficient mutual learning and fusion
-              of genetic and epigenetic distributions in single-cell multi-omics data, enabling precise cell type
-              annotation. Predictions conducted by scMoAnno on single-cell RNA sequencing (scRNA-seq) and single-cell
-              assay for transposase-accessible chromatin sequencing (scATAC-seq) data demonstrate enhanced
-              generalization capacity for the recognition of rare cell types through pre-trained feature fusion
-              extraction and training of classifiers based on fused data inputs.
-            </p>
-            <p>
-              Rigorously conducted experiments on four meticulously curated benchmark datasets illustrate that scMoAnno
-              surpasses nine other state-of-the-art baseline models in overall performance. Furthermore, the increase in
-              clustering scores, fused with multi-omics data and extracted by scMoAnno, is elucidated from the
-              perspective of promoting downstream analysis of single cells, explaining how our model's enhancement of
-              cell type annotation performance yields positive effects.
-            </p>
+            <h2 class="section-title">{{ $t('homeView.p31title') }}</h2>
+            <p>{{ $t('homeView.p31text') }}</p>
+            <p>{{ $t('homeView.p32text') }}</p>
+            <p>{{ $t('homeView.p33text') }}</p>
+            <p>{{ $t('homeView.p34text') }}</p>
+            <p>{{ $t('homeView.p35text') }}</p>
           </div>
         </div>
       </section>
@@ -112,25 +59,11 @@
       <section class="content-section">
         <div class="section-container">
           <div class="content-text">
-            <h2 class="section-title">The workflow diagram of scMoAnno</h2>
-            <p>
-              The scMoAnno model undergoes two rounds of supervised learning. In the first round, a pre-trained fusion
-              feature extractor is utilized to perform cross-attention feature extraction on scRNA-seq and scATAC-seq
-              data, encoding the interaction features of the two modalities.
-            </p>
-            <p>
-              In the second round, using the feature data generated by the pre-trained feature extractor, a
-              Transformer-based fusion data cell type annotation module is introduced to achieve the precise assignment
-              of cell types.
-            </p>
-            <h2 class="section-title mt-8">Comparative analysis results</h2>
-            <p>
-              In Table, the scMoAnno method outperformed the baseline comparison methods regarding accuracy
-              metrics. Compared to the best-performing baseline method CIForm in terms of accuracy, the scMoAnno method
-              achieved a 2% improvement in accuracy. In terms of balanced accuracy metrics, it reached a balanced
-              accuracy of 90%, which was on par with the best-performing baseline method, scTransSort. Thus, this
-              validates the feasibility and effectiveness of the proposed method in this study.
-            </p>
+            <h2 class="section-title">{{ $t('homeView.p41title') }}</h2>
+            <p>{{ $t('homeView.p411text') }}</p>
+            <p>{{ $t('homeView.p412text') }}</p>
+            <h2 class="section-title mt-8">{{ $t('homeView.p42title') }}</h2>
+            <p>{{ $t('homeView.p42text') }}</p>
           </div>
           <div class="content-image">
             <img src="@/assets/model_data.png" alt="Model data visualization" class="data-image" />

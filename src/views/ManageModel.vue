@@ -2,7 +2,7 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <h1 class="page-name">Manage Model</h1>
+      <h1 class="page-name">{{ $t('navigateBar.ManageModel') }}</h1>
       <el-divider />
       <el-table 
         :data="paginatedListData" 
@@ -13,13 +13,13 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="modelName" label="Model Name" sortable></el-table-column>
-        <el-table-column prop="modelType" label="Model Type" sortable></el-table-column>
-        <el-table-column prop="modelPath" label="Model Path" sortable></el-table-column>
-        <el-table-column prop="predictFilePath" label="Predict File Path" sortable></el-table-column>
-        <el-table-column prop="trainFilePath" label="Train File Path" sortable></el-table-column>
-        <el-table-column prop="figurePath" label="Figure Path" sortable></el-table-column>
-        <el-table-column fixed="right" label="Operations" width="250">
+        <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable></el-table-column>
+        <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable></el-table-column>
+        <el-table-column prop="modelPath" :label="$t('database.models.model_path')" sortable></el-table-column>
+        <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
+        <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
+        <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="250">
           <template #default="{ row }">
             <el-button link type="info" size="small" @click="showFigureDialog(row)">Figure</el-button>
             <el-button link type="success" size="small" @click="showParametersDialog(row)">Parameters</el-button>

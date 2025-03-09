@@ -21,35 +21,35 @@
                     {{ userData.userName }}
                 </template>
                 <el-menu-item index="Profile" :class="{ 'is-active': activeIndex === 'Profile' }" id="Profile">
-                    {{ $t('navigateBar.Profile') }}
+                    <font-awesome-icon :icon="['far', 'user']" />&nbsp;&nbsp;{{ $t('navigateBar.Profile') }}
                 </el-menu-item>
                 <el-menu-item @click="logout()">
-                    {{ $t('navigateBar.Logout') }}
+                    <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Logout') }}
                 </el-menu-item>
             </el-sub-menu>
             <el-sub-menu v-if="userData.userName && userData?.isAdmin" index="2">
                 <template #title>
                     {{ $t('navigateBar.Manage') }}
                 </template>
-                <el-menu-item index="ManageUser" :class="{ 'is-active': activeIndex === 'ManageUser' }"
+                <el-menu-item index="ManageUser" :class="{ 'is-active': activeIndex === 'ManageUser' } "
                     v-if="userData?.isAdmin">
-                    {{ $t('navigateBar.ManageUsers') }}
+                    <font-awesome-icon :icon="['far', 'address-book']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageUsers') }}
                 </el-menu-item>
                 <el-menu-item index="ManageTasks" :class="{ 'is-active': activeIndex === 'ManageTasks' }"
                     v-if="userData?.isAdmin">
-                    {{ $t('navigateBar.ManageTasks') }}
+                    <font-awesome-icon :icon="['fas', 'list-check']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageTasks') }}
                 </el-menu-item>
                 <el-menu-item index="ManageFeedback" :class="{ 'is-active': activeIndex === 'ManageFeedback' }"
                     v-if="userData.userName && userData.isAdmin">
-                    {{ $t('navigateBar.ManageFeedbacks') }}
+                    <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
                 </el-menu-item>
                 <el-menu-item index="ManageModel" :class="{ 'is-active': activeIndex === 'ManageModel' }"
                     v-if="userData.userName && userData.isAdmin">
-                    {{ $t('navigateBar.ManageModel') }}
+                    <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
                 </el-menu-item>
                 <el-menu-item index="SystemSettings" :class="{ 'is-active': activeIndex === 'SystemSettings' }"
                     v-if="userData.userName && userData.isAdmin">
-                    {{ $t('navigateBar.SystemSettings') }}
+                    <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}
                 </el-menu-item>
             </el-sub-menu>
             <el-menu-item index="WorkSpace" :class="{ 'is-active': activeIndex === 'WorkSpace' }" id="WorkSpase"
@@ -131,41 +131,47 @@
                             <span>{{ userData.userName }}</span>
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'Profile' }" @click="navigateTo('Profile')">
-                            {{ $t('navigateBar.Profile') }}
+                            <font-awesome-icon :icon="['far', 'user']" />&nbsp;&nbsp;{{ $t('navigateBar.Profile') }}
                         </div>
                         <div class="mobile-menu-item" @click="logout()">
-                            {{ $t('navigateBar.Logout') }}
+                            <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Logout') }}
                         </div>
                     </template>
                     
                     <template v-if="userData.userName && userData?.isAdmin">
                         <div class="mobile-menu-section">{{ $t('navigateBar.Manage') }}</div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageUser' }" @click="navigateTo('ManageUser')">
-                            {{ $t('navigateBar.ManageUsers') }}
+                            <font-awesome-icon :icon="['far', 'address-book']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageUsers') }}
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageTasks' }" @click="navigateTo('ManageTasks')">
-                            {{ $t('navigateBar.ManageTasks') }}
+                            <font-awesome-icon :icon="['fas', 'list-check']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageTasks') }}
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">
-                            {{ $t('navigateBar.ManageFeedbacks') }}
+                            <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
-                            {{ $t('navigateBar.ManageModel') }}
+                            <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
                         </div>
                         <div class="mobile-menu-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">
-                            {{ $t('navigateBar.SystemSettings') }}
+                            <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}
                         </div>
                     </template>
 
                     <template v-if="userData.userName">
                         <div class="mobile-menu-section">{{ $t('navigateBar.Applications') }}</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'WorkSpace' }" @click="navigateTo('WorkSpace')">WorkSpace</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Upload' }" @click="navigateTo('Upload')">Upload</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Feedback' }" @click="navigateTo('Feedback')">Feedback</div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'WorkSpace' }" @click="navigateTo('WorkSpace')">
+                            <font-awesome-icon :icon="['fas', 'gauge']" />&nbsp;&nbsp;{{ $t('navigateBar.WorkSpace') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Upload' }" @click="navigateTo('Upload')">
+                            <font-awesome-icon :icon="['fas', 'upload']" />&nbsp;&nbsp;{{ $t('navigateBar.Upload') }}
+                        </div>
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Feedback' }" @click="navigateTo('Feedback')">
+                            <font-awesome-icon :icon="['far', 'comment-dots']" />&nbsp;&nbsp;{{ $t('navigateBar.Feedback') }}
+                        </div>
                     </template>
                     
                     <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
-                        {{ $t('navigateBar.Virtualization') }}
+                        <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
                     </div>
                 </div>
             </el-collapse-transition>
@@ -277,9 +283,7 @@ export default {
                 this.currentLanguage = lang;
                 localStorage.setItem('language', lang);
                 this.$i18n.locale = lang;
-                // 刷新页面以应用新语言设置
-                // 可选: 如果你不想刷新整个页面，请删除下面这行
-                // window.location.reload();
+                window.location.reload(); // TODO 这里刷新后才会改变el自带组件的语言，逻辑在App.vue
             }
         }
     },
