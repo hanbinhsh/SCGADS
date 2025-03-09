@@ -2,7 +2,7 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <h1 class="page-name">Manage Tasks</h1>
+      <h1 class="page-name">{{ $t('navigateBar.ManageTasks') }}</h1>
       <el-divider />
       <!-- 任务列表表格 -->
       <el-table :data="paginatedTaskList" 
@@ -13,7 +13,7 @@
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
 
-        <el-table-column prop="user_name" label="User" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -24,32 +24,32 @@
           </template>
         </el-table-column>
         <!-- 显示上传者的电子邮件 -->
-        <el-table-column prop="email" label="Email" sortable></el-table-column>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
         <!-- 显示上传者的电话 -->
-        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
         <!-- 显示任务名 -->
-        <el-table-column prop="task_name" label="Task Name" sortable></el-table-column>
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
         <!-- 显示任务开始时间 -->
-        <el-table-column prop="start_time" label="Start Time" sortable>
+        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
           <template #default="{ row }">
             {{ formatDate(row.start_time) }}
           </template>
         </el-table-column>
         <!-- 显示任务结束时间 -->
-        <el-table-column prop="end_time" label="End Time" sortable>
+        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
           <template #default="{ row }">
             {{ row.end_time ? formatDate(row.end_time) : "Not completed yet" }}
           </template>
         </el-table-column>
         <!-- 显示任务状态 -->
-        <el-table-column prop="status" label="Status" sortable>
+        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" label="Operations" width="420">
+        <el-table-column fixed="right" :label="$t('Operations')" width="420">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
               AutoProgress

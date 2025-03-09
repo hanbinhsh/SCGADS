@@ -2,7 +2,7 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <h1 class="page-name">Manage Feedbacks</h1>
+      <h1 class="page-name">{{ $t('navigateBar.ManageFeedbacks') }}</h1>
       <el-divider />
       <el-table 
         :data="paginatedFeedbackList" 
@@ -13,7 +13,7 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" label="User" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -23,15 +23,15 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="Email" sortable></el-table-column>
-        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
-        <el-table-column prop="subject" label="Subject" sortable></el-table-column>
-        <el-table-column prop="created_time" label="Create Time" width="180" sortable>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable></el-table-column>
+        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="180" sortable>
           <template #default="{ row }">
             {{ formatDate(row.created_time) }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="180">
+        <el-table-column fixed="right" :label="$t('Operations')" width="180">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               Message
@@ -123,6 +123,7 @@
 import MainHeader from "../components/MainHeader.vue";
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import logo from '../assets/logo.png';
 
 export default {
   name: 'FeedbackPage',
@@ -146,6 +147,7 @@ export default {
       replyDialogVisible: false,
       replyContent: '',
       selectedFeedbackId: null,
+      defaultAvatar: logo,
     };
   },
   methods: {
