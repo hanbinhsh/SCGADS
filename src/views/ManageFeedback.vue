@@ -31,7 +31,7 @@
             {{ formatDate(row.created_time) }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" :label="$t('Operations')" width="180">
+        <el-table-column fixed="right" :label="$t('Operations')" width="220">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               Message
