@@ -306,7 +306,6 @@ export default {
         uploaderId : userId,
         type : this.activeTask + ':' +this.selectedModel.modelType,
         parameters : paramString,
-        model : this.selectedModel.modelName,
         modelId : this.selectedModel.modelId,
       }
       const response = await axios.post('/api/insertTask', task);

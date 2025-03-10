@@ -36,7 +36,7 @@ const en = {
       task_name: "Task Name",
       start_time: "Start Time",
       end_time: "End Time",
-      status: "Flag",
+      status: "Status",
       details: "Details",
       uploader_id: "Uploader ID",
       type: "Task Type",

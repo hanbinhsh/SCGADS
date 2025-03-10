@@ -12,7 +12,6 @@
         v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-
         <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
@@ -23,12 +22,12 @@
             </div>
           </template>
         </el-table-column>
+        <!-- 显示任务名 -->
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
         <!-- 显示上传者的电子邮件 -->
         <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
         <!-- 显示上传者的电话 -->
         <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-        <!-- 显示任务名 -->
-        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
         <!-- 显示任务开始时间 -->
         <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
           <template #default="{ row }">
@@ -174,8 +173,46 @@
     </el-dialog>
 
     <!-- 任务详细信息对话框 -->
-    <el-dialog v-model="detailDialogVisible" title="Detail" width="500" align-center>
-      <span>{{ selectedTask.details }}</span>
+    <el-dialog v-model="detailDialogVisible" title="Task Detail" width="550px" align-center>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item label="Task Name">
+          {{ selectedTask.task_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="Details">
+          {{ selectedTask.details }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="Type">
+          {{
+            (selectedTask.type?.split(':')[1] || "") === "single" ? "Single-omic" :
+            (selectedTask.type?.split(':')[1] || "") === "multi" ? "Multi-omics" :
+            (selectedTask.type?.split(':')[1] || "") === "deno" ? "Denoising" : "Unknown"
+          }}
+          {{
+            (selectedTask.type?.split(':')[0] || "") === "annotation" ? " Annotation" :
+            (selectedTask.type?.split(':')[0] || "") === "trainning" ? " Trainning" :
+            (selectedTask.type?.split(':')[0] || "") === "denoising" ? "" : " Unknown"
+          }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="Model Name">
+          {{ selectedTask.model_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item label="Parameters">
+          <el-scrollbar max-height="150px">
+            <el-row v-for="(param, index) in (selectedTask.parameters || selectedTask.default_parameters || '').split(',')" :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
+        </el-descriptions-item>
+      </el-descriptions>
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
@@ -187,7 +224,7 @@
     <el-dialog v-model="editDialogVisible" title="Edit Task Status" width="500" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
-        Note: When setting the status, the end time will be automatically updated.
+        Note: When setting status completed, end time will be automatically updated.
       </div>
       <el-form :model="selectedTask" label-width="120px">
         <el-form-item label="Task Name">
@@ -645,3 +682,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.param-tag {
+  margin: 2px 0;
+}
+</style>

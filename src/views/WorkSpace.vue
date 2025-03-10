@@ -44,8 +44,8 @@
                   <div v-for="(task, index) in sortedCompletedTasks" :key="index" class="success-task-item">
                     <div class="success-task-header">
                       <font-awesome-icon :style="{ color: '#67C23A' }" :icon="['fas', 'circle']" />
-                      <span class="success-task-name">{{ task.taskName }}</span>
-                      <el-button link type="success" size="small" @click="showCharts(task.taskName)" :disabled="task.status !== 2" style="margin-left: auto;">
+                      <span class="success-task-name">{{ task.task_name }}</span>
+                      <el-button link type="success" size="small" @click="showCharts(task.task_name)" :disabled="task.status !== 2" style="margin-left: auto;">
                         Virtualization
                       </el-button>
                     </div>
@@ -67,7 +67,7 @@
             </div>
           </template>
           <div class="success-tasks-list">
-            <div v-if="completedCount === 0" class="empty-state">
+            <div v-if="shareCount === 0" class="empty-state">
               No recent shares found
             </div>
             <div v-for="(data, index) in shareList" :key="index" class="success-task-item">
@@ -133,7 +133,7 @@
             </div>
           </template>
           <div class="success-tasks-list">
-            <div v-if="completedCount === 0" class="empty-state">
+            <div v-if="receivedShareCount === 0" class="empty-state">
               No recent received shares found
             </div>
             <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
@@ -188,10 +188,10 @@
           <el-table :data="paginatedTaskList" 
             style="width: 100%" 
             v-loading="loading">
-            <el-table-column prop="taskName" label="Task Name">
+            <el-table-column prop="task_name" label="Task Name">
               <template #default="{ row }">
                 <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-                {{ row.taskName }}
+                {{ row.task_name }}
               </template>
             </el-table-column>
           </el-table>
@@ -217,32 +217,35 @@
             v-loading="loading">
             <!-- 多选框 -->
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="taskName" label="Task Name" sortable>
+            <el-table-column prop="task_name" label="Task Name" sortable>
               <template #default="{ row }">
                 <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-                {{ row.taskName }}
+                {{ row.task_name }}
               </template>
             </el-table-column>
             <el-table-column prop="type" label="Type" sortable>
               <template #default="{ row }">
-                {{ (row.type?.split(':')[1] || "") === "single" ? "Single-omic Annotation" :
-                   (row.type?.split(':')[1] || "") === "multi" ? "Multi-omics Annotation" :
+                {{ (row.type?.split(':')[1] || "") === "single" ? "Single-omic" :
+                   (row.type?.split(':')[1] || "") === "multi" ? "Multi-omics" :
                    (row.type?.split(':')[1] || "") === "deno" ? "Denoising" : "Unknown"}}
+                {{ (row.type?.split(':')[0] || "") === "annotation" ? " Annotation" :
+                   (row.type?.split(':')[0] || "") === "trainning" ? " Trainning" :
+                   (row.type?.split(':')[0] || "") === "denoising" ? "" : " Unknown"}}
               </template>
             </el-table-column>
-            <el-table-column prop="model" label="Model" sortable>
+            <el-table-column prop="model_name" label="Model" sortable>
               <template #default="{ row }">
-                {{ row.model ?? "Unknown" }}
+                {{ row.model_name ?? "Unknown" }}
               </template>
             </el-table-column>
-            <el-table-column prop="startTime" label="Request Time" sortable>
+            <el-table-column prop="start_time" label="Request Time" sortable>
               <template #default="{ row }">
-                {{ formatDate(row.startTime) }}
+                {{ formatDate(row.start_time) }}
               </template>
             </el-table-column>
-            <el-table-column prop="endTime" label="Complete Time" sortable>
+            <el-table-column prop="end_time" label="Complete Time" sortable>
               <template #default="{ row }">
-                {{ (row.endTime&&row.status===2) ? formatDate(row.endTime) : "Not completed yet" }}
+                {{ (row.end_time&&row.status===2) ? formatDate(row.end_time) : "Not completed yet" }}
               </template>
             </el-table-column>
             <el-table-column prop="status" label="Status" sortable>
@@ -252,7 +255,7 @@
             </el-table-column>
             <el-table-column fixed="right" label="Operations" width="300">
               <template #default="{ row }">
-                <el-button link type="success" size="small" @click="showCharts(row.taskName)" :disabled="row.status !== 2">
+                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
                   Virtualization
                 </el-button>
                 <el-button link type="primary" size="small" @click="showDetailDialog(row)">
@@ -304,7 +307,7 @@
     </el-dialog>
 
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask?.taskName }}</strong> will be deleted</span>
+      <span>Task <strong style="color: #e74c3c;">{{ selectedTask?.task_name }}</strong> will be deleted</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
@@ -373,6 +376,12 @@ export default {
     },
     errorCount() {
       return this.taskList.filter(task => task.status === -1).length;
+    },
+    receivedShareCount() {
+      return this.shareReceivedList.length;
+    },
+    shareCount(){
+      return this.shareList.length;
     },
     // 获取错误任务列表
     completedTasks() {
@@ -521,9 +530,9 @@ export default {
     },
     async deleteTask() {
       try {
-        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.taskName);
+        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.task_name);
         ElMessage.success("Delete success.");
-        this.fetchTaskList();
+        this.Refresh();
       } catch (error) {
         console.error("Delete failed:", error);
         ElMessage.error("Delete failed.");
@@ -532,10 +541,10 @@ export default {
     async confirmBatchDelete() {
       this.batchDeleteDialogVisible = false;
       for (const task of this.selectedTasks) {
-        await this.deleteTaskByTaskName(task.taskName);
+        await this.deleteTaskByTaskName(task.task_name);
       }
       ElMessage.success("Batch delete completed.");
-      this.fetchTaskList();
+      this.Refresh();
     },
     async deleteTaskByTaskName(taskName) {
       try {
@@ -638,8 +647,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchTaskList(); // 组件挂载后获取任务数据
-    this.fetchShareList();
+    this.Refresh(); // 组件挂载后获取任务数据
     // 设置图表响应式
     window.addEventListener('resize', this.resizeCharts);
   },
