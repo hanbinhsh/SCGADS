@@ -10,7 +10,47 @@ const zh =  {
   Phone: '电话号码',
   Enternewpassword: '请输入新密码',
   Operations: '操作',
+  Download: '下载',
+  Detail: '详情',
+  Edit: '编辑',
+  Delete: '删除',
+  Refresh: '刷新',
+  BatchDelete: '批量删除',
+  Notcompletedyet: '未完成',
+  Confirm: '确认',
+  Reset: '重置',
 
+  status: {
+    Pending: "待处理",
+    Processing: "处理中",
+    Completed: "已完成",
+    Error: "错误",
+    Unknown: "未知",
+  },
+  taskType: {
+    Singleomic: "单模态",
+    Multiomics: "多模态",
+    Denoising: "降噪",
+    Unknown: "未知",
+    Annotation: "注释",
+    Trainning: "训练",
+  },
+  workSpace: {
+    TaskStatus: "任务状态",
+    MyShares: "我的分享",
+    ShareReceived: "收到的分享",
+    Expand: "展开",
+    Collapse: "折叠",
+    Expire: "过期时间",
+    Expired: "已过期",
+    Indefinite: "无限期",
+    CopyLink: '复制链接',
+  },
+  taskManage: {
+    Auto: "自动处理",
+    BatchDownload: "批量下载",
+    BatchEdit: '批量编辑',
+  },
   database: {
     models: {
       model_id: "模型ID",
@@ -34,14 +74,13 @@ const zh =  {
     task: {
       task_id: "任务ID",
       task_name: "任务名",
-      start_time: "开始时间",
+      start_time: "创建时间",
       end_time: "结束时间",
       status: "状态",
       details: "详情",
       uploader_id: "上传者ID",
       type: "任务类型",
       parameters: "任务参数",
-      model: "模型",
       model_id: "模型ID"
     },
     files: {

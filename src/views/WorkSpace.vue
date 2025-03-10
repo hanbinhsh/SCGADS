@@ -9,7 +9,7 @@
         <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="loading">
           <template #header>
             <div class="card-header">
-              <span>Task Status</span>
+              <span>{{ $t('workSpace.TaskStatus') }}</span>
             </div>
           </template>
 
@@ -21,10 +21,10 @@
                 <!-- 任务统计信息 -->
                 <el-row>
                   <el-col :span="12">
-                    <el-row><el-tag type="warning" style="width: 80px;">Pending</el-tag></el-row>
-                    <el-row><el-tag type="primary" style="width: 80px;">Processing</el-tag></el-row>
-                    <el-row><el-tag type="success" style="width: 80px;">Completed</el-tag></el-row>
-                    <el-row><el-tag type="danger"  style="width: 80px;">Error</el-tag></el-row>
+                    <el-row><el-tag type="warning" style="width: 80px;">{{ $t('status.Pending') }}</el-tag></el-row>
+                    <el-row><el-tag type="primary" style="width: 80px;">{{ $t('status.Processing') }}</el-tag></el-row>
+                    <el-row><el-tag type="success" style="width: 80px;">{{ $t('status.Completed') }}</el-tag></el-row>
+                    <el-row><el-tag type="danger"  style="width: 80px;">{{ $t('status.Error') }}</el-tag></el-row>
                   </el-col>
                   <el-col :span="10">
                     <el-row><span class="status-count">{{ pendingCount }}</span></el-row>
@@ -46,7 +46,7 @@
                       <font-awesome-icon :style="{ color: '#67C23A' }" :icon="['fas', 'circle']" />
                       <span class="success-task-name">{{ task.task_name }}</span>
                       <el-button link type="success" size="small" @click="showCharts(task.task_name)" :disabled="task.status !== 2" style="margin-left: auto;">
-                        Virtualization
+                        {{ $t('navigateBar.Virtualization') }}
                       </el-button>
                     </div>
                     <div class="success-task-details">
@@ -63,7 +63,7 @@
         <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
-              <span>My Shares</span>
+              <span>{{ $t('workSpace.MyShares') }}</span>
             </div>
           </template>
           <div class="success-tasks-list">
@@ -76,10 +76,10 @@
                 <span class="success-task-name">{{ data.task_name }}</span>
 
                 <!-- 任务分享时间状态 -->
-                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> Indefinite </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> Expired </span>
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
                 <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
-                  Expire: {{ formatDate(data.due_time) }}
+                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
                 <el-progress 
                   v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
@@ -90,23 +90,23 @@
                   :show-text="false"
                 />
                 <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
-                  Copy Link
+                  {{ $t('workSpace.CopyLink') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
-                  Edit
+                  {{ $t('Edit') }}
                 </el-button>
                 <el-button link type="danger" size="small" @click="" v-if="!isRightColumnExpanded">
-                  Delete
+                  {{ $t('Delete') }}
                 </el-button>
               </div>
 
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }}
                 <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
-                  Details
+                  {{ $t('Detail') }}
                 </el-button>
                 <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
-                  Virtualization
+                  {{ $t('navigateBar.Virtualization') }}
                 </el-button>
               </div>
             </div>
@@ -129,7 +129,7 @@
         <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
-              <span>Share Received</span>
+              <span>{{ $t('workSpace.ShareReceived') }}</span>
             </div>
           </template>
           <div class="success-tasks-list">
@@ -142,10 +142,10 @@
                 <span class="success-task-name">{{ data.task_name }}</span>
 
                 <!-- 任务分享时间状态 -->
-                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> Indefinite </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> Expired </span>
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
                 <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
-                  Expire: {{ formatDate(data.due_time) }}
+                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
                 <el-progress 
                   v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
@@ -156,17 +156,17 @@
                   :show-text="false"
                 />
                 <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
-                  Copy Link
+                  {{ $t('workSpace.CopyLink') }}
                 </el-button>
                 <el-button link type="info" size="small" @click=""  v-if="!isRightColumnExpanded">
-                  Details
+                  {{ $t('Detail') }}
                 </el-button>
               </div>
 
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }}
                 <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" style="margin-left: auto" v-if="!isRightColumnExpanded">
-                  Virtualization
+                  {{ $t('navigateBar.Virtualization') }}
                 </el-button>
               </div>
             </div>
@@ -179,16 +179,16 @@
         :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
         <div class="column-toggle" @click="toggleRightColumn">
           <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
-            {{ isRightColumnExpanded ? 'Collapse' : 'Expand' }}
+            {{ isRightColumnExpanded ? $t('workSpace.Collapse') : $t('workSpace.Expand') }}
           </el-button>
         </div>
         
-        <!-- Collapsed View (Task Names Only) -->
+        <!-- Collapsed -->
         <div v-if="!isRightColumnExpanded" class="collapsed-task-list">
           <el-table :data="paginatedTaskList" 
             style="width: 100%" 
             v-loading="loading">
-            <el-table-column prop="task_name" label="Task Name">
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
               <template #default="{ row }">
                 <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
                 {{ row.task_name }}
@@ -207,7 +207,7 @@
           </el-pagination>
         </div>
         
-        <!-- Expanded View (Full Table) -->
+        <!-- Expanded -->
         <div v-else class="expanded-task-list">
           <!-- Original Full Table Layout -->
           <el-table :data="paginatedTaskList" 
@@ -217,52 +217,52 @@
             v-loading="loading">
             <!-- 多选框 -->
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="task_name" label="Task Name" sortable>
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
               <template #default="{ row }">
                 <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
                 {{ row.task_name }}
               </template>
             </el-table-column>
-            <el-table-column prop="type" label="Type" sortable>
+            <el-table-column prop="type" :label="$t('database.task.type')" sortable>
               <template #default="{ row }">
-                {{ (row.type?.split(':')[1] || "") === "single" ? "Single-omic" :
-                   (row.type?.split(':')[1] || "") === "multi" ? "Multi-omics" :
-                   (row.type?.split(':')[1] || "") === "deno" ? "Denoising" : "Unknown"}}
-                {{ (row.type?.split(':')[0] || "") === "annotation" ? " Annotation" :
-                   (row.type?.split(':')[0] || "") === "trainning" ? " Trainning" :
-                   (row.type?.split(':')[0] || "") === "denoising" ? "" : " Unknown"}}
+                {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+                   (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+                   (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+                {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+                   (row.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+                   (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
               </template>
             </el-table-column>
-            <el-table-column prop="model_name" label="Model" sortable>
+            <el-table-column prop="model_name" :label="$t('database.models.model_name')" sortable>
               <template #default="{ row }">
                 {{ row.model_name ?? "Unknown" }}
               </template>
             </el-table-column>
-            <el-table-column prop="start_time" label="Request Time" sortable>
+            <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
               <template #default="{ row }">
                 {{ formatDate(row.start_time) }}
               </template>
             </el-table-column>
-            <el-table-column prop="end_time" label="Complete Time" sortable>
+            <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
               <template #default="{ row }">
-                {{ (row.end_time&&row.status===2) ? formatDate(row.end_time) : "Not completed yet" }}
+                {{ (row.end_time&&row.status===2) ? formatDate(row.end_time) :  $t('Notcompletedyet') }}
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status" sortable>
+            <el-table-column prop="status" :label="$t('database.task.status')" sortable>
               <template #default="{ row }">
                 <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" label="Operations" width="300">
+            <el-table-column fixed="right" :label="$t('Operations')" width="300">
               <template #default="{ row }">
                 <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
-                  Virtualization
+                  {{ $t('navigateBar.Virtualization') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="showDetailDialog(row)">
-                  Detail
+                  {{ $t('Detail') }}
                 </el-button>
                 <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-                  Delete
+                  {{ $t('Delete') }}
                 </el-button>
               </template>
             </el-table-column>
@@ -600,15 +600,15 @@ export default {
     statusText(status) {
       switch (status) {
         case 0:
-          return "Pending";
+          return this.$t('status.Pending');
         case 1:
-          return "Processing";
+          return this.$t('status.Processing');
         case 2:
-          return "Completed";
+          return this.$t('status.Completed');
         case -1:
-          return "Error";
+          return this.$t('status.Error');
         default:
-          return "Unknown";
+          return this.$t('status.Unknown');
       }
     },
     statusType(status) {

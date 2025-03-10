@@ -10,7 +10,46 @@ const en = {
   Phone: 'Phone',
   Enternewpassword: 'Enter new password',
   Operations: 'Operations',
+  Download: 'Download',
+  Detail: 'Detail',
+  Edit: 'Edit',
+  Delete: 'Delete',
+  Refresh: 'Refresh',
+  BatchDelete: 'Batch Delete',
+  Notcompletedyet: 'Not completed yet',
+  Confirm: 'Confirm',
+  Reset: 'Reset',
 
+  status: {
+    Pending: "Pending",
+    Processing: "Processing",
+    Completed: "Completed",
+    Error: "Error",
+    Unknown: "Unknown",
+  },
+  taskType: {
+    Singleomic: "Single-omic",
+    Multiomics: "Multi-omics",
+    Denoising: "Denoising",
+    Unknown: "Unknown",
+    Annotation: "Annotation",
+    Trainning: "Trainning",
+  },
+  workSpace: {
+    TaskStatus: "Task Status",
+    MyShares: "My Shares",
+    ShareReceived: "Share Received",
+    Expand: "Expand",
+    Collapse: "Collapse",
+    Expire: "Expire",
+    Expired: "Expired",
+    CopyLink: 'Copy Link',
+  },
+  taskManage: {
+    Auto: "Auto",
+    BatchDownload: "Batch Download",
+    BatchEdit: 'Batch Edit',
+  },
   database: {
     models: {
       model_id: "Model ID",
@@ -41,7 +80,6 @@ const en = {
       uploader_id: "Uploader ID",
       type: "Task Type",
       parameters: "Task Parameters",
-      model: "Model",
       model_id: "Model ID"
     },
     files: {
