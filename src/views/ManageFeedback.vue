@@ -1,8 +1,8 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <section class="fullscreen-section">
-      <h1 class="page-name">Manage Feedbacks</h1>
+    <el-main class="fullscreen-section">
+      <h1 class="page-name">{{ $t('navigateBar.ManageFeedbacks') }}</h1>
       <el-divider />
       <el-table 
         :data="paginatedFeedbackList" 
@@ -13,7 +13,7 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" label="User" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -23,19 +23,20 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="Email" sortable></el-table-column>
-        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
-        <el-table-column prop="subject" label="Subject" sortable></el-table-column>
-        <el-table-column prop="created_time" label="Create Time" width="180" sortable>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable></el-table-column>
+        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="180" sortable>
           <template #default="{ row }">
             {{ formatDate(row.created_time) }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="Operations" width="180">
+        <el-table-column fixed="right" :label="$t('Operations')" width="220">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               Message
             </el-button>
+            <el-button link type="success" size="small" @click="showReplyDialog(row)">Reply</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
           </template>
         </el-table-column>
@@ -45,7 +46,7 @@
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="feedbackList.length"></el-pagination>
-    </section>
+    </el-main>
 
     <!-- 按钮行 -->
     <div class="footer">
@@ -58,6 +59,27 @@
         </el-button>
       </div>
     </div>
+
+<!-- 回复对话框 -->
+<el-dialog 
+    v-model="replyDialogVisible" 
+    :title="`Reply to ${selectedFeedback.user_name}`" 
+    width="600px"
+  >
+    <el-input
+      v-model="replyContent"
+      type="textarea"
+      :rows="6"
+      placeholder="Please enter your reply..."
+      clearable
+    ></el-input>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelReply">Cancel</el-button>
+        <el-button type="primary" @click="sendReply">Send</el-button>
+      </div>
+    </template>
+  </el-dialog>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
@@ -101,6 +123,7 @@
 import MainHeader from "../components/MainHeader.vue";
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import logo from '../assets/logo.png';
 
 export default {
   name: 'FeedbackPage',
@@ -121,9 +144,55 @@ export default {
       sortProp: '',
       sortOrder: '',
       loading:false,
+      replyDialogVisible: false,
+      replyContent: '',
+      selectedFeedbackId: null,
+      defaultAvatar: logo,
     };
   },
   methods: {
+
+    showReplyDialog(feedback) {
+      this.selectedFeedback = feedback;
+      this.selectedFeedbackId = feedback.feedback_id;
+      this.replyContent = feedback.reply_content || ''; // 如果有历史回复可以显示
+      this.replyDialogVisible = true;
+    },
+
+    cancelReply() {
+      this.replyDialogVisible = false;
+      this.replyContent = '';
+    },
+
+    async sendReply() {
+      if (!this.replyContent.trim()) {
+        ElMessage.warning('Reply content cannot be empty');
+        return;
+      }
+      
+      try {
+        const feedbackReply = {
+          feedbackId: this.selectedFeedbackId,
+          userId: this.selectedFeedback.user_id,
+          replyContent: this.replyContent,
+        }
+        const response = await axios.post('/api/replyFeedback', feedbackReply);
+        
+        if (response.data.code === 1) {
+          ElMessage.success('Reply sent successfully');
+          // 更新本地数据或刷新列表
+          this.fetchFeedbacks();
+          this.replyDialogVisible = false;
+          this.replyContent = '';
+        } else {
+          ElMessage.error(response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to send reply:', error);
+        ElMessage.error('Failed to send reply');
+      }
+    },
+
     showDeleteDialog(feedback) {
       this.deleteDialogVisible = true;
       this.selectedFeedback = feedback;
@@ -240,5 +309,15 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.el-textarea {
+  margin-bottom: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

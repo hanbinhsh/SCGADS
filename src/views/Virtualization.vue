@@ -31,7 +31,6 @@
                   <span v-if="true">True</span> <!-- TODO -->
                   <span v-if="false">Pred</span> <!-- TODO -->
                 </el-button>
-                
               </div>
             </template>
             <div class="card-body">
@@ -178,8 +177,6 @@ export default {
   },
   data() {
     return {
-      taskType: false, // TODO
-
       tableData: data.map((coord, index) => ({
         index: index + 1,
         coord,
@@ -193,7 +190,7 @@ export default {
       taskName: this.$route.params.taskName,
       isDarkMode: JSON.parse(localStorage.getItem('isDarkMode')) || false,
       activeChart: "tsne",
-      loading:false,
+      loading: false,
       userData: JSON.parse(sessionStorage.getItem('userData')) || {},
       magnifyRatio: 1,
       settingVisible: false,

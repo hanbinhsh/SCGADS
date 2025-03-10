@@ -1,8 +1,8 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <section class="fullscreen-section">
-      <h1 class="page-name">Manage Users</h1>
+    <el-main class="fullscreen-section">
+      <h1 class="page-name">{{ $t('navigateBar.ManageUsers') }}</h1>
       <el-divider />
       <!-- 用户列表表格 -->
       <el-table :data="paginatedUserList"
@@ -12,7 +12,7 @@
         v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="userName" label="User" sortable>
+        <el-table-column prop="userName" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -22,12 +22,12 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="Email" sortable></el-table-column>
-        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
-        <el-table-column prop="isAdmin" label="Admin" sortable></el-table-column>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
 
         <!-- 操作列 -->
-        <el-table-column fixed="right" label="Operations" width="150">
+        <el-table-column fixed="right" :label="$t('Operations')" width="150">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showEditDialog(row)">Edit</el-button>
             <!-- 禁用删除按钮 -->
@@ -47,7 +47,7 @@
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="userList.length">
       </el-pagination>
-    </section>
+    </el-main>
 
     <!-- 按钮行 -->
     <div class="footer">

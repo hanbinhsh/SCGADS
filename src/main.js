@@ -17,6 +17,8 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fortawesome/vue-fontawesome'
 library.add(fas, far, fab)
 
+import i18n from '@/lang'
+
 window.__VUE_PROD_DEVTOOLS__ = false;
 window.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false;
 
@@ -27,4 +29,4 @@ app.component('font-awesome-layers-text', FontAwesomeLayersText)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
-app.use(router).use(ElementPlus).mount('#app')
+app.use(i18n).use(router).use(ElementPlus).mount('#app')

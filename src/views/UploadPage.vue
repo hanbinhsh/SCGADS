@@ -18,7 +18,7 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
-    <section class="fullscreen-section" v-loading="loading">
+    <el-main class="fullscreen-section" v-loading="loading">
       <!-- 注释页面 -->
       <div class="left-container">
         <el-row :gutter="20">
@@ -112,7 +112,7 @@
           <el-button type="success" class="footer-action-button" @click="handleUploadClick" id="upload">Upload</el-button>
         </div>
       </div>
-    </section>
+    </el-main>
   </div>
 
   <!-- Element Plus 的引导教程 -->
@@ -306,7 +306,6 @@ export default {
         uploaderId : userId,
         type : this.activeTask + ':' +this.selectedModel.modelType,
         parameters : paramString,
-        model : this.selectedModel.modelName,
         modelId : this.selectedModel.modelId,
       }
       const response = await axios.post('/api/insertTask', task);

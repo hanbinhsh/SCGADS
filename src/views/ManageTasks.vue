@@ -1,8 +1,8 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <section class="fullscreen-section">
-      <h1 class="page-name">Manage Tasks</h1>
+    <el-main class="fullscreen-section">
+      <h1 class="page-name">{{ $t('navigateBar.ManageTasks') }}</h1>
       <el-divider />
       <!-- 任务列表表格 -->
       <el-table :data="paginatedTaskList" 
@@ -12,8 +12,7 @@
         v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-
-        <el-table-column prop="user_name" label="User" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -23,51 +22,51 @@
             </div>
           </template>
         </el-table-column>
-        <!-- 显示上传者的电子邮件 -->
-        <el-table-column prop="email" label="Email" sortable></el-table-column>
-        <!-- 显示上传者的电话 -->
-        <el-table-column prop="phone" label="Phone" sortable></el-table-column>
         <!-- 显示任务名 -->
-        <el-table-column prop="task_name" label="Task Name" sortable></el-table-column>
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
+        <!-- 显示上传者的电子邮件 -->
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <!-- 显示上传者的电话 -->
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
         <!-- 显示任务开始时间 -->
-        <el-table-column prop="start_time" label="Start Time" sortable>
+        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
           <template #default="{ row }">
             {{ formatDate(row.start_time) }}
           </template>
         </el-table-column>
         <!-- 显示任务结束时间 -->
-        <el-table-column prop="end_time" label="End Time" sortable>
+        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
           <template #default="{ row }">
-            {{ row.end_time ? formatDate(row.end_time) : "Not completed yet" }}
+            {{ row.end_time ? formatDate(row.end_time) : $t('Notcompletedyet') }}
           </template>
         </el-table-column>
         <!-- 显示任务状态 -->
-        <el-table-column prop="status" label="Status" sortable>
+        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" label="Operations" width="420">
+        <el-table-column fixed="right" :label="$t('Operations')" width="380">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
-              AutoProgress
+              {{ $t('taskManage.Auto') }}
             </el-button>
             <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
-              Download
+              {{ $t('Download') }}
             </el-button>
             <el-button link type="" size="small" @click="showDetailDialog(row)">
-              Detail
+              {{ $t('Detail') }}
             </el-button>
             <el-button link type="" size="small" @click="showCharts( row.task_name )" :disabled="row.status !== 2">
-              Virtualization
+              {{ $t('navigateBar.Virtualization') }}
             </el-button>
             <el-button link type="warning" size="small" @click="showEditDialog(row)">
-              Edit
+              {{ $t('Edit') }}
             </el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-              Delete
+              {{ $t('Delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -78,22 +77,22 @@
         :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper" :total="taskList.length">
       </el-pagination>
-    </section>
+    </el-main>
 
     <!-- 按钮行 -->
     <div class="footer">
       <div class="footer-button-row">
         <el-button type="success" @click="fetchTaskList">
-          Refresh
+          {{ $t('Refresh') }}
         </el-button>
         <el-button type="primary" @click="showBatchEditDialog" :disabled="selectedTasks.length === 0">
-          Batch Edit
+          {{ $t('taskManage.BatchEdit') }}
         </el-button>
         <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-          Batch Delete
+          {{ $t('BatchDelete') }}
         </el-button>
         <el-button type="success" @click="showBatchDownloadDialog" :disabled="selectedTasks.length === 0">
-          Batch Download
+          {{ $t('taskManage.BatchDownload') }}
         </el-button>
       </div>
     </div>
@@ -103,8 +102,8 @@
       <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be auto progressed</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="autoProgressDialogVisible = false">Cancel</el-button>
-          <el-button type="success" @click="autoProgressDialogVisible = false; autoProgress()">Confirm</el-button>
+          <el-button @click="autoProgressDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="success" @click="autoProgressDialogVisible = false; autoProgress()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -114,8 +113,8 @@
       <span>The selected tasks will be downloaded. Are you sure?</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="batchDownloadDialogVisible = false">Cancel</el-button>
-          <el-button type="success" @click="confirmBatchDownload">Confirm</el-button>
+          <el-button @click="batchDownloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="success" @click="confirmBatchDownload">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -125,8 +124,8 @@
       <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be downloaded</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="downloadDialogVisible = false">Cancel</el-button>
-          <el-button type="success" @click="downloadDialogVisible = false; download()">Confirm</el-button>
+          <el-button @click="downloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="success" @click="downloadDialogVisible = false; download()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -136,8 +135,8 @@
       <span>Are you sure you want to delete the selected tasks?</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
+          <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="confirmBatchDelete">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -156,8 +155,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="batchEditDialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="confirmBatchEdit">Save</el-button>
+          <el-button @click="batchEditDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="primary" @click="confirmBatchEdit">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -167,18 +166,52 @@
       <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be deleted</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">Confirm</el-button>
+          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 任务详细信息对话框 -->
-    <el-dialog v-model="detailDialogVisible" title="Detail" width="500" align-center>
-      <span>{{ selectedTask.details }}</span>
+    <el-dialog v-model="detailDialogVisible" title="Task Detail" width="550px" align-center>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item :label="$t('database.task.task_name')">
+          {{ selectedTask.task_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.details')">
+          {{ selectedTask.details }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.type')">
+          {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+             (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+             (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+          {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+             (row.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+             (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.models.model_name')">
+          {{ selectedTask.model_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.parameters')">
+          <el-scrollbar max-height="150px">
+            <el-row v-for="(param, index) in (selectedTask.parameters || selectedTask.default_parameters || '').split(',')" :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
+        </el-descriptions-item>
+      </el-descriptions>
+
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -187,7 +220,7 @@
     <el-dialog v-model="editDialogVisible" title="Edit Task Status" width="500" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
-        Note: When setting the status, the end time will be automatically updated.
+        Note: When setting status completed, end time will be automatically updated.
       </div>
       <el-form :model="selectedTask" label-width="120px">
         <el-form-item label="Task Name">
@@ -207,8 +240,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="editDialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="confirmEdit">Save</el-button>
+          <el-button @click="editDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="primary" @click="confirmEdit">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -254,9 +287,9 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="closeUploadDialog">Cancel</el-button>
-          <el-button type="warning" class="action-button" @click="handleResetClick">Reset</el-button>
-          <el-button type="primary" @click="confirmUpload" :disabled="!canUpload">Confirm</el-button>
+          <el-button @click="closeUploadDialog">{{ $t('Cancel') }}</el-button>
+          <el-button type="warning" class="action-button" @click="handleResetClick">{{ $t('Reset') }}</el-button>
+          <el-button type="primary" @click="confirmUpload" :disabled="!canUpload">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -610,15 +643,15 @@ export default {
     statusText(status) {
       switch (status) {
         case 0:
-          return "Pending";
+          return this.$t('status.Pending');
         case 1:
-          return "Processing";
+          return this.$t('status.Processing');
         case 2:
-          return "Completed";
+          return this.$t('status.Completed');
         case -1:
-          return "Error";
+          return this.$t('status.Error');
         default:
-          return "Unknown";
+          return this.$t('status.Unknown');
       }
     },
     statusType(status) {
@@ -645,3 +678,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.param-tag {
+  margin: 2px 0;
+}
+</style>
