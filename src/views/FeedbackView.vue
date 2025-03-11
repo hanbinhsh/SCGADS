@@ -27,6 +27,50 @@
             </div>
           </el-card>
         </el-col>
+        <el-col :span="12">
+          <el-card shadow="always">
+            <template #header>
+              <div class="card-header">
+                <span>Responses to feedback</span>
+                <el-button 
+                  size="small" 
+                  @click="getFeedbackHistory"
+                  class="refresh-button"
+                >
+                  <el-icon><Refresh /></el-icon>
+                </el-button>
+              </div>
+            </template>
+            <div class="card-body">
+              <el-table 
+                :data="feedbackReplyList" 
+                style="width: 100%"
+                v-loading="loading"
+                empty-text="No reply"
+              >
+                <el-table-column prop="createTime" label="Date" width="180" />
+                <el-table-column prop="subject" label="Subject" />
+                <el-table-column fixed="right" :label="$t('Operations')" width="220">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showMessageDialog(row)">
+              Message
+            </el-button>
+          </template>
+        </el-table-column>
+                <el-table-column type="expand">
+                  <template #default="{row}">
+                    <div class="feedback-details">
+                      <p><strong>Your Message:</strong></p>
+                      <p class="message-content">{{ row.message }}</p>
+                      <p v-if="row.replyContent"><strong>Admin Reply:</strong></p>
+                      <p class="reply-content">{{ row.replyContent }}</p>
+                    </div>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+          </el-card>
+        </el-col>
       </el-row>
     </el-main>
   </el-container>
@@ -36,10 +80,11 @@
 import MainHeader from "../components/MainHeader.vue"
 import axios from "axios";
 import { ElMessage } from 'element-plus';
-
+import { Refresh } from '@element-plus/icons-vue';
 export default {
   components: {
-    MainHeader
+    MainHeader,
+    Refresh
   },
   data() {
     return {
@@ -50,9 +95,30 @@ export default {
         message: '',
         createTime: ''
       },
+      feedbackReplyList: [], // 新增反馈列表
+      loading: false
     };
   },
+  mounted() {
+    this.getFeedbackHistory();
+  },
   methods: {
+    async getFeedbackHistory() {
+      this.loading = true;
+      try {
+        const response = await axios.get("/api/findFeedbackReply", {
+          params: { userId: this.userData.userId }
+        });
+        if (response.data.code === 1) {
+          this.feedbackReplyList = response.data.data;
+        }
+      } catch (error) {
+        console.error("Failed to get feedback:", error);
+        ElMessage.error("Failed to load feedback history");
+      } finally {
+        this.loading = false;
+      }
+    },
     async submitForm() {
       console.log('Feedback submitted:', this.feedbackForm);
       if (this.feedbackForm.subject === '' || this.feedbackForm.message === '') {
