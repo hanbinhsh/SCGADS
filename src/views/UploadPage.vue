@@ -6,15 +6,15 @@
       <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect">
         <el-menu-item index="annotation">
           <el-icon><Edit /></el-icon>
-          <span>Annotation</span>
+          <span>{{ $t('uploadPage.Annotation') }}</span>
         </el-menu-item>
         <el-menu-item index="training">
           <el-icon><Cpu /></el-icon>
-          <span>Training</span>
+          <span>{{ $t('uploadPage.Training') }}</span>
         </el-menu-item>
         <el-menu-item index="denoising">
           <el-icon><Filter /></el-icon>
-          <span>Denoising</span>
+          <span>{{ $t('uploadPage.Denoising') }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -31,13 +31,13 @@
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
                     </el-icon>
-                    <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                    <div class="el-upload__text">{{ $t('uploadPage.Dropfilehereor') }}<em>{{ $t('uploadPage.clicktoupload') }}</em></div>
                     <template #tip>
                       <div class="el-upload__tip" v-if="(activeTask === 'training' || activeTask === 'annotation') && selectedModel.modelType === 'multi'">
-                        Upload scRNA-seq file (.h5/.h5ad/.npy)
+                        {{ $t('uploadPage.Upload') }} scRNA-seq {{ $t('uploadPage.file') }} (.h5/.h5ad/.npy)
                       </div>
                       <div class="el-upload__tip" v-else>
-                        Upload sc-seq file (.h5/.h5ad/.npy)
+                        {{ $t('uploadPage.Upload') }} sc-seq {{ $t('uploadPage.file') }} (.h5/.h5ad/.npy)
                       </div>
                     </template>
                   </el-upload>
@@ -48,9 +48,9 @@
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
                     </el-icon>
-                    <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                    <div class="el-upload__text">{{ $t('uploadPage.Dropfilehereor') }}<em>{{ $t('uploadPage.clicktoupload') }}</em></div>
                     <template #tip>
-                      <div class="el-upload__tip">Upload scATAC-seq file (.h5/.h5ad/.npy)</div>
+                      <div class="el-upload__tip">{{ $t('uploadPage.Upload') }} scATAC-seq {{ $t('uploadPage.file') }} (.h5/.h5ad/.npy)</div>
                     </template>
                   </el-upload>
                 </el-col>
@@ -60,11 +60,9 @@
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
                     </el-icon>
-                    <div class="el-upload__text">
-                      Drop file here or <em>click to upload</em>
-                    </div>
+                    <div class="el-upload__text">{{ $t('uploadPage.Dropfilehereor') }}<em>{{ $t('uploadPage.clicktoupload') }}</em></div>
                     <template #tip>
-                      <div class="el-upload__tip">Upload Tag file (.csv/.npy)</div>
+                      <div class="el-upload__tip">{{ $t('uploadPage.Upload') }} {{ $t('uploadPage.Tag') }} {{ $t('uploadPage.file') }} (.csv/.npy)</div>
                     </template>
                   </el-upload>
                 </el-col>
@@ -81,7 +79,7 @@
             <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;" id="model-select">
               <el-form label-width="40%">
               <!-- 模型选择 -->
-              <el-form-item label="Model Select">
+              <el-form-item :label="$t('uploadPage.ModelSelect')">
                 <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
                   <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
                 </el-select>
@@ -92,7 +90,7 @@
               <el-form label-width="40%">
                 <!-- 参数输入框 -->
                 <el-alert type="info" show-icon :closable="false" v-if="activeTask === 'annotation'">
-                  <p>Do not change the parameters if you are using built-in models.</p>
+                  <p>{{ $t('uploadPage.annoAlart') }}</p>
                 </el-alert>
                 <br v-if="activeTask === 'annotation'">
                 <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
@@ -107,9 +105,9 @@
       <!-- 按钮行 -->
       <div class="footer animate__animated animate__fadeInUp">
         <div class="footer-button-row">
-          <el-button type="primary" class="footer-action-button" @click="open = true" ref="ref3">Tutorial</el-button>
-          <el-button type="warning" class="footer-action-button" @click="handleResetClick">Reset</el-button>
-          <el-button type="success" class="footer-action-button" @click="handleUploadClick" id="upload">Upload</el-button>
+          <el-button type="primary" class="footer-action-button" @click="open = true" ref="ref3">{{ $t('uploadPage.Tutorial') }}</el-button>
+          <el-button type="warning" class="footer-action-button" @click="handleResetClick">{{ $t('Reset') }}</el-button>
+          <el-button type="success" class="footer-action-button" @click="handleUploadClick" id="upload">{{ $t('uploadPage.Upload') }}</el-button>
         </div>
       </div>
     </el-main>
@@ -117,14 +115,12 @@
 
   <!-- Element Plus 的引导教程 -->
   <el-tour v-model="open">
-    <el-tour-step target="#model-select" title="Select Model" description="Select model here." />
-    <el-tour-step target="#image-row" title="Model" description="Check the model figure." />
-    <el-tour-step target="#upload-row" title="Upload File">
-      <div>Put your files here.</div>
-    </el-tour-step>
-    <el-tour-step target="#parameters" title="Input Parameters" description="Input parameters if necessary." />
-    <el-tour-step target="#upload" title="Upload" description="Click to upload." />
-    <el-tour-step target="#WorkSpase" title="Results" description="Results will be shown here." />
+    <el-tour-step target="#model-select" :title="$t('uploadPage.ModelSelect')"     :description="$t('uploadPage.Selectmodelhere')" />
+    <el-tour-step target="#image-row"    :title="$t('uploadPage.Model')"           :description="$t('uploadPage.Checkthemodelfigure')" />
+    <el-tour-step target="#upload-row"   :title="$t('uploadPage.UploadFile')"      :description="$t('uploadPage.Putyourfileshere')" />
+    <el-tour-step target="#parameters"   :title="$t('uploadPage.InputParameters')" :description="$t('uploadPage.Inputparametersifnecessary')" />
+    <el-tour-step target="#upload"       :title="$t('uploadPage.Upload')"          :description="$t('uploadPage.Clicktoupload')" />
+    <el-tour-step target="#WorkSpase"    :title="$t('uploadPage.Results')"         :description="$t('uploadPage.Resultswillbeshownhere')" />
   </el-tour>
 
   <!-- 任务名输入框 -->
@@ -132,8 +128,8 @@
     <el-input v-model="taskName" placeholder="Please enter the task name"></el-input>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="showTaskNameDialog = false">Cancel</el-button>
-        <el-button type="primary" @click="submitTaskName">Confirm</el-button>
+        <el-button @click="showTaskNameDialog = false">{{ $t('Cancel') }}</el-button>
+        <el-button type="primary" @click="submitTaskName">{{ $t('Confirm') }}</el-button>
       </div>
     </template>
   </el-dialog>
@@ -425,6 +421,7 @@ const open = ref(false);
   padding: 20px;
   text-align: center;
   transition: all 0.3s ease;
+  height: 80%;
 }
 
 .upload:hover {

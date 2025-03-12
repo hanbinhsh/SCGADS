@@ -14,7 +14,7 @@
         </el-menu-item>
         <el-menu-item index="b">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
-          <span>Denoising</span>
+          <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -25,11 +25,11 @@
             <template #header>
               <div slot="header" class="card-header">
                 <el-text class="mx-1" size="large"></el-text>
-                <span class="page-name">{{ taskName || "Example" }} Data Visualization</span>
+                <span class="page-name">{{ taskName || $t('Visualization.Example') }} {{ $t('Visualization.DataVisualization' )}}</span>
                 <el-button type="primary" style="float: right;" @click="" :disabled="true"> <!-- TODO -->
-                  <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;Switch&nbsp;
-                  <span v-if="true">True</span> <!-- TODO -->
-                  <span v-if="false">Pred</span> <!-- TODO -->
+                  <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;{{ $t('Visualization.Switch') }}&nbsp;
+                  <span v-if="true">{{ $t('Visualization.True') }}</span> <!-- TODO -->
+                  <span v-if="false">{{ $t('Visualization.Pred') }}</span> <!-- TODO -->
                 </el-button>
               </div>
             </template>
@@ -43,12 +43,12 @@
                 <el-col :span="12">
                   <el-table :data="paginatedData" stripe style="width: 100%;" @sort-change="handleSortChange">
                     <el-table-column prop="index" label="ID" width="70" sortable></el-table-column>
-                      <el-table-column prop="coord" label="Position" sortable>
+                      <el-table-column prop="coord" :label="$t('Visualization.Position')" sortable>
                         <template #default="{ row }">
                           {{ `(${row.coord[0]}, ${row.coord[1]})` }}
                         </template>
                       </el-table-column>
-                    <el-table-column prop="label" label="Label" width="290" sortable></el-table-column>
+                    <el-table-column prop="label" :label="$t('Visualization.Label')" width="290" sortable></el-table-column>
                   </el-table>
                   <el-pagination background layout="prev, pager, next" :total="totalItems" :page-size="pageSize"
                     :current-page="currentPage" @current-change="handlePageChange" class="page-control">
@@ -63,20 +63,20 @@
     <!-- 按钮行 -->
     <div class="footer animate__animated animate__fadeInUp">
       <div class="bottom-left-setting">
-        <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">Settings</el-button>
+        <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">{{ $t('Visualization.Settings') }}</el-button>
       </div>
       <div class="footer-button-row">
         <el-button type="primary" class="footer-action-button" @click="" 
           :disabled="taskName===undefined">
-          Download Data
+          {{ $t('Visualization.DownloadData') }}
         </el-button>
         <el-button type="warning" class="footer-action-button" @click="download()" 
           :disabled="taskName===undefined">
-          Download Charts
+          {{ $t('Visualization.DownloadCharts') }}
         </el-button>
         <el-button type="success" class="footer-action-button" @click=""
          :disabled="taskName===undefined">
-          Download Report
+         {{ $t('Visualization.DownloadReport') }}
         </el-button>
       </div>
     </div>
