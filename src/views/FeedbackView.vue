@@ -2,9 +2,33 @@
   <el-container class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <el-row type="flex" justify="center" class="animate__animated animate__fadeInUp feedback-container">
-        <el-col :xs="24" :sm="20" :md="16" :lg="12">
-          <el-card shadow="always">
+      <el-row type="flex" justify="start" class="animate__animated animate__fadeInUp feedback-container">
+        <!-- 左侧侧边栏 -->
+        <el-col :span="4" class="sidebar-col">
+          <el-card shadow="always" class="sidebar-card">
+            <el-menu 
+              :default-active="activeMenu"
+              class="side-menu"
+              @select="handleMenuSelect"
+            >
+              <el-menu-item index="feedback">
+                <span>Submit Feedback</span>
+              </el-menu-item>
+              <el-menu-item index="history">
+                <span>Feedback History</span>
+              </el-menu-item>
+            </el-menu>
+          </el-card>
+        </el-col>
+
+        <!-- 右侧内容区域 -->
+        <el-col :span="20" class="content-col">
+          <!-- 反馈表单 -->
+          <el-card 
+            v-show="activeMenu === 'feedback'"
+            shadow="always" 
+            class="content-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>Feedback</span>
@@ -12,23 +36,47 @@
               </div>
             </template>
             <div class="card-body">
-              <el-form ref="feedbackForm" :model="feedbackForm" :label-width="isMobile ? '80px' : '120px'" class="feedback-form">
+              <el-form 
+                ref="feedbackForm" 
+                :model="feedbackForm" 
+                :label-width="isMobile ? '80px' : '120px'" 
+                class="feedback-form"
+              >
                 <el-form-item label="Subject" prop="subject">
-                  <el-input v-model="feedbackForm.subject" placeholder="Subject" class="input-field"></el-input>
+                  <el-input 
+                    v-model="feedbackForm.subject" 
+                    placeholder="Subject" 
+                    class="input-field"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="Message" prop="message">
-                  <el-input type="textarea" :rows="isMobile ? 5 : 8" v-model="feedbackForm.message" placeholder="Your Message"
-                    class="textarea-field"></el-input>
+                  <el-input 
+                    type="textarea" 
+                    :rows="isMobile ? 5 : 8" 
+                    v-model="feedbackForm.message" 
+                    placeholder="Your Message"
+                    class="textarea-field"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="submitForm" class="submit-button">Send Message</el-button>
+                  <el-button 
+                    type="primary" 
+                    @click="submitForm" 
+                    class="submit-button"
+                  >
+                    Send Message
+                  </el-button>
                 </el-form-item>
               </el-form>
             </div>
           </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card shadow="always">
+
+          <!-- 反馈历史 -->
+          <el-card 
+            v-show="activeMenu === 'history'"
+            shadow="always" 
+            class="content-card"
+          >
             <template #header>
               <div class="card-header">
                 <span>Responses to feedback</span>
@@ -50,15 +98,20 @@
               >
                 <el-table-column prop="createTime" label="Date" width="180" />
                 <el-table-column prop="subject" label="Subject" />
-                <el-table-column fixed="right" :label="$t('Operations')" width="220">
-          <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="showMessageDialog(row)">
-              Message
-            </el-button>
-          </template>
-        </el-table-column>
+                <el-table-column fixed="right" label="Operations" width="220">
+                  <template #default="{ row }">
+                    <el-button 
+                      link 
+                      type="primary" 
+                      size="small" 
+                      @click="showMessageDialog(row)"
+                    >
+                      Message
+                    </el-button>
+                  </template>
+                </el-table-column>
                 <el-table-column type="expand">
-                  <template #default="{row}">
+                  <template #default="{ row }">
                     <div class="feedback-details">
                       <p><strong>Your Message:</strong></p>
                       <p class="message-content">{{ row.message }}</p>
@@ -77,7 +130,7 @@
 </template>
 
 <script>
-import MainHeader from "../components/MainHeader.vue"
+import MainHeader from "../components/MainHeader.vue";
 import axios from "axios";
 import { ElMessage } from 'element-plus';
 import { Refresh } from '@element-plus/icons-vue';
@@ -110,21 +163,25 @@ export default {
   },
   data() {
     return {
-      userData: JSON.parse(sessionStorage.getItem('userData')) || {},//存用户信息
+      activeMenu: 'feedback',
+      userData: JSON.parse(sessionStorage.getItem('userData')) || {},
       feedbackForm: {
         userId: '',
         subject: '',
         message: '',
         createTime: ''
       },
-      feedbackReplyList: [], // 新增反馈列表
+      feedbackReplyList: [],
       loading: false
     };
   },
-  mounted() {
-    this.getFeedbackHistory();
-  },
   methods: {
+    handleMenuSelect(index) {
+      this.activeMenu = index;
+      if (index === 'history') {
+        this.getFeedbackHistory();
+      }
+    },
     async getFeedbackHistory() {
       this.loading = true;
       try {
@@ -142,100 +199,222 @@ export default {
       }
     },
     async submitForm() {
-      console.log('Feedback submitted:', this.feedbackForm);
-      if (this.feedbackForm.subject === '' || this.feedbackForm.message === '') {
+      if (!this.feedbackForm.subject || !this.feedbackForm.message) {
         ElMessage.error('Please fill in all the fields');
         return;
       }
-      this.feedbackForm.userId = this.userData.userId;
+      
       try {
-        await axios.post("/api/feedback", this.feedbackForm)
-          .then(response => {
-            if (response.data.code === 1) {
-              ElMessage.success("Feedback success");
-
-            } else {
-              console.error("Feedback failed:", response.data.msg);
-              ElMessage.error(response.data.msg);
-            }
-          })
-          .catch(error => {
-            console.error("Feedback failed:", error);
-          });
+        this.feedbackForm.userId = this.userData.userId;
+        const response = await axios.post("/api/feedback", this.feedbackForm);
+        
+        if (response.data.code === 1) {
+          ElMessage.success("Feedback submitted successfully");
+          this.$refs.feedbackForm.resetFields();
+          if (this.activeMenu === 'history') {
+            await this.getFeedbackHistory();
+          }
+        } else {
+          ElMessage.error(response.data.msg || "Submission failed");
+        }
       } catch (error) {
-        console.error("Feedback failed:", error);
+        console.error("Feedback submission error:", error);
+        ElMessage.error("Failed to submit feedback");
       }
-      // 重置表单
-      this.$refs.feedbackForm.resetFields();
+    },
+    showMessageDialog(row) {
+      this.$alert(
+        `<p><strong>Your Message:</strong></p>
+        <p>${row.message}</p>
+        ${row.replyContent ? `
+        <p><strong>Admin Reply:</strong></p>
+        <p>${row.replyContent}</p>` : ''}`,
+        row.subject,
+        {
+          dangerouslyUseHTMLString: true,
+          confirmButtonText: 'OK'
+        }
+      );
     }
   }
 };
 </script>
 
 <style scoped>
-.dark-mode .card-header {
-  color: #EEE;
-}
-
-/* 添加与导航栏的间距 */
+/* 布局样式 */
 .feedback-container {
   margin-top: 30px;
   padding: 0 20px;
 }
 
-.card-body {
-  padding: 0px 20px 0px 0px;
+.sidebar-col {
+  margin-right: 20px;
+}
+
+.sidebar-card {
+  min-height: 400px;
+  border-radius: 8px;
+}
+
+.content-col {
+  margin-left: 20px;
+}
+
+.content-card {
+  min-height: 400px;
+  border-radius: 8px;
+}
+
+/* 菜单样式 */
+.side-menu {
+  border-right: none;
+  background: transparent;
+}
+
+.side-menu .el-menu-item {
+  height: 60px;
+  line-height: 60px;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.side-menu .el-menu-item.is-active {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+
+/* 卡片头部样式 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+}
+
+.card-header span {
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .feedback-text {
   color: #666;
-  font-size: 16px;
-}
-
-.dark-mode .feedback-text {
-  color: #EEE;
-}
-
-.contact-info {
-  color: #409eff;
+  margin-top: 10px;
   font-size: 14px;
-  margin-bottom: 20px;
+}
+
+/* 表单样式 */
+.feedback-form {
+  padding: 20px;
 }
 
 .input-field,
 .textarea-field {
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .submit-button {
   width: 100%;
-  border-radius: 4px;
+  height: 45px;
   font-size: 16px;
-  padding: 10px 20px;
 }
 
-/* 移动端适配样式 */
-@media screen and (max-width: 767px) {
+/* 表格样式 */
+.feedback-details {
+  padding: 20px;
+}
+
+.message-content,
+.reply-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .sidebar-col {
+    display: none;
+  }
+  
+  .content-col {
+    width: 100%;
+    margin-left: 0;
+  }
+  
   .feedback-container {
     margin-top: 20px;
     padding: 0 10px;
   }
-
-  .card-body {
-    padding: 0px 0px;
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .feedback-text {
-    font-size: 14px;
+  .feedback-form {
+    padding: 15px;
   }
   
   .submit-button {
-    padding: 8px 15px;
+    height: 40px;
     font-size: 14px;
   }
+}
+
+.dark-mode .feedback-text {
+  color: #a0a0a0;
+}
+
+.dark-mode .side-menu .el-menu-item {
+  color: #e0e0e0;
+}
+
+.dark-mode .side-menu .el-menu-item.is-active {
+  background-color: var(--el-color-primary-dark-2);
+}
+
+.feedback-container {
+  margin-top: 30px;
+  padding: 0 20px;
+  flex-wrap: nowrap;
+}
+
+.sidebar-col {
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  min-height: 400px;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.content-col {
+  margin-left: 0;
+  flex-grow: 1;
+}
+
+/* 新增固定侧边栏样式 */
+.side-menu {
+  position: sticky;
+  top: 20px;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+  .sidebar-col {
+    display: none;
+  }
   
-  .el-form-item {
-    margin-bottom: 15px;
+  .content-col {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .feedback-container {
+    margin-top: 20px;
+    padding: 0 10px;
   }
 }
 </style>

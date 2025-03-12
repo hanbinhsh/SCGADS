@@ -39,7 +39,7 @@
               <el-col :span="isRightColumnExpanded ? 0 : 16" class="right-section">
                 <div class="success-tasks-list">
                   <div v-if="completedCount === 0" class="empty-state">
-                    No recent completed task found
+                    {{ $t('workSpace.Norecentcompletedtaskfound') }}
                   </div>
                   <div v-for="(task, index) in sortedCompletedTasks" :key="index" class="success-task-item">
                     <div class="success-task-header">
@@ -68,7 +68,7 @@
           </template>
           <div class="success-tasks-list">
             <div v-if="shareCount === 0" class="empty-state">
-              No recent shares found
+              {{ $t('workSpace.Norecentsharesfound') }}
             </div>
             <div v-for="(data, index) in shareList" :key="index" class="success-task-item">
               <div class="success-task-header">
@@ -113,15 +113,15 @@
           </div>
         </el-card>
         
-        <!-- Card 3: Empty for now -->
+        <!-- My Models -->
         <el-card class="dashboard-card animate__animated animate__fadeInLeft">
           <template #header>
             <div class="card-header">
-              <span>Card 3</span>
+              <span>{{ $t('workSpace.MyModels') }}</span>
             </div>
           </template>
           <div class="empty-state">
-            Under Construction
+            {{ $t('workSpace.Nomodelsfound') }}
           </div>
         </el-card>
         
@@ -134,7 +134,7 @@
           </template>
           <div class="success-tasks-list">
             <div v-if="receivedShareCount === 0" class="empty-state">
-              No recent received shares found
+              {{ $t('workSpace.Norecentreceivedsharesfound') }}
             </div>
             <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
               <div class="success-task-header">
