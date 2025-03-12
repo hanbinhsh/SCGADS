@@ -250,7 +250,8 @@
       @close="closeUploadDialog">
       <el-form>
         <!-- 文件上传组件 -->
-        <el-upload v-model:file-list="configjsFile" class="upload" drag action="" :limit="1" :auto-upload="false">
+        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" 
+        :limit="3" :auto-upload="false" :accept="'.js'">
           <el-icon class="el-icon--upload">
             <UploadFilled />
           </el-icon>
@@ -258,30 +259,14 @@
             Drop file here or <em>click to upload</em>
           </div>
           <template #tip>
-            <div class="el-upload__tip">upload config.js file </div>
-          </template>
-        </el-upload>
-        <el-upload v-model:file-list="datajsFile" class="upload" drag action="" :limit="1" :auto-upload="false">
-          <el-icon class="el-icon--upload">
-            <UploadFilled />
-          </el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">upload data.js file </div>
-          </template>
-        </el-upload>
-
-        <el-upload v-model:file-list="lablejsFile" class="upload" drag action="" :limit="1" :auto-upload="false">
-          <el-icon class="el-icon--upload">
-            <UploadFilled />
-          </el-icon>
-          <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">upload lable.js file </div>
+            <div class="el-upload__tip">
+              Required files pattern: <br>
+              • data_(tsne|umap).js<br>
+              • (label|config)[_pred]_(tsne|umap).js
+            </div>
+            <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
+              {{ file.name }}
+            </div>
           </template>
         </el-upload>
       </el-form>
@@ -310,9 +295,8 @@ export default {
   data() {
     return {
       uploadDialogVisible: false, // 新增状态，用于控制文件上传对话框的显示
-      configjsFile: [],
-      datajsFile: [],
-      lablejsFile: [],
+      uploadedFiles: [],
+      validFiles : [],
       canUpload: true, // 新增状态，用于判断是否可以确认上传
       taskList: [],
       paginatedTaskList: [],
@@ -342,26 +326,8 @@ export default {
       this.selectedTask.status = 1; // 1 对应 "Processing"
     },
     handleResetClick() {
-      this.configjsFile = [];
-      this.datajsFile = [];
-      this.lablejsFile = [];
+      this.uploadedFiles = [];
       ElMessage.success('Reset success.');
-    },
-    handleUploadClick() {
-      // 检查文件是否为空或类型不正确
-      const isConfigjsFileValid = this.configjsFile.length > 0 && this.configjsFile.every(file => file.name.endsWith('js'));
-      const isDatajsFileValid = this.datajsFile.length > 0 && this.datajsFile.every(file => file.name.endsWith('.js'));
-      const isLablejsFileValid = this.lablejsFile.length > 0 && this.lablejsFile.every(file => file.name.endsWith('.js'));
-      if (this.configjsFile.length === 0 || this.datajsFile.length === 0 || this.lablejsFile.length === 0) {
-        ElMessage.error('Please upload all required files.');
-        return;
-      }
-      if (!isConfigjsFileValid || !isDatajsFileValid || !isLablejsFileValid) {
-        ElMessage.error('Incorrect file type. Please upload the correct file types.');
-        return;
-      }
-      // 所有检查通过，显示任务名称输入框
-      this.canUpload = true;
     },
     showCharts(taskName) {  
       this.$router.push({ name: "Virtualization", query: { taskName } });  
@@ -377,54 +343,137 @@ export default {
       this.fileList[file.name] = fileList;
       this.checkAllFilesUploaded();
     },
+    // 检查是否可以上传
     async confirmUpload() {
-      // 确认上传后，更新任务状态并关闭对话框
-      // 检查文件是否为空或类型不正确
-      const isConfigjsFileValid = this.configjsFile.length > 0 && this.configjsFile.every(file => file.name.endsWith('.js'));
-      const isDatajsFileValid = this.datajsFile.length > 0 && this.datajsFile.every(file => file.name.endsWith('.js'));
-      const isLablejsFileValid = this.lablejsFile.length > 0 && this.lablejsFile.every(file => file.name.endsWith('.js'));
-      if (this.configjsFile.length === 0 || this.datajsFile.length === 0 || this.lablejsFile.length === 0) {
-        ElMessage.error('Please upload all required files.');
-        return;
-      }
-      if (!isConfigjsFileValid || !isDatajsFileValid || !isLablejsFileValid) {
-        ElMessage.error('Incorrect file type. Please upload the correct file types.');
-        return;
-      }
-      if (this.canUpload) {
+      try {
+        // 初始化数据结构
+        const fileGroups = {
+          tsne: { data: null, label: [], config: [] },
+          umap: { data: null, label: [], config: [] }
+        };
+        const errors = [];
+        // 解析所有文件
+        const allFiles = this.uploadedFiles;
+        // 文件分类处理
+        allFiles.forEach(file => {
+          const fileName = file.name.toLowerCase();
+          const rawFile = file.raw || file;
+          // 使用正则表达式匹配文件名
+          const dataMatch = fileName.match(/^data_(tsne|umap)\.js$/);
+          const labelMatch = fileName.match(/^label(_pred)?_(tsne|umap)\.js$/);
+          const configMatch = fileName.match(/^config(_pred)?_(tsne|umap)\.js$/);
+          if (dataMatch) {
+            const algo = dataMatch[1];
+            if (fileGroups[algo].data) {
+              errors.push(`Duplicate data files: ${fileName}`);
+            }
+            fileGroups[algo].data = rawFile;
+          } else if (labelMatch) {
+            const algo = labelMatch[2];
+            fileGroups[algo].label.push({
+              file: rawFile,
+              isPred: !!labelMatch[1]
+            });
+          } else if (configMatch) {
+            const algo = configMatch[2];
+            fileGroups[algo].config.push({
+              file: rawFile,
+              isPred: !!configMatch[1]
+            });
+          } else {
+            errors.push(`Invalid file name: ${fileName}`);
+          }
+        });
+
+        // 验证必需文件
+        // 1. 检查至少有一个data文件（tsne或umap）
+        const hasData = fileGroups.tsne.data !== null || fileGroups.umap.data !== null;
+        if (!hasData) {
+          errors.push("At least one data file needs to be uploaded (data_tsne.js or data_umap.js)");
+        }
+        // 2. 检查至少有一个label文件（tsne或umap）
+        const hasLabel = fileGroups.tsne.label.length > 0 || fileGroups.umap.label.length > 0;
+        if (!hasLabel) {
+          errors.push("At least one tag file needs to be uploaded (label[_pred]_tsne.js or label[_pred]_umap.js)");
+        }
+        // 3. 检查至少有一个config文件（tsne或umap）
+        const hasConfig = fileGroups.tsne.config.length > 0 || fileGroups.umap.config.length > 0;
+        if (!hasConfig) {
+          errors.push("At least one configuration file needs to be uploaded (config[_pred]_tsne.js or config[_pred]_umap.js)");
+        }
+        // 4. 最终验证结果
+        if (errors.length > 0) {
+          ElMessage.error(`File validation failed: \n${errors.join('\n')}`);
+          return false;
+        }
+        // 执行上传
+        await this.UploadFiles(fileGroups);
+        
         this.updateTaskStatus(this.selectedTask.task_id, 2);
-        await this.UploadFiles();
         this.uploadDialogVisible = false;
-        this.editDialogVisible = false; // 关闭编辑对话框
-        window.location.reload()
-        ElMessage.success('File upload was successful.');
+        this.editDialogVisible = false;
+        
+        ElMessage.success('The file was uploaded successfully');
+        window.location.reload();
+      } catch (error) {
+        ElMessage.error(`Upload failed: ${error.message}`);
       }
     },
-    async UploadFiles() {
-      const response = await axios.post('/api/findResultByTaskName?taskName=' + this.selectedTask.task_name);
-      if (response.data.code === 1) {
-        await axios.post('/api/insertResult', { taskName: this.selectedTask.task_name });
+    
+    async UploadFiles(fileGroups) {
+      try {
+        const uploadTasks = [];
+        const allFiles = [];
+        // 遍历每个算法组
+        Object.entries(fileGroups).forEach(([algo, group]) => {
+          // 上传data文件（如果存在）
+          if (group.data) {
+            allFiles.push({ file: group.data, type: 'data', algo });
+          }
+          // 处理label文件
+          group.label.forEach(labelFile => {
+            allFiles.push({ 
+              file: labelFile.file, 
+              type: labelFile.isPred ? 'label_pred' : 'label',
+              algo 
+            });
+          });
+          // 处理config文件
+          group.config.forEach(configFile => {
+            allFiles.push({ 
+              file: configFile.file, 
+              type: configFile.isPred ? 'config_pred' : 'config',
+              algo 
+            });
+          });
+        });
+        // 创建上传任务
+        allFiles.forEach(({ file, type, algo }) => {
+          console.log(file, type, algo)
+          uploadTasks.push(this.uploadFile(file, type, algo));
+        });
+        await Promise.all(uploadTasks);
+        // 清空文件列表
+        this.uploadedFiles = [];
+        
+      } catch (error) {
+        throw new Error(`File upload error: ${error.message}`);
       }
-      const files = [
-        { file: this.configjsFile[0].raw, fileType: 'configjsFile' },
-        { file: this.datajsFile[0].raw, fileType: 'datajsFile' },
-        { file: this.lablejsFile[0].raw, fileType: 'lablejsFile' }
-      ];
-      const uploadPromises = files.map(({ file, fileType }) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('taskName', this.selectedTask.task_name);
-        formData.append('fileType', fileType);
-        formData.append('userName', this.selectedTask.user_name);
-        return axios.post('/api/uploadResult', formData);
-      });
-      await Promise.all(uploadPromises);
-      //ElMessage.success('The file upload was successful.');
-      this.configjsFile = [];
-      this.datajsFile = [];
-      this.lablejsFile = [];
       this.showTaskNameDialog = false; // 成功上传后关闭对话框
-      //ElMessage.success('The file upload was successful.');
+    },
+    async uploadFile(file, typePrefix, algorithm) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('taskName', this.selectedTask.task_name);
+      formData.append('userName', this.selectedTask.user_name);
+      formData.append('fileType', `${typePrefix}_${algorithm}`);
+      
+      const response = await axios.post('/api/uploadResult', formData);
+      console.log(response.data);
+      if (response.data.code !== 1) {
+        throw new Error(`${file.name} Upload failed`);
+      }
+      return response;
     },
     showAutoProgressDialog(task) {
       this.autoProgressDialogVisible = true;
@@ -583,7 +632,7 @@ export default {
     async deleteTaskByTaskName(userName, taskName) {
       try {
         const response = await axios.get(`/api/deleteTaskByTaskName?userName=${userName}&taskName=${taskName}`);
-        await axios.get("/api/deleteTaskByID?taskID=" + taskID);
+        // await axios.get("/api/deleteTaskByID?taskID=" + taskID);
       } catch (error) {
         console.error("Delete failed:", error);
       }
