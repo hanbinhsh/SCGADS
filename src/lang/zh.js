@@ -44,7 +44,7 @@ const zh =  {
     file: "文件",
     Tag: "标签",
     Tutorial: "教程演示",
-    annoAlart: "如果使用内置模型，请勿更改参数。",
+    annoAlart: "若使用内置模型，请勿更改参数。",
     ModelSelect: "选择模型",
     Model: "模型",
     UploadFile: "上传文件",
