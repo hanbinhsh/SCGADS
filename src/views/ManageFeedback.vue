@@ -175,6 +175,7 @@ export default {
           feedbackId: this.selectedFeedbackId,
           userId: this.selectedFeedback.user_id,
           replyContent: this.replyContent,
+          subject: this.selectedFeedback.subject,
         }
         const response = await axios.post('/api/replyFeedback', feedbackReply);
         
@@ -248,6 +249,7 @@ export default {
         const response = await axios.get('/api/findAllFeedbackWithUserInformation');
         if (response.data.code === 200) {
           const dataObject = response.data.data;
+          console.log(dataObject);
           this.feedbackList = Object.values(dataObject);
           this.applySorting();
         } else {

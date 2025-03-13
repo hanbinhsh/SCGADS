@@ -96,7 +96,7 @@
                 v-loading="loading"
                 empty-text="No reply"
               >
-                <el-table-column prop="createTime" label="Date" width="180" />
+                <el-table-column prop="replyTime" label="Date" width="180" />
                 <el-table-column prop="subject" label="Subject" />
                 <el-table-column fixed="right" label="Operations" width="220">
                   <template #default="{ row }">
@@ -110,16 +110,7 @@
                     </el-button>
                   </template>
                 </el-table-column>
-                <el-table-column type="expand">
-                  <template #default="{ row }">
-                    <div class="feedback-details">
-                      <p><strong>Your Message:</strong></p>
-                      <p class="message-content">{{ row.message }}</p>
-                      <p v-if="row.replyContent"><strong>Admin Reply:</strong></p>
-                      <p class="reply-content">{{ row.replyContent }}</p>
-                    </div>
-                  </template>
-                </el-table-column>
+                
               </el-table>
             </div>
           </el-card>
@@ -188,8 +179,13 @@ export default {
         const response = await axios.get("/api/findFeedbackReply", {
           params: { userId: this.userData.userId }
         });
-        if (response.data.code === 1) {
-          this.feedbackReplyList = response.data.data;
+        console.log('Raw response data:', response.data.data);
+
+        
+        if (response.data.code === 200) {
+          // 新增数据结构转换逻辑
+          this.feedbackReplyList = this.transformResponseData(response.data.data);
+          console.log('Transformed feedbackReplyList:', this.feedbackReplyList);
         }
       } catch (error) {
         console.error("Failed to get feedback:", error);
@@ -197,6 +193,17 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+
+    // 新增数据转换方法
+    transformResponseData(rawData) {
+      return Object.values(rawData).map(item => ({
+        createTime: item.feedbackDate || item.createTime, // 适配不同字段名
+        subject: item.feedbackSubject || item.subject,
+        message: item.feedbackContent || item.message,
+        replyContent: item.reply_content || item.adminReply,
+        replyTime: item.reply_time // 保留原始字段
+      }));
     },
     async submitForm() {
       if (!this.feedbackForm.subject || !this.feedbackForm.message) {
@@ -224,12 +231,11 @@ export default {
     },
     showMessageDialog(row) {
       this.$alert(
-        `<p><strong>Your Message:</strong></p>
-        <p>${row.message}</p>
+        `
         ${row.replyContent ? `
         <p><strong>Admin Reply:</strong></p>
         <p>${row.replyContent}</p>` : ''}`,
-        row.subject,
+        
         {
           dangerouslyUseHTMLString: true,
           confirmButtonText: 'OK'
@@ -241,7 +247,7 @@ export default {
 </script>
 
 <style scoped>
-/* 布局样式 */
+/* 保持原有样式不变 */
 .feedback-container {
   margin-top: 30px;
   padding: 0 20px;
@@ -265,7 +271,6 @@ export default {
   border-radius: 8px;
 }
 
-/* 菜单样式 */
 .side-menu {
   border-right: none;
   background: transparent;
@@ -283,7 +288,6 @@ export default {
   color: var(--el-color-primary);
 }
 
-/* 卡片头部样式 */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -302,7 +306,6 @@ export default {
   font-size: 14px;
 }
 
-/* 表单样式 */
 .feedback-form {
   padding: 20px;
 }
@@ -318,7 +321,6 @@ export default {
   font-size: 16px;
 }
 
-/* 表格样式 */
 .feedback-details {
   padding: 20px;
 }
@@ -329,7 +331,6 @@ export default {
   line-height: 1.6;
 }
 
-/* 响应式设计 */
 @media screen and (max-width: 768px) {
   .sidebar-col {
     display: none;
@@ -395,13 +396,11 @@ export default {
   flex-grow: 1;
 }
 
-/* 新增固定侧边栏样式 */
 .side-menu {
   position: sticky;
   top: 20px;
 }
 
-/* 响应式调整 */
 @media screen and (max-width: 768px) {
   .sidebar-col {
     display: none;
