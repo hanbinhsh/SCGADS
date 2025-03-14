@@ -2,9 +2,9 @@
   <el-container class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <el-row type="flex" justify="start" class="animate__animated animate__fadeInUp feedback-container">
-        <!-- 左侧侧边栏 -->
-        <el-col :span="4" class="sidebar-col">
+      <el-row type="flex" justify="start" class="feedback-container">
+        <!-- 电脑端侧边栏 -->
+        <el-col v-if="!isMobile" :span="4" class="sidebar-col">
           <el-card shadow="always" class="sidebar-card">
             <el-menu 
               :default-active="activeMenu"
@@ -21,8 +21,28 @@
           </el-card>
         </el-col>
 
+        <!-- 移动端侧边栏 -->
+        <el-col v-if="isMobile" :span="24" class="mobile-sidebar-col">
+          <el-collapse v-model="collapseActive">
+            <el-collapse-item title="Menu" name="1">
+              <el-menu 
+                :default-active="activeMenu"
+                class="side-menu"
+                @select="handleMenuSelect"
+              >
+                <el-menu-item index="feedback">
+                  <span>Submit Feedback</span>
+                </el-menu-item>
+                <el-menu-item index="history">
+                  <span>Feedback History</span>
+                </el-menu-item>
+              </el-menu>
+            </el-collapse-item>
+          </el-collapse>
+        </el-col>
+
         <!-- 右侧内容区域 -->
-        <el-col :span="20" class="content-col">
+        <el-col :span="isMobile ? 24 : 20" class="content-col">
           <!-- 反馈表单 -->
           <el-card 
             v-show="activeMenu === 'feedback'"
@@ -110,7 +130,6 @@
                     </el-button>
                   </template>
                 </el-table-column>
-                
               </el-table>
             </div>
           </el-card>
@@ -134,6 +153,7 @@ export default {
   },
   setup() {
     const isMobile = ref(false);
+    const collapseActive = ref([]); // 控制移动端侧边栏的折叠状态
     
     const checkScreenSize = () => {
       isMobile.value = window.innerWidth < 768;
@@ -149,7 +169,8 @@ export default {
     });
     
     return {
-      isMobile
+      isMobile,
+      collapseActive
     };
   },
   data() {
@@ -181,7 +202,6 @@ export default {
         });
         console.log('Raw response data:', response.data.data);
 
-        
         if (response.data.code === 200) {
           // 新增数据结构转换逻辑
           this.feedbackReplyList = this.transformResponseData(response.data.data);
@@ -247,13 +267,46 @@ export default {
 </script>
 
 <style scoped>
-/* 保持原有样式不变 */
+/* 移动端样式 */
+.mobile-sidebar-col {
+  margin-bottom: 20px;
+}
+
+.mobile-sidebar-col .el-collapse {
+  border: none;
+}
+
+.mobile-sidebar-col .el-collapse-item__header {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px;
+  background-color: var(--el-color-primary-light-9);
+  border-radius: 8px;
+}
+
+.mobile-sidebar-col .el-collapse-item__content {
+  padding: 0;
+}
+
+.mobile-sidebar-col .side-menu {
+  border: none;
+}
+
+.mobile-sidebar-col .el-menu-item {
+  height: 50px;
+  line-height: 50px;
+  font-size: 14px;
+}
+
+/* 电脑端样式 */
 .feedback-container {
-  margin-top: 30px;
-  padding: 0 20px;
+  display: flex;
+  flex-wrap: nowrap;
 }
 
 .sidebar-col {
+  flex: 0 0 16.6667%; /* 4/24 */
+  max-width: 16.6667%; /* 4/24 */
   margin-right: 20px;
 }
 
@@ -263,7 +316,8 @@ export default {
 }
 
 .content-col {
-  margin-left: 20px;
+  flex: 0 0 83.3333%; /* 20/24 */
+  max-width: 83.3333%; /* 20/24 */
 }
 
 .content-card {
@@ -337,8 +391,8 @@ export default {
   }
   
   .content-col {
-    width: 100%;
-    margin-left: 0;
+    flex: 0 0 100%;
+    max-width: 100%;
   }
   
   .feedback-container {
@@ -371,49 +425,5 @@ export default {
 
 .dark-mode .side-menu .el-menu-item.is-active {
   background-color: var(--el-color-primary-dark-2);
-}
-
-.feedback-container {
-  margin-top: 30px;
-  padding: 0 20px;
-  flex-wrap: nowrap;
-}
-
-.sidebar-col {
-  margin-right: 20px;
-  flex-shrink: 0;
-}
-
-.sidebar-card {
-  min-height: 400px;
-  border-radius: 8px;
-  position: sticky;
-  top: 20px;
-}
-
-.content-col {
-  margin-left: 0;
-  flex-grow: 1;
-}
-
-.side-menu {
-  position: sticky;
-  top: 20px;
-}
-
-@media screen and (max-width: 768px) {
-  .sidebar-col {
-    display: none;
-  }
-  
-  .content-col {
-    width: 100%;
-    margin-left: 0;
-  }
-  
-  .feedback-container {
-    margin-top: 20px;
-    padding: 0 10px;
-  }
 }
 </style>
