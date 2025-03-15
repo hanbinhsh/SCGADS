@@ -470,7 +470,7 @@ export default {
   .pagination {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: left;
     margin-bottom: 20px;
   }
 }
