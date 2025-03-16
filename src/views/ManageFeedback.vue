@@ -4,7 +4,8 @@
     <el-main class="fullscreen-section">
       <h1 class="page-name">{{ $t('navigateBar.ManageFeedbacks') }}</h1>
       <el-divider />
-      <el-table 
+      <div class="desktop-view">
+        <el-table 
         :data="paginatedFeedbackList" 
         style="width: 100%"
         @selection-change="handleSelectionChange"
@@ -31,7 +32,8 @@
             {{ formatDate(row.created_time) }}
           </template>
         </el-table-column>
-        <el-table-column fixed="right" :label="$t('Operations')" width="220">
+        
+          <el-table-column fixed="right" :label="$t('Operations')" width="220">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               Message
@@ -39,8 +41,49 @@
             <el-button link type="success" size="small" @click="showReplyDialog(row)">Reply</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
           </template>
-        </el-table-column>
+        </el-table-column> 
       </el-table>
+      </div>
+
+      <div class="mobile-view">
+        <el-table 
+        :data="paginatedFeedbackList" 
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+        v-loading="loading"
+      >
+        <!-- 多选功能 -->
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center;">
+              <el-avatar :size="24"
+                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
+              </el-avatar>
+              <span style="margin-left: 8px;">{{ row.user_name }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable></el-table-column>
+        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="180" sortable>
+          <template #default="{ row }">
+            {{ formatDate(row.created_time) }}
+          </template>
+        </el-table-column>
+       
+          <el-table-column fixed="right" :label="$t('Operations')" width="120">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showOptDialog(row)">
+              Details
+            </el-button>
+          </template>
+        </el-table-column> 
+      </el-table>
+      </div>
+      
       
       <!-- 分页组件 -->
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -61,10 +104,10 @@
     </div>
 
 <!-- 回复对话框 -->
-<el-dialog 
+<el-dialog
     v-model="replyDialogVisible" 
     :title="`Reply to ${selectedFeedback.user_name}`" 
-    width="600px"
+    :width="isMobile ? '95%' : '700px'"
   >
     <el-input
       v-model="replyContent"
@@ -116,6 +159,21 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
+      <div class="operation-buttons">
+                <el-button link type="primary" size="small" @click="showMessageDialog(currentRow)">
+                  {{ $t('Message') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="showReplyDialog(currentRow)">
+                  {{ $t('Reply') }}
+                </el-button>
+                <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
+                  {{ $t('Delete') }}
+                </el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -132,8 +190,10 @@ export default {
   },
   data() {
     return {
+      currentRow: {},
       feedbackList: [],
       paginatedFeedbackList: [], // 当前页的反馈数据
+      optDialogVisible: false,
       deleteDialogVisible: false,
       batchDeleteDialogVisible: false,
       messageDialogVisible: false,
@@ -148,9 +208,17 @@ export default {
       replyContent: '',
       selectedFeedbackId: null,
       defaultAvatar: logo,
+      isMobile: false,
     };
   },
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+    },
+    showOptDialog(row) {
+      this.currentRow = row;
+      this.optDialogVisible = true;
+    },
 
     showReplyDialog(feedback) {
       this.selectedFeedback = feedback;
@@ -296,8 +364,12 @@ export default {
   },
   mounted() {
     this.fetchFeedbacks();
+    this.checkMobile(); // Initial check
+    window.addEventListener('resize', this.checkMobile);
   },
+  
 };
+
 </script>
 
 <style scoped>
@@ -321,5 +393,37 @@ export default {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.desktop-view {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-view {
+  display: none;
+}
+
+.replyDialog {
+  width: 600px;
+  max-width: 80%;
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    margin-bottom: 20px;
+  }
+
 }
 </style>

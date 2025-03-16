@@ -366,7 +366,6 @@ import MainHeader from "../components/MainHeader.vue";
 import axios from "axios";
 import { ElMessage } from 'element-plus';
 import logo from '../assets/logo.png';
-import { ArrowDown } from '@element-plus/icons-vue';
 
 export default {
   name: "WorkSpace",
