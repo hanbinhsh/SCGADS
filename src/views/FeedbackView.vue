@@ -74,12 +74,16 @@
             </template>
             <div class="card-body">
               <el-table :data="feedbackReplyList" style="width: 100%"v-loading="loading" :empty-text="$t('feedback.Noreply')">
-                <el-table-column prop="subject" :label="$t('feedback.Subject')" />
-                <el-table-column prop="replyTime" :label="$t('feedback.Date')" width="180" />
+                <el-table-column prop="subject" :label="$t('feedback.Subject')" sortable />
+                <el-table-column prop="created_time" :label="$t('feedback.Date')" width="180" sortable>
+                  <template #default="{ row }">
+                    {{ formatDate(row.replyTime) }}
+                  </template>
+                </el-table-column>
                 <el-table-column fixed="right" :label="$t('Operations')" width="220">
                   <template #default="{ row }">
                     <el-button link type="primary" size="small" @click="showMessageDialog(row)">
-                      Message
+                      {{ $t('feedback.View') }}
                     </el-button>
                   </template>
                 </el-table-column>
@@ -142,6 +146,10 @@ export default {
     };
   },
   methods: {
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleString(undefined, options);
+    },
     handleMenuSelect(index) {
       this.activeMenu = index;
       if (index === 'history') {
@@ -212,7 +220,7 @@ export default {
       this.$alert(
         `
         ${row.replyContent ? `
-        <p><strong>Admin Reply:</strong></p>
+        <p><strong>${ this.$t('feedback.AdminReply') }:</strong></p>
         <p>${row.replyContent}</p>` : ''}`,
         
         {

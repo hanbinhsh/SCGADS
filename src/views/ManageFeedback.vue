@@ -36,10 +36,10 @@
           <el-table-column fixed="right" :label="$t('Operations')" width="220">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
-              Message
+              {{ $t('feedback.Message') }}
             </el-button>
-            <el-button link type="success" size="small" @click="showReplyDialog(row)">Reply</el-button>
-            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
+            <el-button link type="success" size="small" @click="showReplyDialog(row)">{{ $t('feedback.AdminReply') }}</el-button>
+            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
           </template>
         </el-table-column> 
       </el-table>
@@ -77,7 +77,7 @@
           <el-table-column fixed="right" :label="$t('Operations')" width="120">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showOptDialog(row)">
-              Details
+              {{ $t('Detail') }}
             </el-button>
           </template>
         </el-table-column> 
@@ -95,10 +95,10 @@
     <div class="footer">
       <div class="footer-button-row">
         <el-button type="success" @click="fetchFeedbacks">
-          Refresh
+          {{ $t('Refresh') }}
         </el-button>
         <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedFeedbacks.length === 0">
-          Batch Delete
+          {{ $t('BatchDelete') }}
         </el-button>
       </div>
     </div>

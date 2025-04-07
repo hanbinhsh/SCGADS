@@ -20,6 +20,15 @@ const en = {
   Confirm: 'Confirm',
   Reset: 'Reset',
 
+  SystemSettings:{
+    tip: "Set Auto Progress OFF if you have not put models online.",
+    AutoProgress: "Auto Progress"
+  },
+  ModelManage: {
+    Figure: "Figure",
+    Parameters: "Parameters",
+    AddModel: "Add Model"
+  },
   feedback: {
     sendfeedback: "Feedback",
     history: "History",
@@ -31,6 +40,8 @@ const en = {
     Date: "Date",
     Responsestofeedback: "Responses to feedback",
     Noreply: "No Reply",
+    View: "View",
+    AdminReply: "Reply",
   },
   Visualization: {
     Denoising: "Denoising",

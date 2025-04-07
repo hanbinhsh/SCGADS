@@ -31,14 +31,14 @@
           <!-- 操作列 -->
           <el-table-column fixed="right" :label="$t('Operations')" width="150">
             <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="showEditDialog(row)">Edit</el-button>
+              <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
               <!-- 禁用删除按钮 -->
               <el-button v-if="row.userId === this.userData.userId" link type="default" size="small" disabled>
-                Delete
+                {{ $t('Delete') }}
               </el-button>
               <!-- 可点击的删除按钮 -->
               <el-button v-else link type="danger" size="small" @click="showDeleteDialog(row)">
-                Delete
+                {{ $t('Delete') }}
               </el-button>
             </template>
           </el-table-column>
@@ -87,10 +87,10 @@
       <div class="footer">
         <div class="footer-button-row">
           <el-button type="success" @click="fetchUserList">
-            Refresh
+            {{ $t('Refresh') }}
           </el-button>
           <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedUsers.length === 0">
-            Batch Delete
+            {{ $t('BatchDelete') }}
           </el-button>
         </div>
       </div>

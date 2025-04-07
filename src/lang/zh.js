@@ -20,6 +20,15 @@ const zh =  {
   Confirm: '确认',
   Reset: '重置',
 
+  SystemSettings:{
+    tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
+    AutoProgress: "自动处理"
+  },
+  ModelManage: {
+    Figure: "模型图",
+    Parameters: "参数",
+    AddModel: "添加模型"
+  },
   feedback: {
     sendfeedback: "发送反馈",
     history: "反馈历史",
@@ -31,6 +40,8 @@ const zh =  {
     Date: "日期",
     Responsestofeedback: "反馈回复",
     Noreply: "没有回复",
+    View: "查看",
+    AdminReply: "回复",
   },
   Visualization: {
     Denoising: "降噪对比",

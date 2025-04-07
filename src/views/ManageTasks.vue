@@ -330,8 +330,8 @@
       @close="closeUploadDialog">
       <el-form>
         <!-- 文件上传组件 -->
-        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" 
-        :limit="3" :auto-upload="false" :accept="'.js'">
+        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" multiple
+        :auto-upload="false" :accept="'.js'">
           <el-icon class="el-icon--upload">
             <UploadFilled />
           </el-icon>
