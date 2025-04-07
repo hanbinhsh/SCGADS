@@ -63,10 +63,11 @@
   float: left;
   flex-direction: column;
   justify-content: center; /* 垂直居中 */
-  width: 150px;
+  /* width: 150px; */
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1;
   background-color: #fff;
+  transition: width 0.3s ease;
 }
 
 .footer {
@@ -147,4 +148,89 @@
   font-size: 20px;
   font-weight: bold;
   color: #333;
+}
+
+/* Mobile navigation styles */
+.mobile-nav {
+  margin-top: 75px;
+  padding: 0;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f0f9ff;
+}
+
+.dark-mode .mobile-nav {
+  background-color: #333;
+}
+
+.mobile-nav .el-menu {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-bottom: none;
+}
+
+.mobile-nav .el-menu-item {
+  align-items: center;
+}
+
+.mobile-nav .el-icon {
+  margin-right: 0;
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+
+.mobile-nav .el-menu-item span {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+/* Make sure sidebar is hidden properly on smaller screens when not in mobile mode */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+  .image-container{
+    padding: 0;
+    flex-direction: row;
+  }
+}
+
+.sidebar-toggle {
+  position: absolute;
+  right: 0;
+  top: 200px;
+  background-color: #409eff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50% 0 0 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  z-index: 2;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.sidebar-toggle:hover {
+  width: 28px;
+  background-color: #66b1ff;
+}
+
+.sidebar-collapsed .sidebar {
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.expanded-content {
+  margin-left: 64px;
+  width: calc(100% - 64px);
 }

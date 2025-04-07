@@ -1,9 +1,20 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <!-- 侧边栏 -->
-    <el-aside class="sidebar animate__animated animate__fadeInLeft">
-      <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect">
+    <!-- 桌面端侧边栏 -->
+    <el-aside class="sidebar animate__animated animate__fadeInLeft" v-if="!isMobile" :width="isCollapsed ? '64px' : '150px'">
+      <div class="sidebar-toggle" @click="toggleSidebar">
+        <el-icon :class="{ 'rotate-180': isCollapsed }">
+          <ArrowLeft />
+        </el-icon>
+      </div>
+      
+      <el-menu 
+        :default-active="activeTask" 
+        class="task-menu" 
+        @select="handleTaskSelect"
+        mode="vertical"
+        :collapse="isCollapsed">
         <el-menu-item index="annotation">
           <el-icon><Edit /></el-icon>
           <span>{{ $t('uploadPage.Annotation') }}</span>
@@ -18,15 +29,41 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
+    <!-- 移动端侧边栏（顶部水平菜单） -->
+    <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
+      <el-menu 
+        :default-active="activeTask" 
+        class="task-menu" 
+        @select="handleTaskSelect"
+        mode="horizontal">
+        <el-menu-item index="annotation">
+          <el-icon><Edit /></el-icon>
+          <span>{{ $t('uploadPage.Annotation') }}</span>
+        </el-menu-item>
+        <el-menu-item index="training">
+          <el-icon><Cpu /></el-icon>
+          <span>{{ $t('uploadPage.Training') }}</span>
+        </el-menu-item>
+        <el-menu-item index="denoising">
+          <el-icon><Filter /></el-icon>
+          <span>{{ $t('uploadPage.Denoising') }}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-header>
+
     <el-main class="fullscreen-section" v-loading="loading">
       <!-- 注释页面 -->
       <div class="left-container">
         <el-row :gutter="20">
           <!-- 左侧：文件上传 -->
-          <el-col :span="14">
+          <el-col :xs="24" :sm="24" :md="14" :lg="14" :xl="14">
             <el-card class="upload-card animate__animated animate__fadeInLeft">
               <el-row :gutter="20" id="upload-row">
-                <el-col :span="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation') ) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12">
+                <el-col 
+                  :xs="24" 
+                  :sm="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation')) ? 24 : 12" 
+                  :md="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation')) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12"
+                >
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -43,7 +80,12 @@
                   </el-upload>
                 </el-col>
 
-                <el-col :span="activeTask ===  'training' ? 8 : 12" v-if="selectedModel.modelType === 'multi' && (activeTask === 'training' || activeTask === 'annotation')">
+                <el-col 
+                  :xs="24" 
+                  :sm="activeTask === 'training' ? 12 : 12" 
+                  :md="activeTask === 'training' ? 8 : 12" 
+                  v-if="selectedModel.modelType === 'multi' && (activeTask === 'training' || activeTask === 'annotation')"
+                >
                   <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -55,7 +97,12 @@
                   </el-upload>
                 </el-col>
 
-                <el-col :span="selectedModel.modelType !== 'multi'? 12 : 8" v-if="activeTask === 'training'">
+                <el-col 
+                  :xs="24" 
+                  :sm="12" 
+                  :md="selectedModel.modelType !== 'multi'? 12 : 8" 
+                  v-if="activeTask === 'training'"
+                >
                   <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -75,16 +122,16 @@
           </el-col>
 
           <!-- 右侧：参数设置 -->
-          <el-col :span="10">
-            <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;" id="model-select">
+          <el-col :xs="24" :sm="24" :md="10" :lg="10" :xl="10">
+            <el-card class="form-card animate__animated animate__fadeInRight" style="height: auto;" id="model-select">
               <el-form label-width="40%">
-              <!-- 模型选择 -->
-              <el-form-item :label="$t('uploadPage.ModelSelect')">
-                <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
-                  <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
-                </el-select>
-              </el-form-item>
-            </el-form>
+                <!-- 模型选择 -->
+                <el-form-item :label="$t('uploadPage.ModelSelect')">
+                  <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
+                    <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
+                  </el-select>
+                </el-form-item>
+              </el-form>
             </el-card>
             <el-card class="form-card animate__animated animate__fadeInRight" id="parameters">
               <el-form label-width="40%">
@@ -124,7 +171,7 @@
   </el-tour>
 
   <!-- 任务名输入框 -->
-  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="500" align-center>
+  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="90%" max-width="500px" align-center>
     <el-input v-model="taskName" placeholder="Please enter the task name"></el-input>
     <template #footer>
       <div class="dialog-footer">
@@ -147,6 +194,10 @@ export default {
   },
   mounted() {
     this.fetchModels()
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      this.isCollapsed = savedState === 'true';
+    }
   },
   data() {
     return {
@@ -162,7 +213,8 @@ export default {
       parameterDefaults: {}, // 默认参数
       selectedModel: '',
       loading:false,
-      activeTask: 'annotation' // 默认选中的任务
+      activeTask: 'annotation', // 默认选中的任务
+      isCollapsed: false,
     };
   },
   methods: {
@@ -350,6 +402,11 @@ export default {
         this.scRNASeqFile = [];
       }
     },
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed;
+      // Store sidebar state in localStorage for persistence
+      localStorage.setItem('sidebarCollapsed', this.isCollapsed);
+    }
   },
   computed: {
     filteredModels() {
@@ -382,10 +439,25 @@ export default {
 
 <script setup>
 import { UploadFilled } from "@element-plus/icons-vue";
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue'; 
 import SparkMD5 from "spark-md5";
 
 const open = ref(false);
+
+const isMobile = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 </script>
 
 
@@ -436,5 +508,11 @@ const open = ref(false);
 /* 全宽组件 */
 .full-width {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .fullscreen-section{
+    margin-top: 0;
+  }
 }
 </style>

@@ -1,23 +1,52 @@
 <template>
   <el-container class="main-page">
     <MainHeader @darkmodeChanged="handleDarkModeChange"></MainHeader>
-    <!-- 侧边栏 -->
-    <el-aside class="sidebar animate__animated animate__fadeInLeft">
-      <el-menu :default-active="activeChart" class="chart-menu" @select="handleChartSelect">
+
+    <!-- 桌面端侧边栏 -->
+    <el-aside class="sidebar animate__animated animate__fadeInLeft" v-if="!isMobile" :width="isCollapsed ? '64px' : '150px'">
+      <div class="sidebar-toggle" @click="toggleSidebar">
+        <el-icon :class="{ 'rotate-180': isCollapsed }">
+          <ArrowLeft />
+        </el-icon>
+      </div>
+      
+      <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect" mode="vertical" :collapse="isCollapsed">
         <el-menu-item index="tsne">
           <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
           <span>T-SNE</span>
         </el-menu-item>
-        <el-menu-item index="a">
+        <el-menu-item index="umap">
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="b">
+        <el-menu-item index="denoising">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
+    <!-- 移动端侧边栏（顶部水平菜单） -->
+    <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
+      <el-menu 
+        :default-active="activeTask" 
+        class="task-menu" 
+        @select="handleTaskSelect"
+        mode="horizontal">
+        <el-menu-item index="annotation">
+          <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>T-SNE</span>
+        </el-menu-item>
+        <el-menu-item index="training">
+          <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>UMAP</span>
+        </el-menu-item>
+        <el-menu-item index="denoising">
+          <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>{{ $t('Visualization.Denoising') }}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-header>
+
     <el-main class="fullscreen-section">
       <el-row type="flex" justify="center animate__animated animate__fadeInRight">
         <el-col :span="20">
@@ -81,10 +110,10 @@
       </div>
     </div>
 
-    <el-dialog v-model="settingVisible" title="Download Settings" width="600" align-center>
+    <el-dialog v-model="settingVisible" :title="$t('Visualization.Settings')" width="600" align-center>
       <el-form :model="axisSettings" label-width="180px" label-position="left">
         <!-- 放大倍率设置 -->
-        <el-form-item label="Chart Magnify Ratio" class="form-item" style="display: flex; justify-content: space-between; align-items: center;">
+        <el-form-item :label="$t('Visualization.ChartMagnifyRatio')" class="form-item" style="display: flex; justify-content: space-between; align-items: center;">
           <el-input-number v-model="magnifyRatio" :precision="2" :step="0.5" :max="10" :min="0" style="margin-left: auto;" />
         </el-form-item>
 
@@ -93,20 +122,20 @@
           <!-- X 轴设置 -->
           <el-col :span="12">
             <el-card shadow="hover">
-              <template #header><b>X Axis Settings</b></template>
-              <el-form-item label="Show Axis">
+              <template #header><b>X {{ $t('Visualization.AxisSettings') }}</b></template>
+              <el-form-item :label="$t('Visualization.ShowAxis')">
                 <el-switch v-model="axisSettings.x.show"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Ticks">
+              <el-form-item :label="$t('Visualization.ShowTicks')">
                 <el-switch v-model="axisSettings.x.showTicks"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Axis Line">
+              <el-form-item :label="$t('Visualization.ShowAxisLine')">
                 <el-switch v-model="axisSettings.x.showAxisLine"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Labels">
+              <el-form-item :label="$t('Visualization.ShowLabels')">
                 <el-switch v-model="axisSettings.x.showLabels"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Grid Lines">
+              <el-form-item :label="$t('Visualization.ShowGridLines')">
                 <el-switch v-model="axisSettings.x.showGridLines"></el-switch>
               </el-form-item>
             </el-card>
@@ -115,20 +144,20 @@
           <!-- Y 轴设置 -->
           <el-col :span="12">
             <el-card shadow="hover">
-              <template #header><b>Y Axis Settings</b></template>
-              <el-form-item label="Show Axis">
+              <template #header><b>Y {{ $t('Visualization.AxisSettings') }}</b></template>
+              <el-form-item :label="$t('Visualization.ShowAxis')">
                 <el-switch v-model="axisSettings.y.show"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Ticks">
+              <el-form-item :label="$t('Visualization.ShowTicks')">
                 <el-switch v-model="axisSettings.y.showTicks"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Axis Line">
+              <el-form-item :label="$t('Visualization.ShowAxisLine')">
                 <el-switch v-model="axisSettings.y.showAxisLine"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Labels">
+              <el-form-item :label="$t('Visualization.ShowLabels')">
                 <el-switch v-model="axisSettings.y.showLabels"></el-switch>
               </el-form-item>
-              <el-form-item label="Show Grid Lines">
+              <el-form-item :label="$t('Visualization.ShowGridLines')">
                 <el-switch v-model="axisSettings.y.showGridLines"></el-switch>
               </el-form-item>
             </el-card>
@@ -139,17 +168,17 @@
       <!-- 底部按钮 -->
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="conformSettings()">Confirm</el-button>
+          <el-button type="primary" @click="conformSettings()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 任务结果文件不存在对话框 -->
-    <el-dialog v-model="resultFailVisible" title="Download Settings" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ taskName }}</strong> result failed to load, please contract to administrator.</span>
+    <el-dialog v-model="resultFailVisible" :title="$t('status.Error')" width="500" align-center>
+      <span>{{ $t('Visualization.Task') }} <strong style="color: #e74c3c;">{{ taskName }}</strong> {{ $t('Visualization.failLoad') }}</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="resultFailVisible = false">Confirm</el-button>
+          <el-button type="primary" @click="resultFailVisible = false">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -177,6 +206,7 @@ export default {
   },
   data() {
     return {
+      isCollapsed: false,
       tableData: data.map((coord, index) => ({
         index: index + 1,
         coord,
@@ -237,6 +267,11 @@ export default {
     },
   },
   methods: {
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed;
+      // Store sidebar state in localStorage for persistence
+      localStorage.setItem('sidebarCollapsed', this.isCollapsed);
+    },
     handleDarkModeChange(newValue){
       initializeChart(newValue, this.newChart, this.axisSettings, this.newData, this.newPieces, this.newLabel);
       this.isDarkMode = newValue;
@@ -381,8 +416,27 @@ export default {
     this.isDarkMode = JSON.parse(localStorage.getItem('isDarkMode')) || false;
     // BUG
     initializeChart(this.isDarkMode, false, this.axisSettings, '', '', '');
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      this.isCollapsed = savedState === 'true';
+    }
   },
 };
+</script>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'; 
+const isMobile = ref(false);
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 </script>
 
 <style scoped>
@@ -412,5 +466,11 @@ export default {
   bottom: 0;
   right: 0;
   position: absolute;
+}
+
+@media (max-width: 768px) {
+  .fullscreen-section{
+    margin-top: 0;
+  }
 }
 </style>

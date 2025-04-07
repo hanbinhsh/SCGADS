@@ -64,9 +64,12 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
 
           <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="100">
+          <el-table-column fixed="right" :label="$t('Operations')" width="70">
             <template #default="{ row }">
               <el-button link type="primary" size="small" @click="showDetailDialog(row)">Detail</el-button>
             </template>
