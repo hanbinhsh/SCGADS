@@ -326,7 +326,7 @@ export default {
       }
 
       // 调用接口检查任务名称是否存在
-      const response = await axios.post('/api/findTaskByTaskName?taskName=' + this.taskName);
+      const response = await axios.post('/api/checkExistsTaskByTaskName?taskName=' + this.taskName);
       if (response.data.code === 1) {
         // 如果任务名称可用，继续上传文件
         this.UploadFiles();
