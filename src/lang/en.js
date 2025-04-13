@@ -19,6 +19,7 @@ const en = {
   Notcompletedyet: 'Not completed yet',
   Confirm: 'Confirm',
   Reset: 'Reset',
+  Add: 'createCompany',
 
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
@@ -144,6 +145,10 @@ const en = {
       phone: "Phone Number",
       avatar: "User Avatar"
     },
+    company: {
+      company_id: "Company ID",
+      company_name: "Company Name",
+    },
     task: {
       task_id: "Task ID",
       task_name: "Task Name",
@@ -193,6 +198,7 @@ const en = {
 
     Manage: 'Manage',
     ManageUsers: 'User Management',
+    ManageCompanys: 'Company Management',
     ManageTasks: 'Task Management',
     ManageFeedbacks: 'Feedback Management',
     ManageModel: 'Model Management',
