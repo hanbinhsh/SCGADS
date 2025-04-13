@@ -72,11 +72,11 @@
                 <el-col :span="12">
                   <el-table :data="paginatedData" stripe style="width: 100%;" @sort-change="handleSortChange">
                     <el-table-column prop="index" label="ID" width="70" sortable></el-table-column>
-                      <el-table-column prop="coord" :label="$t('Visualization.Position')" sortable>
-                        <template #default="{ row }">
-                          {{ `(${row.coord[0]}, ${row.coord[1]})` }}
-                        </template>
-                      </el-table-column>
+                    <el-table-column prop="coord" :label="$t('Visualization.Position')" sortable>
+                      <template #default="{ row }">
+                        {{ `(${row.coord[0].toFixed(4)}, ${row.coord[1].toFixed(4)})` }}
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="label" :label="$t('Visualization.Label')" width="290" sortable></el-table-column>
                   </el-table>
                   <el-pagination background layout="prev, pager, next" :total="totalItems" :page-size="pageSize"
