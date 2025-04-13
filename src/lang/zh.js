@@ -20,6 +20,29 @@ const zh =  {
   Confirm: '确认',
   Reset: '重置',
 
+  SystemSettings:{
+    tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
+    AutoProgress: "自动处理"
+  },
+  ModelManage: {
+    Figure: "模型图",
+    Parameters: "参数",
+    AddModel: "添加模型"
+  },
+  feedback: {
+    sendfeedback: "发送反馈",
+    history: "反馈历史",
+    feedback: "反馈",
+    feedbacktip: "在下方提交您的反馈，我们在收到之后会在第一时间提交回复。",
+    Subject: "反馈主题",
+    Message: "反馈内容",
+    SendMessage: "发送反馈",
+    Date: "日期",
+    Responsestofeedback: "反馈回复",
+    Noreply: "没有回复",
+    View: "查看",
+    AdminReply: "回复",
+  },
   Visualization: {
     Denoising: "降噪对比",
     Example: "示例",
@@ -33,6 +56,15 @@ const zh =  {
     DownloadData: "下载数据",
     DownloadCharts: "下载图表",
     DownloadReport: "下载报告",
+    AxisSettings: "坐标轴设置",
+    ChartMagnifyRatio: "图表放大倍率",
+    ShowAxis: "显示坐标轴",
+    ShowTicks: "显示坐标轴刻度",
+    ShowAxisLine: "显示主坐标轴",
+    ShowLabels: "显示刻度",
+    ShowGridLines: "显示网格线",
+    Task: "任务",
+    failLoad: "结果加载失败，请联系管理员处理。",
   },
   uploadPage: {
     Annotation: "类型注释",
@@ -44,7 +76,7 @@ const zh =  {
     file: "文件",
     Tag: "标签",
     Tutorial: "教程演示",
-    annoAlart: "如果使用内置模型，请勿更改参数。",
+    annoAlart: "若使用内置模型，请勿更改参数。",
     ModelSelect: "选择模型",
     Model: "模型",
     UploadFile: "上传文件",
@@ -137,7 +169,7 @@ const zh =  {
       user_id: "用户ID",
       subject: "主题",
       message: "信息",
-      created_time: "反馈时间"
+      created_time: "反馈时间",
     },
     result: {
       result_id: "文件的唯一标识符",
@@ -194,19 +226,18 @@ const zh =  {
     p32text: '同时利用转录组和表观基因组数据进行单细胞类型注释，对于深化生物学理解、开发新型治疗策略以及基于个体细胞组成进行精准医疗至关重要。',
     p33text: '细胞类型注释是后续生物医学研究的重要基础。近年来，基于深度学习的监督分类方法在细胞类型注释方面取得了显著进展。\
               然而，如何高效利用单细胞多组学数据进行细胞类型注释和解析，以及如何赋予模型自适应泛化能力以高效识别稀有细胞类型，仍然是亟待解决的挑战。',
-    p34text: '我们提出了 scMoAnno，一种基于单细胞多组学数据的细胞类型注释方法。该方法利用 预训练的跨注意力（cross-attention）网络，实现单细胞多组学数据中遗传与表观遗传特征的高效互学习与融合，从而实现精准的细胞类型注释。\
-              在 scRNA-seq 和 scATAC-seq 数据上的预测结果表明，scMoAnno 通过 预训练特征融合提取 并基于融合数据训练分类器，展现出卓越的泛化能力，特别是在 稀有细胞类型识别 方面表现突出。',
-    p35text: '在 四个经过严格筛选的基准数据集 上进行的实验表明，scMoAnno 在整体性能上超越了 九种最先进的基准模型。此外，scMoAnno 通过多组学数据融合提高了聚类评分，并在单细胞数据的下游分析中展现了显著优势，进一步证明了本模型在细胞类型注释中的增强能力如何促进生物医学研究的深入发展。',
-  
-    p41title: 'scMoAnno 工作流程图',
-    p411text: 'scMoAnno 模型采用双轮监督学习以提高细胞类型注释的准确性。\
-              第一轮学习：利用预训练的融合特征提取器，对 scRNA-seq 和 scATAC-seq 数据进行 跨注意力（cross-attention）特征提取，编码两种模态之间的交互特征。',
-    p412text: '第二轮学习：基于预训练特征提取器生成的融合数据，引入基于 Transformer 的细胞类型注释模块，实现高精度的细胞类型分配。',
+    p34text: '我们提出了 scLTH，一种基于单细胞多组学数据的细胞类型注释方法。该方法利用预训练的跨注意力（cross-attention）网络，实现单细胞多组学数据中遗传与表观遗传特征的高效互学习与融合，从而实现精准的细胞类型注释。\
+              在 scRNA-seq 和 scATAC-seq 数据上的预测结果表明，scLTH 通过 预训练特征融合提取并基于融合数据训练分类器，展现出卓越的泛化能力，特别是在稀有细胞类型识别方面表现突出。',
+    p35text: '在 四个经过严格筛选的基准数据集 上进行的实验表明，scLTH 在整体性能上超越了4种最先进的基准模型。此外，scLTH 通过多组学数据融合提高了聚类评分，并在单细胞数据的下游分析中展现了显著优势，进一步证明了本模型在细胞类型注释中的增强能力如何促进生物医学研究的深入发展。',
+    p41title: 'scLTH 工作流程',
+    p411text: 'SCLTH 模型采用跨模态潜在空间对齐策略，提升多组学细胞类型注释的准确性。\
+               第一阶段：通过引入 KL 散度对齐机制，将 scRNA-seq 和 scATAC-seq 的潜在空间映射到共享表示，从而增强不同组学间的协同表达关系建模。',
+    p412text: '第二阶段：构建基于多头注意力机制的细胞注释模块，在融合空间上高效捕捉跨模态特征，实现对细胞类型的精准识别。',
     p42title: '对比分析结果',
-    p42text: '实验结果表明，scMoAnno 方法在准确率等指标上 优于基准对比方法。\
-              与表现最优的基准方法 CIForm 相比，scMoAnno 在 准确率 方面提升 2%。\
-              在 平衡准确率（balanced accuracy） 指标上，scMoAnno 达到了 90%，与基准方法 scTransSort 持平。\
-              这一结果验证了 scMoAnno 方法的可行性与有效性，进一步证明了其在细胞类型注释任务中的卓越性能。',
+    p42text: '实验结果表明，SCLTH 模型在准确率和 F1-score 等核心指标上均超过现有方法。\
+              在三个主流公开多组学数据集（10X-Multiome、SHARE-seq 和 ISSAAC-seq）上，SCLTH 显著优于 Seurat、scGAD 等标记基因方法，以及 CIForm、scTransSort 等监督方法。\
+              例如，在 10X-Multiome 数据集上，SCLTH 的平均准确率达到了 96.9%，F1-score 为 95.4%，表现最优。\
+              该结果验证了所提方法在多组学细胞注释任务中的先进性与强适应性。',
   },
   profile: {
     EditInformation: '编辑个人信息',

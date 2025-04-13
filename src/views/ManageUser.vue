@@ -31,14 +31,14 @@
           <!-- 操作列 -->
           <el-table-column fixed="right" :label="$t('Operations')" width="150">
             <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="showEditDialog(row)">Edit</el-button>
+              <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
               <!-- 禁用删除按钮 -->
               <el-button v-if="row.userId === this.userData.userId" link type="default" size="small" disabled>
-                Delete
+                {{ $t('Delete') }}
               </el-button>
               <!-- 可点击的删除按钮 -->
               <el-button v-else link type="danger" size="small" @click="showDeleteDialog(row)">
-                Delete
+                {{ $t('Delete') }}
               </el-button>
             </template>
           </el-table-column>
@@ -64,9 +64,12 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
 
           <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="100">
+          <el-table-column fixed="right" :label="$t('Operations')" width="70">
             <template #default="{ row }">
               <el-button link type="primary" size="small" @click="showDetailDialog(row)">Detail</el-button>
             </template>
@@ -84,10 +87,10 @@
       <div class="footer">
         <div class="footer-button-row">
           <el-button type="success" @click="fetchUserList">
-            Refresh
+            {{ $t('Refresh') }}
           </el-button>
           <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedUsers.length === 0">
-            Batch Delete
+            {{ $t('BatchDelete') }}
           </el-button>
         </div>
       </div>

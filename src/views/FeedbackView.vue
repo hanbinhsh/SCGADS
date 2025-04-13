@@ -1,90 +1,61 @@
 <template>
   <el-container class="main-page">
     <MainHeader></MainHeader>
+    <!-- 桌面端侧边栏 -->
+    <el-aside class="sidebar animate__animated animate__fadeInLeft" v-if="!isMobile" :width="isCollapsed ? '64px' : '150px'">
+      <div class="sidebar-toggle" @click="toggleSidebar">
+        <el-icon :class="{ 'rotate-180': isCollapsed }">
+          <ArrowLeft />
+        </el-icon>
+      </div>
+      <el-menu :default-active="activeTask" class="task-menu" @select="handleMenuSelect" mode="vertical" :collapse="isCollapsed">
+        <el-menu-item index="feedback">
+          <font-awesome-icon :icon="['fas', 'message']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>{{ $t('feedback.sendfeedback') }}</span>
+        </el-menu-item>
+        <el-menu-item index="history">
+          <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>{{ $t('feedback.history') }}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
+    <!-- 移动端侧边栏（顶部水平菜单） -->
+    <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
+      <el-menu :default-active="activeTask" class="task-menu" @select="handleMenuSelect" mode="horizontal">
+        <el-menu-item index="feedback">
+          <font-awesome-icon :icon="['fas', 'message']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>{{ $t('feedback.sendfeedback') }}</span>
+        </el-menu-item>
+        <el-menu-item index="history">
+          <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="margin-left: 5px;margin-right: 10px;" />
+          <span>{{ $t('feedback.history') }}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-header>
+
     <el-main class="fullscreen-section">
       <el-row type="flex" justify="start" class="feedback-container">
-        <!-- 电脑端侧边栏 -->
-        <el-col v-if="!isMobile" :span="4" class="sidebar-col">
-          <el-card shadow="always" class="sidebar-card">
-            <el-menu 
-              :default-active="activeMenu"
-              class="side-menu"
-              @select="handleMenuSelect"
-            >
-              <el-menu-item index="feedback">
-                <span>Submit Feedback</span>
-              </el-menu-item>
-              <el-menu-item index="history">
-                <span>Feedback History</span>
-              </el-menu-item>
-            </el-menu>
-          </el-card>
-        </el-col>
-
-        <!-- 移动端侧边栏 -->
-        <el-col v-if="isMobile" :span="24" class="mobile-sidebar-col">
-          <el-collapse v-model="collapseActive">
-            <el-collapse-item title="Menu" name="1">
-              <el-menu 
-                :default-active="activeMenu"
-                class="side-menu"
-                @select="handleMenuSelect"
-              >
-                <el-menu-item index="feedback">
-                  <span>Submit Feedback</span>
-                </el-menu-item>
-                <el-menu-item index="history">
-                  <span>Feedback History</span>
-                </el-menu-item>
-              </el-menu>
-            </el-collapse-item>
-          </el-collapse>
-        </el-col>
-
         <!-- 右侧内容区域 -->
-        <el-col :span="isMobile ? 24 : 20" class="content-col">
+        <el-col :span="isMobile ? 24 : 15" class="content-col animate__animated animate__fadeInRight">
           <!-- 反馈表单 -->
-          <el-card 
-            v-show="activeMenu === 'feedback'"
-            shadow="always" 
-            class="content-card"
-          >
+          <el-card v-show="activeMenu === 'feedback'" shadow="always" class="content-card">
             <template #header>
-              <div class="card-header">
-                <span>Feedback</span>
-                <p class="feedback-text">You can submit your feedback below, and we will get your message.</p>
+              <div>
+                <span>{{ $t('feedback.feedback') }}</span>
+                <p class="feedback-text">{{ $t('feedback.feedbacktip') }}</p>
               </div>
             </template>
             <div class="card-body">
-              <el-form 
-                ref="feedbackForm" 
-                :model="feedbackForm" 
-                :label-width="isMobile ? '80px' : '120px'" 
-                class="feedback-form"
-              >
-                <el-form-item label="Subject" prop="subject">
-                  <el-input 
-                    v-model="feedbackForm.subject" 
-                    placeholder="Subject" 
-                    class="input-field"
-                  ></el-input>
+              <el-form ref="feedbackForm" :model="feedbackForm" :label-width="isMobile ? '80px' : '120px'" class="feedback-form">
+                <el-form-item :label="$t('feedback.Subject')" prop="subject">
+                  <el-input v-model="feedbackForm.subject" :placeholder="$t('feedback.Subject')" class="input-field"></el-input>
                 </el-form-item>
-                <el-form-item label="Message" prop="message">
-                  <el-input 
-                    type="textarea" 
-                    :rows="isMobile ? 5 : 8" 
-                    v-model="feedbackForm.message" 
-                    placeholder="Your Message"
-                    class="textarea-field"
-                  ></el-input>
+                <el-form-item :label="$t('feedback.Message')" prop="message">
+                  <el-input type="textarea" :rows="isMobile ? 5 : 8" v-model="feedbackForm.message" :placeholder="$t('feedback.Message')" class="textarea-field"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button 
-                    type="primary" 
-                    @click="submitForm" 
-                    class="submit-button"
-                  >
-                    Send Message
+                  <el-button type="primary" @click="submitForm" class="submit-button">
+                    {{ $t('feedback.SendMessage') }}
                   </el-button>
                 </el-form-item>
               </el-form>
@@ -92,41 +63,27 @@
           </el-card>
 
           <!-- 反馈历史 -->
-          <el-card 
-            v-show="activeMenu === 'history'"
-            shadow="always" 
-            class="content-card"
-          >
+          <el-card v-show="activeMenu === 'history'"shadow="always" class="content-card">
             <template #header>
               <div class="card-header">
-                <span>Responses to feedback</span>
-                <el-button 
-                  size="small" 
-                  @click="getFeedbackHistory"
-                  class="refresh-button"
-                >
+                <span>{{ $t('feedback.Responsestofeedback') }}</span>
+                <el-button size="small" @click="getFeedbackHistory"class="refresh-button">
                   <el-icon><Refresh /></el-icon>
                 </el-button>
               </div>
             </template>
             <div class="card-body">
-              <el-table 
-                :data="feedbackReplyList" 
-                style="width: 100%"
-                v-loading="loading"
-                empty-text="No reply"
-              >
-                <el-table-column prop="replyTime" label="Date" width="180" />
-                <el-table-column prop="subject" label="Subject" />
-                <el-table-column fixed="right" label="Operations" width="220">
+              <el-table :data="feedbackReplyList" style="width: 100%"v-loading="loading" :empty-text="$t('feedback.Noreply')">
+                <el-table-column prop="subject" :label="$t('feedback.Subject')" sortable />
+                <el-table-column prop="created_time" :label="$t('feedback.Date')" width="180" sortable>
                   <template #default="{ row }">
-                    <el-button 
-                      link 
-                      type="primary" 
-                      size="small" 
-                      @click="showMessageDialog(row)"
-                    >
-                      Message
+                    {{ formatDate(row.replyTime) }}
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" :label="$t('Operations')" width="220">
+                  <template #default="{ row }">
+                    <el-button link type="primary" size="small" @click="showMessageDialog(row)">
+                      {{ $t('feedback.View') }}
                     </el-button>
                   </template>
                 </el-table-column>
@@ -184,15 +141,25 @@ export default {
         createTime: ''
       },
       feedbackReplyList: [],
-      loading: false
+      loading: false,
+      isCollapsed: false,
     };
   },
   methods: {
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleString(undefined, options);
+    },
     handleMenuSelect(index) {
       this.activeMenu = index;
       if (index === 'history') {
         this.getFeedbackHistory();
       }
+    },
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed;
+      // Store sidebar state in localStorage for persistence
+      localStorage.setItem('sidebarCollapsed', this.isCollapsed);
     },
     async getFeedbackHistory() {
       this.loading = true;
@@ -253,7 +220,7 @@ export default {
       this.$alert(
         `
         ${row.replyContent ? `
-        <p><strong>Admin Reply:</strong></p>
+        <p><strong>${ this.$t('feedback.AdminReply') }:</strong></p>
         <p>${row.replyContent}</p>` : ''}`,
         
         {
@@ -262,168 +229,40 @@ export default {
         }
       );
     }
-  }
+  },
+  mounted() {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      this.isCollapsed = savedState === 'true';
+    }
+  },
 };
 </script>
 
 <style scoped>
-/* 移动端样式 */
-.mobile-sidebar-col {
-  margin-bottom: 20px;
-}
-
-.mobile-sidebar-col .el-collapse {
-  border: none;
-}
-
-.mobile-sidebar-col .el-collapse-item__header {
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px;
-  background-color: var(--el-color-primary-light-9);
-  border-radius: 8px;
-}
-
-.mobile-sidebar-col .el-collapse-item__content {
-  padding: 0;
-}
-
-.mobile-sidebar-col .side-menu {
-  border: none;
-}
-
-.mobile-sidebar-col .el-menu-item {
-  height: 50px;
-  line-height: 50px;
-  font-size: 14px;
-}
-
-/* 电脑端样式 */
-.feedback-container {
-  display: flex;
-  flex-wrap: nowrap;
-}
-
-.sidebar-col {
-  flex: 0 0 16.6667%; /* 4/24 */
-  max-width: 16.6667%; /* 4/24 */
-  margin-right: 20px;
-}
-
-.sidebar-card {
-  min-height: 400px;
-  border-radius: 8px;
-}
-
-.content-col {
-  flex: 0 0 83.3333%; /* 20/24 */
-  max-width: 83.3333%; /* 20/24 */
-}
-
-.content-card {
-  min-height: 400px;
-  border-radius: 8px;
-}
-
-.side-menu {
-  border-right: none;
-  background: transparent;
-}
-
-.side-menu .el-menu-item {
-  height: 60px;
-  line-height: 60px;
-  font-size: 16px;
-  transition: all 0.3s;
-}
-
-.side-menu .el-menu-item.is-active {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 20px;
-}
-
-.card-header span {
-  font-size: 20px;
-  font-weight: 500;
-}
-
 .feedback-text {
   color: #666;
   margin-top: 10px;
   font-size: 14px;
 }
-
-.feedback-form {
-  padding: 20px;
-}
-
-.input-field,
-.textarea-field {
-  border-radius: 6px;
-}
-
-.submit-button {
-  width: 100%;
-  height: 45px;
-  font-size: 16px;
-}
-
-.feedback-details {
-  padding: 20px;
-}
-
-.message-content,
-.reply-content {
-  white-space: pre-wrap;
-  line-height: 1.6;
-}
-
-@media screen and (max-width: 768px) {
-  .sidebar-col {
-    display: none;
-  }
-  
-  .content-col {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-  
-  .feedback-container {
-    margin-top: 20px;
-    padding: 0 10px;
-  }
-  
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .feedback-form {
-    padding: 15px;
-  }
-  
-  .submit-button {
-    height: 40px;
-    font-size: 14px;
-  }
-}
-
 .dark-mode .feedback-text {
   color: #a0a0a0;
 }
-
-.dark-mode .side-menu .el-menu-item {
-  color: #e0e0e0;
+.content-col{
+  margin: auto;
 }
 
-.dark-mode .side-menu .el-menu-item.is-active {
-  background-color: var(--el-color-primary-dark-2);
+@media (max-width: 768px) {
+  .fullscreen-section{
+    margin-top: 0;
+  }
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.submit-button{
+  width: 100%;
 }
 </style>

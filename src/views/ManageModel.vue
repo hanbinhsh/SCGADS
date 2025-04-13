@@ -21,10 +21,10 @@
         <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
         <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
           <template #default="{ row }">
-            <el-button link type="info" size="small" @click="showFigureDialog(row)">Figure</el-button>
-            <el-button link type="success" size="small" @click="showParametersDialog(row)">Parameters</el-button>
-            <el-button link type="primary" size="small" @click="showEditDialog(row)">Edit</el-button>
-            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">Delete</el-button>
+            <el-button link type="info" size="small" @click="showFigureDialog(row)">{{ $t('ModelManage.Figure') }}</el-button>
+            <el-button link type="success" size="small" @click="showParametersDialog(row)">{{ $t('ModelManage.Parameters') }}</el-button>
+            <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
+            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -39,13 +39,13 @@
     <div class="footer">
       <div class="footer-button-row">
         <el-button type="success" @click="fetchListData">
-          Refresh
+          {{ $t('Refresh') }}
         </el-button>
         <el-button type="primary" @click="addDialogVisible = true">
-          Add Model
+          {{ $t('ModelManage.AddModel') }}
         </el-button>
         <el-button type="danger" @click="batchDeleteDialogVisible = true" :disabled="selectedDatas.length === 0">
-          Batch Delete
+          {{ $t('BatchDelete') }}
         </el-button>
       </div>
     </div>
