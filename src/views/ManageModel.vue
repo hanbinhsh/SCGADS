@@ -19,7 +19,7 @@
         <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
         <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
         <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
-        <el-table-column fixed="right" :label="$t('Operations')" width="250">
+        <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
           <template #default="{ row }">
             <el-button link type="info" size="small" @click="showFigureDialog(row)">Figure</el-button>
             <el-button link type="success" size="small" @click="showParametersDialog(row)">Parameters</el-button>
@@ -259,6 +259,7 @@ export default {
       sortOrder: '',
       parameters: [], // 选中的模型参数
       loading: false,
+      isMobile: false,
       
       modelAdding: {
         modelName: "",
@@ -272,6 +273,9 @@ export default {
     };
   },
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768;
+    },
     addEditingParameter() {
       this.parameters.push({ name: "", value: "" });
     },
@@ -474,6 +478,8 @@ export default {
   },
   mounted() {
     this.fetchListData();
+    this.checkMobile(); // Initial check
+    window.addEventListener('resize', this.checkMobile);
   },
 };
 </script>
@@ -489,5 +495,24 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    margin-bottom: 20px;
+  }
+
 }
 </style>
