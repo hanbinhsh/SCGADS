@@ -35,6 +35,10 @@
                     v-if="userData?.isAdmin">
                     <font-awesome-icon :icon="['far', 'address-book']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageUsers') }}
                 </el-menu-item>
+                <el-menu-item index="ManageCompany" :class="{ 'is-active': activeIndex === 'ManageCompany' } "
+                    v-if="userData?.isAdmin">
+                    <font-awesome-icon :icon="['far', 'keyboard']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageCompanys') }}
+                </el-menu-item>
                 <el-menu-item index="ManageTasks" :class="{ 'is-active': activeIndex === 'ManageTasks' }"
                     v-if="userData?.isAdmin">
                     <font-awesome-icon :icon="['fas', 'list-check']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageTasks') }}

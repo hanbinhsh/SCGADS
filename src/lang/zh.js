@@ -19,6 +19,7 @@ const zh =  {
   Notcompletedyet: '未完成',
   Confirm: '确认',
   Reset: '重置',
+  Add: '新建公司',
 
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
@@ -145,6 +146,10 @@ const zh =  {
       phone: "电话号码",
       avatar: "用户头像"
     },
+    company: {
+      company_id: "公司ID",
+      company_name: "公司名称",
+    },
     task: {
       task_id: "任务ID",
       task_name: "任务名",
@@ -194,6 +199,7 @@ const zh =  {
 
     Manage: '管理',
     ManageUsers: '用户管理',
+    ManageCompanys: '公司管理',
     ManageTasks: '任务管理',
     ManageFeedbacks: '反馈管理',
     ManageModel: '模型管理',

@@ -19,7 +19,7 @@
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising" disabled="true">
+        <el-menu-item index="denoising" :disabled="!((this.type?.split(':')[0] || '') === 'denoising')">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
@@ -40,7 +40,7 @@
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising">
+        <el-menu-item index="denoising" :disabled="!((this.type?.split(':')[0] || '') === 'denoising')">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
@@ -55,10 +55,10 @@
               <div slot="header" class="card-header">
                 <el-text class="mx-1" size="large"></el-text>
                 <span class="page-name">{{ taskName || $t('Visualization.Example') }} {{ $t('Visualization.DataVisualization' )}}</span>
-                <el-button type="primary" style="float: right;" @click="SwitchTrueLabel" :disabled="!isUserTask">
+                <el-button type="primary" style="float: right;" @click="SwitchTrueLabel" :disabled="!isUserTask||!((this.type?.split(':')[0] || '') === 'training')">
                   <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;{{ $t('Visualization.Switch') }}&nbsp;
-                  <span v-if="trueLabel">{{ $t('Visualization.True') }}</span>
-                  <span v-else>{{ $t('Visualization.Pred') }}</span>
+                  <span v-if="trueLabel">{{ $t('Visualization.Pred') }}</span>
+                  <span v-else>{{ $t('Visualization.True') }}</span>
                 </el-button>
               </div>
             </template>
@@ -230,6 +230,7 @@ export default {
       newData: '',
       newLabel: '',
       isUserTask: false, // 是否是用户的任务而不是示例
+      type: 'annotation',
       trueLabel: false,  // 是否真实标签
       newPieces: false,
       axisSettings: {
@@ -420,6 +421,10 @@ export default {
         a.dispatchEvent(event);
         a.remove();
       }
+    },
+    async findTaskType(taskName){
+      const response = await axios.post('/api/findTaskByTaskName?taskName='+taskName);
+      this.type = response.data.type
     }
   },
   mounted() {
@@ -437,6 +442,8 @@ export default {
 
     // 如果有 taskName 参数，调用下载
     if (this.$route.query.taskName) {
+      // 判断任务类型
+      this.findTaskType(this.$route.query.taskName)
       this.downloadResult(this.$route.query.taskName);
       this.isUserTask = true;
     }
