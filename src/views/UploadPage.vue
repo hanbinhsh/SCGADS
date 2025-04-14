@@ -1,9 +1,20 @@
 <template>
   <div class="main-page">
     <MainHeader></MainHeader>
-    <!-- 侧边栏 -->
-    <el-aside class="sidebar animate__animated animate__fadeInLeft">
-      <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect">
+    <!-- 桌面端侧边栏 -->
+    <el-aside class="sidebar animate__animated animate__fadeInLeft" v-if="!isMobile" :width="isCollapsed ? '64px' : '150px'">
+      <div class="sidebar-toggle" @click="toggleSidebar">
+        <el-icon :class="{ 'rotate-180': isCollapsed }">
+          <ArrowLeft />
+        </el-icon>
+      </div>
+      
+      <el-menu 
+        :default-active="activeTask" 
+        class="task-menu" 
+        @select="handleTaskSelect"
+        mode="vertical"
+        :collapse="isCollapsed">
         <el-menu-item index="annotation">
           <el-icon><Edit /></el-icon>
           <span>{{ $t('uploadPage.Annotation') }}</span>
@@ -18,15 +29,41 @@
         </el-menu-item>
       </el-menu>
     </el-aside>
+    <!-- 移动端侧边栏（顶部水平菜单） -->
+    <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
+      <el-menu 
+        :default-active="activeTask" 
+        class="task-menu" 
+        @select="handleTaskSelect"
+        mode="horizontal">
+        <el-menu-item index="annotation">
+          <el-icon><Edit /></el-icon>
+          <span>{{ $t('uploadPage.Annotation') }}</span>
+        </el-menu-item>
+        <el-menu-item index="training">
+          <el-icon><Cpu /></el-icon>
+          <span>{{ $t('uploadPage.Training') }}</span>
+        </el-menu-item>
+        <el-menu-item index="denoising">
+          <el-icon><Filter /></el-icon>
+          <span>{{ $t('uploadPage.Denoising') }}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-header>
+
     <el-main class="fullscreen-section" v-loading="loading">
       <!-- 注释页面 -->
       <div class="left-container">
         <el-row :gutter="20">
           <!-- 左侧：文件上传 -->
-          <el-col :span="14">
+          <el-col :xs="24" :sm="24" :md="14" :lg="14" :xl="14">
             <el-card class="upload-card animate__animated animate__fadeInLeft">
               <el-row :gutter="20" id="upload-row">
-                <el-col :span="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation') ) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12">
+                <el-col 
+                  :xs="24" 
+                  :sm="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation')) ? 24 : 12" 
+                  :md="(activeTask === 'denoising' || (selectedModel.modelType !== 'multi' && activeTask === 'annotation')) ? 24 : activeTask === 'training' ? (selectedModel.modelType !== 'multi'? 12:8) : 12"
+                >
                   <el-upload v-model:file-list="scRNASeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -43,7 +80,12 @@
                   </el-upload>
                 </el-col>
 
-                <el-col :span="activeTask ===  'training' ? 8 : 12" v-if="selectedModel.modelType === 'multi' && (activeTask === 'training' || activeTask === 'annotation')">
+                <el-col 
+                  :xs="24" 
+                  :sm="activeTask === 'training' ? 12 : 12" 
+                  :md="activeTask === 'training' ? 8 : 12" 
+                  v-if="selectedModel.modelType === 'multi' && (activeTask === 'training' || activeTask === 'annotation')"
+                >
                   <el-upload v-model:file-list="scATACSeqFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -55,7 +97,12 @@
                   </el-upload>
                 </el-col>
 
-                <el-col :span="selectedModel.modelType !== 'multi'? 12 : 8" v-if="activeTask === 'training'">
+                <el-col 
+                  :xs="24" 
+                  :sm="12" 
+                  :md="selectedModel.modelType !== 'multi'? 12 : 8" 
+                  v-if="activeTask === 'training'"
+                >
                   <el-upload v-model:file-list="tagFile" class="upload" drag action="" :limit="1" :auto-upload="false">
                     <el-icon class="el-icon--upload">
                       <UploadFilled />
@@ -75,16 +122,16 @@
           </el-col>
 
           <!-- 右侧：参数设置 -->
-          <el-col :span="10">
-            <el-card class="form-card animate__animated animate__fadeInRight" style="height: 70px;" id="model-select">
+          <el-col :xs="24" :sm="24" :md="10" :lg="10" :xl="10">
+            <el-card class="form-card animate__animated animate__fadeInRight" style="height: auto;" id="model-select">
               <el-form label-width="40%">
-              <!-- 模型选择 -->
-              <el-form-item :label="$t('uploadPage.ModelSelect')">
-                <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
-                  <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
-                </el-select>
-              </el-form-item>
-            </el-form>
+                <!-- 模型选择 -->
+                <el-form-item :label="$t('uploadPage.ModelSelect')">
+                  <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
+                    <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
+                  </el-select>
+                </el-form-item>
+              </el-form>
             </el-card>
             <el-card class="form-card animate__animated animate__fadeInRight" id="parameters">
               <el-form label-width="40%">
@@ -124,7 +171,7 @@
   </el-tour>
 
   <!-- 任务名输入框 -->
-  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="500" align-center>
+  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="90%" max-width="500px" align-center>
     <el-input v-model="taskName" placeholder="Please enter the task name"></el-input>
     <template #footer>
       <div class="dialog-footer">
@@ -147,6 +194,10 @@ export default {
   },
   mounted() {
     this.fetchModels()
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      this.isCollapsed = savedState === 'true';
+    }
   },
   data() {
     return {
@@ -162,7 +213,8 @@ export default {
       parameterDefaults: {}, // 默认参数
       selectedModel: '',
       loading:false,
-      activeTask: 'annotation' // 默认选中的任务
+      activeTask: 'annotation', // 默认选中的任务
+      isCollapsed: false,
     };
   },
   methods: {
@@ -315,29 +367,29 @@ export default {
           { file: this.scATACSeqFile[0]?.raw, fileType: 'scATACSeqFile' },
           { file: this.tagFile[0]?.raw, fileType: 'tagFile' }
         ];
-
-        const uploadPromises = files.map(({ file, fileType }) => {
-          const taskName = this.taskName;
-          // 获取文件的ArrayBuffer并计算MD5
-          const fileReader = new FileReader();
+        const uploadPromises = files.map( async ({ file, fileType }) => {
+          if (!(file instanceof Blob)) return;
+          // 获取固定的AES密钥和IV
+          const { aesKey, iv } = await this.getFixedEncryptionKeys();
+          // 读取文件并计算MD5
+          const arrayBuffer = await file.arrayBuffer();
           const spark = new SparkMD5.ArrayBuffer();
-          // 获取文件二进制数据
-          if (file instanceof Blob){
-            fileReader.readAsArrayBuffer(file);
-            fileReader.onload = async e =>{
-            spark.append(e.target.result);
-              const hash = spark.end();
-              const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
-              if (response.data.code === 1){
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('taskName', taskName);
-                formData.append('fileType', fileType);
-                formData.append('hash', hash);
-                return axios.post('/api/uploadOneFile', formData);
-              }
-            };
-          }
+          spark.append(arrayBuffer);
+          const hash = spark.end();
+
+          // 加密文件
+          const encryptedData = await this.aesEncrypt(arrayBuffer, aesKey, iv);
+
+          // 创建FormData并附加加密的文件和相关信息
+          const encryptedFile = new Blob([encryptedData]);
+          const formData = new FormData();
+          // const taskName = this.taskName;
+          formData.append('file', encryptedFile);
+          formData.append('taskName', this.taskName);
+          formData.append('fileType', fileType);
+          formData.append('hash', hash);
+          // 发送请求上传加密文件
+          return axios.post('/api/uploadOneFile', formData);
         });
 
         await Promise.all(uploadPromises);
@@ -350,6 +402,56 @@ export default {
         this.scRNASeqFile = [];
       }
     },
+    // 获取固定的AES密钥和IV
+    async getFixedEncryptionKeys() {
+      try {
+        // 发送请求到后端接口以获取密钥和IV
+        const response = await axios.post('/api/getEncryptionKeys');
+        const { aesKeyHex, ivHex } = response.data; // 注意字段名改为Hex后缀
+        // console.log('AES Key (Hex):', aesKeyHex);
+        // console.log('IV (Hex):', ivHex);
+        // 将Hex字符串转换为Uint8Array
+        const aesKeyBytes = this.hexToBytes(aesKeyHex);
+        const ivBytes = this.hexToBytes(ivHex);
+        // 导入密钥
+        const aesKey = await crypto.subtle.importKey(
+          'raw',
+          aesKeyBytes,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        return { aesKey, iv: ivBytes };
+      } catch (error) {
+        // 处理错误情况
+        console.error('Error fetching encryption keys:', error);
+        throw error; // 或者根据需要处理错误
+      }
+    },
+    hexToBytes(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      }
+      return bytes;
+    },
+    // AES加密函数
+    async aesEncrypt(data, key, iv) {
+      const encryptedData = await crypto.subtle.encrypt(
+        {
+          name: 'AES-GCM',
+          iv: iv
+        },
+        key,
+        data
+      );
+      return encryptedData;
+    },
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed;
+      // Store sidebar state in localStorage for persistence
+      localStorage.setItem('sidebarCollapsed', this.isCollapsed);
+    }
   },
   computed: {
     filteredModels() {
@@ -382,10 +484,25 @@ export default {
 
 <script setup>
 import { UploadFilled } from "@element-plus/icons-vue";
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue'; 
 import SparkMD5 from "spark-md5";
 
 const open = ref(false);
+
+const isMobile = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 </script>
 
 
@@ -436,5 +553,11 @@ const open = ref(false);
 /* 全宽组件 */
 .full-width {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .fullscreen-section{
+    margin-top: 0;
+  }
 }
 </style>

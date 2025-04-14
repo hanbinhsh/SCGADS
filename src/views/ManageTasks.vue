@@ -5,7 +5,8 @@
       <h1 class="page-name">{{ $t('navigateBar.ManageTasks') }}</h1>
       <el-divider />
       <!-- 任务列表表格 -->
-      <el-table :data="paginatedTaskList" 
+      <div class="desktop-view">
+        <el-table :data="paginatedTaskList" 
         style="width: 100%" 
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
@@ -48,29 +49,108 @@
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" :label="$t('Operations')" width="380">
+        <el-table-column fixed="right" :label="$t('Operations')" width="380" class-name="operations-column">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
-              {{ $t('taskManage.Auto') }}
-            </el-button>
-            <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
-              {{ $t('Download') }}
-            </el-button>
-            <el-button link type="" size="small" @click="showDetailDialog(row)">
-              {{ $t('Detail') }}
-            </el-button>
-            <el-button link type="" size="small" @click="showCharts( row.task_name )" :disabled="row.status !== 2">
-              {{ $t('navigateBar.Virtualization') }}
-            </el-button>
-            <el-button link type="warning" size="small" @click="showEditDialog(row)">
-              {{ $t('Edit') }}
-            </el-button>
-            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-              {{ $t('Delete') }}
-            </el-button>
+            <!-- Desktop view - show all buttons -->
+                <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
+                  {{ $t('taskManage.Auto') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
+                  {{ $t('Download') }}
+                </el-button>
+                <el-button link type="" size="small" @click="showDetailDialog(row)">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+                <el-button link type="warning" size="small" @click="showEditDialog(row)">
+                  {{ $t('Edit') }}
+                </el-button>
+                <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
+                  {{ $t('Delete') }}
+                </el-button>
           </template>
         </el-table-column>
       </el-table>
+      </div>
+      
+      <div class="mobile-view">
+        <el-table :data="paginatedTaskList" 
+        style="width: 100%" 
+        @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
+        v-loading="loading">
+        <!-- 多选功能 -->
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center;">
+              <el-avatar :size="24"
+                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
+              </el-avatar>
+              <span style="margin-left: 8px;">{{ row.user_name }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <!-- 显示任务名 -->
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
+        <!-- 显示上传者的电子邮件 -->
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <!-- 显示上传者的电话 -->
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <!-- 显示任务开始时间 -->
+        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
+          <template #default="{ row }">
+            {{ formatDate(row.start_time) }}
+          </template>
+        </el-table-column>
+        <!-- 显示任务结束时间 -->
+        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
+          <template #default="{ row }">
+            {{ row.end_time ? formatDate(row.end_time) : $t('Notcompletedyet') }}
+          </template>
+        </el-table-column>
+        <!-- 显示任务状态 -->
+        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+
+        <!--显示操作列-->
+        
+        <el-table-column fixed="right" :label="$t('Operations')" width="100">
+            <template #default="{ row }">
+              <el-button link type="primary" size="small" @click="showOptDialog(row)">Detail</el-button>
+            </template>
+          </el-table-column>
+      </el-table>
+      </div>
+
+      <!-- 移动端详情对话框 -->
+    <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
+      <div class="operation-buttons">
+                <el-button link type="primary" size="small" @click="showAutoProgressDialog(currentRow)">
+                  {{ $t('taskManage.Auto') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="showDownloadFileDialog(currentRow)">
+                  {{ $t('Download') }}
+                </el-button>
+                <el-button link type="" size="small" @click="showDetailDialog(currentRow)">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="" size="small" @click="showCharts(currentRow.task_name)" :disabled="currentRow.status !== 2">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+                <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
+                  {{ $t('Edit') }}
+                </el-button>
+                <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
+                  {{ $t('Delete') }}
+                </el-button>
+      </div>
+    </el-dialog>
 
       <!-- 分页组件 -->
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -184,12 +264,12 @@
         </el-descriptions-item>
 
         <el-descriptions-item :label="$t('database.task.type')">
-          {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
-             (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
-             (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
-          {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-             (row.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
-             (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+          {{ (selectedTask.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+             (selectedTask.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+             (selectedTask.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+          {{ (selectedTask.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+             (selectedTask.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+             (selectedTask.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
         </el-descriptions-item>
 
         <el-descriptions-item :label="$t('database.models.model_name')">
@@ -250,8 +330,8 @@
       @close="closeUploadDialog">
       <el-form>
         <!-- 文件上传组件 -->
-        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" 
-        :limit="3" :auto-upload="false" :accept="'.js'">
+        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" multiple
+        :auto-upload="false" :accept="'.js'">
           <el-icon class="el-icon--upload">
             <UploadFilled />
           </el-icon>
@@ -294,6 +374,7 @@ export default {
   },
   data() {
     return {
+      currentRow: {},
       uploadDialogVisible: false, // 新增状态，用于控制文件上传对话框的显示
       uploadedFiles: [],
       validFiles : [],
@@ -301,6 +382,7 @@ export default {
       taskList: [],
       paginatedTaskList: [],
       selectedTasks: [],
+      optDialogVisible: false,
       deleteDialogVisible: false,
       detailDialogVisible: false,
       editDialogVisible: false,
@@ -324,6 +406,10 @@ export default {
       this.uploadDialogVisible = false;
       // 当对话框关闭时，将状态设置为 "Processing"
       this.selectedTask.status = 1; // 1 对应 "Processing"
+    },
+    showOptDialog(row) {
+      this.currentRow = row;
+      this.optDialogVisible = true;
     },
     handleResetClick() {
       this.uploadedFiles = [];
@@ -722,6 +808,7 @@ export default {
       return new Date(dateString).toLocaleString(undefined, options);
     }
   },
+  
   mounted() {
     this.fetchTaskList();
   },
@@ -732,4 +819,33 @@ export default {
 .param-tag {
   margin: 2px 0;
 }
+
+.desktop-view {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    margin-bottom: 20px;
+  }
+}
+
 </style>
+
+

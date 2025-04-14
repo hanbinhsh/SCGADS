@@ -12,10 +12,10 @@
             </template>
             <el-form :label-width="isMobile ? '40%' : '30%'">
               <el-alert type="info" show-icon :closable="false">
-                <p>Only set Auto Progress off if you have not put models online.</p>
+                <p>{{ $t('SystemSettings.tip') }}</p>
               </el-alert>
               <br>
-              <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
+              <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="$t('SystemSettings.' + key.replace(/\s+/g, ''))">
                 <el-switch v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
               </el-form-item>
               <hr>
