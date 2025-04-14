@@ -9,7 +9,6 @@
           <ArrowLeft />
         </el-icon>
       </div>
-      
       <el-menu :default-active="activeTask" class="task-menu" @select="handleTaskSelect" mode="vertical" :collapse="isCollapsed">
         <el-menu-item index="tsne">
           <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
@@ -19,43 +18,54 @@
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising" :disabled="!((this.type?.split(':')[0] || '') === 'denoising')">
+        <el-menu-item index="denoising" :disabled="!((type?.split(':')[0] || '') === 'denoising')">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
-    <!-- 移动端侧边栏（顶部水平菜单） -->
-    <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
+
+    <!-- 移动端侧边栏开关 -->
+    <div class="mobile-sidebar-toggle" v-if="isMobile" @click="toggleSidebar">
+      <el-icon>
+        <Menu />
+      </el-icon>
+    </div>
+
+    <!-- 移动端侧边栏 -->
+    <el-aside 
+      class="mobile-sidebar"
+      :class="{ 'active': mobileSidebarVisible }"
+      v-show="isMobile"
+      @click.self="mobileSidebarVisible = false">
       <el-menu 
         :default-active="activeTask" 
         class="task-menu" 
         @select="handleTaskSelect"
-        mode="horizontal">
+        mode="vertical">
         <el-menu-item index="tsne">
-          <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-left: 5px;margin-right: 10px;" />
+          <font-awesome-icon :icon="['fas', 'chart-pie']" style="margin-right: 10px;" />
           <span>T-SNE</span>
         </el-menu-item>
         <el-menu-item index="umap">
-          <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
+          <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising" :disabled="!((this.type?.split(':')[0] || '') === 'denoising')">
-          <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
+        <el-menu-item index="denoising" :disabled="!((type?.split(':')[0] || '') === 'denoising')">
+          <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
       </el-menu>
-    </el-header>
+    </el-aside>
 
     <el-main class="fullscreen-section">
       <el-row type="flex" justify="center animate__animated animate__fadeInRight">
         <el-col :span="20">
           <el-card shadow="always" v-loading="loading">
             <template #header>
-              <div slot="header" class="card-header">
-                <el-text class="mx-1" size="large"></el-text>
+              <div class="card-header">
                 <span class="page-name">{{ taskName || $t('Visualization.Example') }} {{ $t('Visualization.DataVisualization' )}}</span>
-                <el-button type="primary" style="float: right;" @click="SwitchTrueLabel" :disabled="!isUserTask||!((this.type?.split(':')[0] || '') === 'training')">
+                <el-button type="primary" style="float: right;" @click="SwitchTrueLabel" :disabled="!isUserTask||!((type?.split(':')[0] || '') === 'training')">
                   <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;{{ $t('Visualization.Switch') }}&nbsp;
                   <span v-if="trueLabel">{{ $t('Visualization.Pred') }}</span>
                   <span v-else>{{ $t('Visualization.True') }}</span>
@@ -63,13 +73,11 @@
               </div>
             </template>
             <div class="card-body">
-              <el-row type="flex" justify="space-between">
-                <!-- 图表容器 -->
-                <el-col :span="12">
+              <el-row type="flex" :class="{'mobile-column': isMobile}">
+                <el-col :xs="24" :sm="24" :md="12" class="scrollable-container">
                   <div id="main" class="chart"></div>
                 </el-col>
-                <!-- 表格和分页容器 -->
-                <el-col :span="12">
+                <el-col :xs="24" :sm="24" :md="12" class="scrollable-container">
                   <el-table :data="paginatedData" stripe style="width: 100%;" @sort-change="handleSortChange">
                     <el-table-column prop="index" label="ID" width="70" sortable></el-table-column>
                     <el-table-column prop="coord" :label="$t('Visualization.Position')" sortable>
@@ -89,38 +97,55 @@
         </el-col>
       </el-row>
     </el-main>
-    <!-- 按钮行 -->
-    <div class="footer animate__animated animate__fadeInUp">
+
+    <!-- 移动端底部触发按钮 -->
+    <div v-if="isMobile" 
+         class="mobile-footer-trigger"
+         @click.stop="toggleFooterButtons">
+      <el-icon :size="24">
+        <component :is="showFooterButtons ? 'Close' : 'Plus'" />
+      </el-icon>
+    </div>
+
+    <!-- 底部菜单 -->
+    <div class="footer animate__animated animate__fadeInUp" :class="{ 'active': showFooterButtons }">
       <div class="bottom-left-setting">
-        <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">{{ $t('Visualization.Settings') }}</el-button>
+        <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">
+          {{ $t('Visualization.Settings') }}
+        </el-button>
       </div>
-      <div class="footer-button-row">
-        <el-button type="primary" class="footer-action-button" @click="" 
+      <div class="footer-button-column">
+        <el-button type="primary" class="footer-action-button" 
           :disabled="taskName===undefined">
           {{ $t('Visualization.DownloadData') }}
         </el-button>
-        <el-button type="warning" class="footer-action-button" @click="download()" 
-          :disabled="taskName===undefined">
+        <el-button type="warning" class="footer-action-button"
+          :disabled="taskName===undefined" @click="download">
           {{ $t('Visualization.DownloadCharts') }}
         </el-button>
-        <el-button type="success" class="footer-action-button" @click=""
-         :disabled="taskName===undefined">
-         {{ $t('Visualization.DownloadReport') }}
+        <el-button type="success" class="footer-action-button"
+          :disabled="taskName===undefined">
+          {{ $t('Visualization.DownloadReport') }}
         </el-button>
       </div>
     </div>
 
-    <el-dialog v-model="settingVisible" :title="$t('Visualization.Settings')" width="600" align-center>
-      <el-form :model="axisSettings" label-width="180px" label-position="left">
-        <!-- 放大倍率设置 -->
-        <el-form-item :label="$t('Visualization.ChartMagnifyRatio')" class="form-item" style="display: flex; justify-content: space-between; align-items: center;">
-          <el-input-number v-model="magnifyRatio" :precision="2" :step="0.5" :max="10" :min="0" style="margin-left: auto;" />
+    <el-dialog 
+      v-model="settingVisible" 
+      :title="$t('Visualization.Settings')" 
+      width="600" 
+      append-to-body
+      :modal="false"
+      align-center
+      class="settings-dialog"
+      @click.stop>
+      <el-form :model="axisSettings" label-position="left">
+        <el-form-item :label="$t('Visualization.ChartMagnifyRatio')" class="form-item">
+          <el-input-number v-model="magnifyRatio" :precision="2" :step="0.5" :max="10" :min="0" class="magnify-ratio-input"/>
         </el-form-item>
 
-        <!-- X 轴 和 Y 轴 设置 -->
         <el-row :gutter="20">
-          <!-- X 轴设置 -->
-          <el-col :span="12">
+          <el-col :xs="24" :sm="24" :md="24">
             <el-card shadow="hover">
               <template #header><b>X {{ $t('Visualization.AxisSettings') }}</b></template>
               <el-form-item :label="$t('Visualization.ShowAxis')">
@@ -141,8 +166,7 @@
             </el-card>
           </el-col>
 
-          <!-- Y 轴设置 -->
-          <el-col :span="12">
+          <el-col :xs="24" :sm="24" :md="24">
             <el-card shadow="hover">
               <template #header><b>Y {{ $t('Visualization.AxisSettings') }}</b></template>
               <el-form-item :label="$t('Visualization.ShowAxis')">
@@ -165,7 +189,6 @@
         </el-row>
       </el-form>
 
-      <!-- 底部按钮 -->
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="conformSettings()">{{ $t('Confirm') }}</el-button>
@@ -173,7 +196,6 @@
       </template>
     </el-dialog>
 
-    <!-- 任务结果文件不存在对话框 -->
     <el-dialog v-model="resultFailVisible" :title="$t('status.Error')" width="500" align-center>
       <span>{{ $t('Visualization.Task') }} <strong style="color: #e74c3c;">{{ taskName }}</strong> {{ $t('Visualization.failLoad') }}</span>
       <template #footer>
@@ -196,17 +218,24 @@ import 'element-plus/theme-chalk/el-pagination.css';
 import axios from 'axios';
 import { pieces } from "@/assets/example_data/config";
 import * as echarts from 'echarts';
+import { ArrowLeft, Menu, Close, Plus } from '@element-plus/icons-vue';
+
 export default {
   name: "Virtualization",
   components: {
     MainHeader,
     ElTable,
     ElTableColumn,
-    ElPagination
+    ElPagination,
+    ArrowLeft,
+    Menu,
+    Close,
+    Plus
   },
   data() {
     return {
       isCollapsed: false,
+      mobileSidebarVisible: false,
       tableData: data.map((coord, index) => ({
         index: index + 1,
         coord,
@@ -220,7 +249,6 @@ export default {
       paginatedData: [],
       taskName: this.$route.params.taskName,
       isDarkMode: JSON.parse(localStorage.getItem('isDarkMode')) || false,
-      activeChart: "tsne",
       loading: false,
       userData: JSON.parse(sessionStorage.getItem('userData')) || {},
       magnifyRatio: 1,
@@ -229,26 +257,30 @@ export default {
       newChart: '',
       newData: '',
       newLabel: '',
-      isUserTask: false, // 是否是用户的任务而不是示例
+      isUserTask: false,
       type: 'annotation',
-      trueLabel: false,  // 是否真实标签
+      trueLabel: false,
       newPieces: false,
       axisSettings: {
         x: {
-          show: true, // 是否显示 X 轴
-          showTicks: true, // X 轴刻度线
-          showAxisLine: true, // X 轴线
-          showLabels: true, // X 轴上的文字
-          showGridLines: true // X 轴网格线
+          show: true,
+          showTicks: true,
+          showAxisLine: true,
+          showLabels: true,
+          showGridLines: true
         },
         y: {
-          show: true, // 是否显示 Y 轴
-          showTicks: true, // Y 轴刻度线
-          showAxisLine: true, // Y 轴线
-          showLabels: true, // Y 轴上的文字
-          showGridLines: true // Y 轴网格线
+          show: true,
+          showTicks: true,
+          showAxisLine: true,
+          showLabels: true,
+          showGridLines: true
         }
-      }
+      },
+      clickOutsideHandler: null,
+      showFooterButtons: false,
+      clickOutsideFooterHandler: null,
+      isMobile: false
     };
   },
   computed: {
@@ -269,8 +301,38 @@ export default {
     sortOrder() {
       this.applySorting();
     },
+    mobileSidebarVisible(newVal) {
+      if (newVal) {
+        this.clickOutsideHandler = (e) => {
+          if (!this.$el.querySelector('.mobile-sidebar').contains(e.target) && 
+              !this.$el.querySelector('.mobile-sidebar-toggle').contains(e.target)) {
+            this.mobileSidebarVisible = false;
+          }
+        };
+        document.addEventListener('click', this.clickOutsideHandler);
+      } else {
+        document.removeEventListener('click', this.clickOutsideHandler);
+      }
+    },
+    showFooterButtons(newVal) {
+      if (newVal) {
+        this.clickOutsideFooterHandler = (e) => {
+          const footer = this.$el.querySelector('.footer');
+          const trigger = this.$el.querySelector('.mobile-footer-trigger');
+          if (footer && trigger && !footer.contains(e.target) && !trigger.contains(e.target)) {
+            this.showFooterButtons = false;
+          }
+        };
+        document.addEventListener('click', this.clickOutsideFooterHandler, { passive: true });
+      } else {
+        document.removeEventListener('click', this.clickOutsideFooterHandler);
+      }
+    }
   },
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth < 768;
+    },
     SwitchTrueLabel(){
       this.trueLabel = !this.trueLabel
       if(this.isUserTask){
@@ -278,9 +340,22 @@ export default {
       }
     },
     toggleSidebar() {
-      this.isCollapsed = !this.isCollapsed;
-      // Store sidebar state in localStorage for persistence
+      if (this.isMobile) {
+        this.mobileSidebarVisible = !this.mobileSidebarVisible;
+      } else {
+        this.isCollapsed = !this.isCollapsed;
+      }
       localStorage.setItem('sidebarCollapsed', this.isCollapsed);
+    },
+    toggleFooterButtons() {
+      if (this.loading) return;
+      this.showFooterButtons = !this.showFooterButtons;
+      this.$nextTick(() => {
+        if (this.showFooterButtons) {
+          const footer = this.$el.querySelector('.footer');
+          footer && footer.classList.add('active');
+        }
+      });
     },
     handleDarkModeChange(newValue){
       initializeChart(newValue, this.newChart, this.axisSettings, this.newData, this.newPieces, this.newLabel);
@@ -294,8 +369,7 @@ export default {
     async downloadResult(taskName) {
       try{
         this.loading = true;
-        this.taskName = taskName; // 确保 taskName 被赋值
-        // data
+        this.taskName = taskName;
         const formData = new FormData();
         formData.append('taskName', taskName);
         formData.append('type', 'data_' + this.activeTask);
@@ -306,7 +380,6 @@ export default {
         newData = newData.replace(';', '');
         newData = JSON.parse(newData);
       
-        // label
         const formData2 = new FormData();
         formData2.append('taskName', taskName);
         formData2.append('type', 'label_' + (this.trueLabel ? '' : 'pred_') + this.activeTask);
@@ -317,7 +390,6 @@ export default {
         newLabel = newLabel.replace(';', '');
         newLabel = JSON.parse(newLabel);
 
-        // config
         const formData3 = new FormData();
         formData3.append('taskName', taskName);
         formData3.append('type', 'config_' + (this.trueLabel ? '' : 'pred_') + this.activeTask);
@@ -330,11 +402,7 @@ export default {
         if (match && match[1]) {
           let piecesString = match[1].trim();
           piecesString = piecesString.replace(/'/g, '"');
-          
           newPieces = JSON.parse(piecesString);
-          // console.log(pieces); // 打印出 pieces 数组
-        } else {
-            console.error('未找到 pieces 的内容');
         }
 
         this.tableData = newData.map((coord, index) => ({
@@ -363,8 +431,6 @@ export default {
       this.activeTask = task;
       if(this.isUserTask){
         this.downloadResult(this.$route.query.taskName);
-      }else{
-        // TODO
       }
     },
     handleSortChange({ prop, order }) {
@@ -397,11 +463,10 @@ export default {
     download() {
       const chartDom = document.getElementById('main');
       let myChart1 = echarts.getInstanceByDom(chartDom);
-      // 导出单个图表图片
       var img = new Image();
       img.src = myChart1.getDataURL({
         type: "png",
-        pixelRatio: this.magnifyRatio, //放大2倍
+        pixelRatio: this.magnifyRatio,
         backgroundColor: "#fff",
       });
       img.onload = function () {
@@ -414,10 +479,8 @@ export default {
     
         var a = document.createElement("a");
         var event = new MouseEvent("click");
-        a.download = "pic.png" || "picname";
-        // 将生成的URL设置为a.href属性
+        a.download = "pic.png";
         a.href = dataURL;
-        // 触发a的单击事件
         a.dispatchEvent(event);
         a.remove();
       }
@@ -428,42 +491,27 @@ export default {
     }
   },
   mounted() {
+    this.checkMobile();
+    window.addEventListener('resize', this.checkMobile);
     this.applySorting();
     this.isDarkMode = JSON.parse(localStorage.getItem('isDarkMode')) || false;
-
-    // 初始化图表
     initializeChart(this.isDarkMode, false, this.axisSettings, '', '', '');
-
-    // 加载侧边栏状态
     const savedState = localStorage.getItem('sidebarCollapsed');
     if (savedState !== null) {
       this.isCollapsed = savedState === 'true';
     }
-
-    // 如果有 taskName 参数，调用下载
     if (this.$route.query.taskName) {
-      // 判断任务类型
       this.findTaskType(this.$route.query.taskName)
       this.downloadResult(this.$route.query.taskName);
       this.isUserTask = true;
     }
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkMobile);
+    document.removeEventListener('click', this.clickOutsideHandler);
+    document.removeEventListener('click', this.clickOutsideFooterHandler);
   }
 };
-</script>
-
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'; 
-const isMobile = ref(false);
-const checkMobile = () => {
-  isMobile.value = window.innerWidth < 768;
-};
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
-onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);
-});
 </script>
 
 <style scoped>
@@ -490,14 +538,190 @@ onUnmounted(() => {
 }
 
 .page-control {
-  bottom: 0;
-  right: 0;
-  position: absolute;
+  position: relative;
+  margin: 20px 0 100px;
+  padding-bottom: 20px;
 }
 
+.sidebar {
+  transition: width 0.3s;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: transform 0.3s;
+}
+
+.settings-dialog {
+  z-index: 3000 !important;
+}
+
+.el-card {
+  margin-bottom: 15px;
+}
+
+/* 移动端适配 */
 @media (max-width: 768px) {
-  .fullscreen-section{
+  .fullscreen-section {
     margin-top: 0;
+    padding: 10px;
+  }
+
+  .el-col-20 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .scrollable-container {
+    overflow-x: auto;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .chart {
+    width: 600px;
+    min-width: 600px;
+    height: 600px;
+  }
+
+  .el-table {
+    min-width: 600px;
+  }
+
+  .mobile-column {
+    flex-direction: column;
+  }
+
+  .mobile-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 260px !important;
+    z-index: 2500;
+    background: var(--el-bg-color);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-sidebar.active {
+    transform: translateX(0);
+  }
+
+  .mobile-sidebar-toggle {
+    position: fixed;
+    left: 15px;
+    top: 15px;
+    z-index: 3000;
+    padding: 12px;
+    background: var(--el-color-primary);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-sidebar-toggle:hover {
+    transform: scale(1.05);
+  }
+
+  .mobile-sidebar::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 260px;
+    background: rgba(0,0,0,0.3);
+    z-index: -1;
+  }
+
+  .footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    padding: 15px;
+    background: var(--el-bg-color);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 0.2s;
+  }
+
+  .footer.active {
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  .el-main {
+    padding-bottom: 80px !important;
+  }
+
+  .footer-button-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-footer-trigger {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2500;
+    background: var(--el-color-primary);
+    color: white;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    touch-action: manipulation;
+  }
+
+  .mobile-footer-trigger:hover {
+    transform: scale(1.1);
+  }
+
+  .form-item {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .magnify-ratio-input {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .settings-dialog {
+    width: 90% !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2001 !important;
+  }
+
+  .el-form-item__label {
+    width: 100% !important;
+    text-align: left;
+    padding-bottom: 8px;
   }
 }
 </style>
