@@ -7,7 +7,7 @@
   
         <!-- 桌面端显示的表格 -->
         <div class="desktop-view">
-          <el-table :data="paginatedUserList"
+          <el-table :data="paginatedCompanyList"
             style="width: 100%"
             @selection-change="handleSelectionChange"
             @sort-change="handleSortChange"
@@ -20,7 +20,7 @@
                   <el-avatar :size="24"
                     :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
                   </el-avatar>
-                  <span style="margin-left: 8px;">{{ row.userName }}</span>
+                  <span style="margin-left: 8px;">{{ row.companyName }}</span>
                 </div>
               </template>
             </el-table-column>
@@ -30,12 +30,8 @@
             <el-table-column fixed="right" :label="$t('Operations')" width="150">
               <template #default="{ row }">
                 <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
-                <!-- 禁用删除按钮 -->
-                <el-button v-if="row.userId === this.userData.userId" link type="default" size="small" disabled>
-                  {{ $t('Delete') }}
-                </el-button>
                 <!-- 可点击的删除按钮 -->
-                <el-button v-else link type="danger" size="small" @click="showDeleteDialog(row)">
+                <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
                   {{ $t('Delete') }}
                 </el-button>
               </template>
@@ -78,7 +74,7 @@
         <!-- 分页组件 -->
         <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
           :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper" :total="userList.length">
+          layout="total, sizes, prev, pager, next, jumper" :total="companyList.length">
         </el-pagination>
   
         <!-- 按钮行 -->
@@ -151,23 +147,9 @@
   
       <!-- 桌面端编辑对话框 -->
       <el-dialog v-model="editDialogVisible" title="Edit Company" width="500" align-center>
-        <el-form :model="selectedUser" label-width="100px" label-position="left">
-          <el-form-item label="User Name" class="form-item">
-            <el-input v-model="selectedUser.userName" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Password" class="form-item">
-            <el-input v-model="selectedUser.psw" type="password" show-password placeholder="Enter new password"
-              class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Email" class="form-item">
-            <el-input v-model="selectedUser.email" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Phone" class="form-item">
-            <el-input v-model="selectedUser.phone" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Admin" class="form-item">
-            <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
-              :disabled="selectedUser.userId === this.userData.userId"></el-switch>
+        <el-form :model="selectedCompanys" label-width="100px" label-position="left">
+          <el-form-item label="Company Name" class="form-item">
+            <el-input v-model="selectedCompanys.companyName" class="form-input"></el-input>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -180,7 +162,7 @@
   
       <!-- 删除确认对话框 -->
       <el-dialog v-model="deleteDialogVisible" title="Warning" :width="isMobile ? '90%' : '500'" align-center>
-        <span>User <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> will be deleted</span>
+        <span>Company <strong style="color: #e74c3c;">{{ selectedCompany ? selectedCompany.companyName : '' }}</strong> will be deleted</span>
         <template #footer>
           <div class="dialog-footer-desktop">
             <el-button @click="deleteDialogVisible = false">Cancel</el-button>
@@ -221,6 +203,9 @@
           phone: '',
           address: ''
         },
+        selectedCompanys: [],
+        selectedCompany: null,
+        paginatedCompanyList: [],
         userList: [], // 用于存储用户数据
         paginatedUserList: [], // 当前页的用户数据
         selectedUsers: [], // 存储多选选中的用户
@@ -270,14 +255,10 @@
         }
       },
       // 显示删除对话框
-      showDeleteDialog(user) {
-        if (user.userId === this.userData.userId) {
-          ElMessage.warning('You cannot delete your own account.');
-          return;
-        }
-        this.deleteDialogVisible = true;
-        this.selectedUser = user;
+      showDeleteDialog(company) {
         
+        this.deleteDialogVisible = true;
+        this.selectedCompany = company;        
         // 如果是从详情对话框打开的，关闭详情对话框
         if (this.detailDialogVisible) {
           this.detailDialogVisible = false;
@@ -294,11 +275,11 @@
       // 确认删除操作
       async confirmDelete() {
         try {
-          await axios.get(`/api/deleteUserByUserID?userID=${this.selectedUser.userId}`);
-          this.fetchUserList();
-          ElMessage.success('User deleted successfully.');
+          await axios.get(`/api/deleteCompanyByID?companyID=${this.selectedCompany.companyId}`);
+          this.fetchCompanyList();
+          ElMessage.success('Company deleted successfully.');
         } catch (error) {
-          ElMessage.error('Failed to delete user.');
+          ElMessage.error('Failed to delete company.');
           console.error("Delete failed:", error);
         } finally {
           this.deleteDialogVisible = false;
@@ -365,6 +346,7 @@
           if (response.data.code === 1) {
             ElMessage.success('Company created successfully.');
           } else {
+            ElMessage.error('Failed to create company.');
             console.error("Failed to fetch user list:", response.data.msg);
           }
           this.loading = false;
@@ -379,16 +361,16 @@
       async fetchCompanyList() {
         try {
           this.loading = true;
-          const response = await axios.get("/api/findCompanys");
+          const response = await axios.post("/api/selectAllCompany");
           if (response.data.code === 200) {
-            this.CompanyList = response.data.data;
+            this.companyList = response.data.data;
             this.applySorting(); // 调用排序函数
           } else {
-            console.error("Failed to fetch user list:", response.data.msg);
+            console.error("Failed to fetch company list:", response.data.msg);
           }
           this.loading = false;
         } catch (error) {
-          console.error("Failed to fetch user list:", error);
+          console.error("Failed to fetch company list:", error);
         }
       },
       // 获取用户数据
@@ -398,7 +380,7 @@
           const response = await axios.get("/api/findUsers");
           if (response.data.code === 200) {
             this.userList = response.data.data;
-            this.applySorting(); // 调用排序函数
+            // this.applySorting(); // 调用排序函数
           } else {
             console.error("Failed to fetch user list:", response.data.msg);
           }
@@ -414,7 +396,7 @@
       },
       applySorting() {
         if (this.sortProp && this.sortOrder) {
-          this.userList.sort((a, b) => {
+          this.companyList.sort((a, b) => {
             const aValue = a[this.sortProp];
             const bValue = b[this.sortProp];
             if (aValue < bValue) return this.sortOrder === 'ascending' ? -1 : 1;
@@ -422,24 +404,24 @@
             return 0;
           });
         }
-        this.updatePaginatedUserList();
+        this.updatePaginatedCompanyList();
       },
       // 更新分页数据
-      updatePaginatedUserList() {
+      updatePaginatedCompanyList() {
         const start = (this.currentPage - 1) * this.pageSize;
         const end = start + this.pageSize;
-        this.paginatedUserList = this.userList.slice(start, end);
+        this.paginatedCompanyList = this.companyList.slice(start, end);
       },
       handleSelectionChange(val) {
-        this.selectedUsers = val;
+        this.selectedCompanys = val;
       },
       handleSizeChange(val) {
         this.pageSize = val;
-        this.updatePaginatedUserList();
+        this.updatePaginatedCompanyList();
       },
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.updatePaginatedUserList();
+        this.updatePaginatedCompanyList();
       },
       // 监听窗口大小变化
       handleResize() {
@@ -448,6 +430,7 @@
     },
     mounted() {
       this.fetchUserList();
+      this.fetchCompanyList();
       window.addEventListener('resize', this.handleResize);
     },
     beforeUnmount() {
