@@ -23,7 +23,8 @@ const en = {
 
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
-    AutoProgress: "Auto Progress"
+    AutoProgress: "Auto Progress",
+    EncryptFiles:"Encrypt Files",
   },
   ModelManage: {
     Figure: "Figure",

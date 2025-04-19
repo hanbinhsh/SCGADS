@@ -23,7 +23,8 @@ const zh =  {
 
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
-    AutoProgress: "自动处理"
+    AutoProgress: "自动处理",
+    EncryptFiles: "加密文件",
   },
   ModelManage: {
     Figure: "模型图",

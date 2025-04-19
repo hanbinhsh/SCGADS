@@ -621,10 +621,9 @@ export default {
     async autoProgress(){
       try {
         const params = new URLSearchParams();
-        params.append('type', this.selectedTask.type);
-        params.append('userName', this.selectedTask.user_name);
         params.append('taskName', this.selectedTask.task_name);
-        await axios.post("/api/chartProgress", params)
+        params.append('userName', this.selectedTask.user_name);
+        await axios.post("/api/predictProgress", params)
       } catch (error) {
         console.error("Progress failed:", error);
       }

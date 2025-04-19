@@ -64,6 +64,7 @@ export default {
       },
       parameterDefaults: {
         "Auto Progress": true,
+        "Encrypt Files": true,
       },
       userData: JSON.parse(sessionStorage.getItem('userData')) || {}, // 存储用户信息
     };

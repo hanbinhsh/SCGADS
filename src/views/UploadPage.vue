@@ -171,7 +171,7 @@
   </el-tour>
 
   <!-- 任务名输入框 -->
-  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="90%" max-width="500px" align-center>
+  <el-dialog v-model="showTaskNameDialog" title="Enter Task Name" @close="resetDialog" width="500" max-width="500px" align-center>
     <el-input v-model="taskName" placeholder="Please enter the task name"></el-input>
     <template #footer>
       <div class="dialog-footer">
