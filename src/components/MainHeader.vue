@@ -120,63 +120,84 @@
             <!-- Mobile Menu Dropdown -->
             <el-collapse-transition>
                 <div class="mobile-menu-dropdown" v-if="mobileMenuOpen">
+                    <!-- 未登录状态菜单 - 两列 -->
                     <template v-if="!userData.userName">
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Login' }" @click="navigateTo('Login')">
-                            <font-awesome-icon :icon="['fas', 'right-to-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Login') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Register' }" @click="navigateTo('Register')">
-                            <font-awesome-icon :icon="['fas', 'registered']" />&nbsp;&nbsp;{{ $t('navigateBar.Register') }}
+                        <div class="mobile-grid">
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Login' }" @click="navigateTo('Login')">
+                                <font-awesome-icon :icon="['fas', 'right-to-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Login') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Register' }" @click="navigateTo('Register')">
+                                <font-awesome-icon :icon="['fas', 'registered']" />&nbsp;&nbsp;{{ $t('navigateBar.Register') }}
+                            </div>
                         </div>
                     </template>
                     
+                    <!-- 用户个人菜单 - 两列 -->
                     <template v-else>
                         <div class="mobile-user-profile">
                             <el-avatar :src="userData.avatarBase64 ? 'data:image/jpeg;base64,' + userData.avatarBase64 : defaultAvatar" size="small"></el-avatar>
                             <span>{{ userData.userName }}</span>
                         </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Profile' }" @click="navigateTo('Profile')">
-                            <font-awesome-icon :icon="['far', 'user']" />&nbsp;&nbsp;{{ $t('navigateBar.Profile') }}
-                        </div>
-                        <div class="mobile-menu-item" @click="logout()">
-                            <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Logout') }}
+                        <div class="mobile-grid">
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Profile' }" @click="navigateTo('Profile')">
+                                <font-awesome-icon :icon="['far', 'user']" />&nbsp;&nbsp;{{ $t('navigateBar.Profile') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" @click="logout()">
+                                <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" />&nbsp;&nbsp;{{ $t('navigateBar.Logout') }}
+                            </div>
                         </div>
                     </template>
                     
+                    <!-- 管理员菜单 - 两列 -->
                     <template v-if="userData.userName && userData?.isAdmin">
                         <div class="mobile-menu-section">{{ $t('navigateBar.Manage') }}</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageUser' }" @click="navigateTo('ManageUser')">
-                            <font-awesome-icon :icon="['far', 'address-book']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageUsers') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageTasks' }" @click="navigateTo('ManageTasks')">
-                            <font-awesome-icon :icon="['fas', 'list-check']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageTasks') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">
-                            <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
-                            <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">
-                            <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}
+                        <div class="mobile-grid">
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageUser' }" @click="navigateTo('ManageUser')">
+                                <font-awesome-icon :icon="['far', 'address-book']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageUsers') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageCompany' }" @click="navigateTo('ManageCompany')">
+                                <font-awesome-icon :icon="['far', 'keyboard']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageCompanys') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageTasks' }" @click="navigateTo('ManageTasks')">
+                                <font-awesome-icon :icon="['fas', 'list-check']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageTasks') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">
+                                <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
+                                <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">
+                                <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}
+                            </div>
                         </div>
                     </template>
 
+                    <!-- 用户应用功能菜单 - 两列 -->
                     <template v-if="userData.userName">
                         <div class="mobile-menu-section">{{ $t('navigateBar.Applications') }}</div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'WorkSpace' }" @click="navigateTo('WorkSpace')">
-                            <font-awesome-icon :icon="['fas', 'gauge']" />&nbsp;&nbsp;{{ $t('navigateBar.WorkSpace') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Upload' }" @click="navigateTo('Upload')">
-                            <font-awesome-icon :icon="['fas', 'upload']" />&nbsp;&nbsp;{{ $t('navigateBar.Upload') }}
-                        </div>
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Feedback' }" @click="navigateTo('Feedback')">
-                            <font-awesome-icon :icon="['far', 'comment-dots']" />&nbsp;&nbsp;{{ $t('navigateBar.Feedback') }}
+                        <div class="mobile-grid">
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'WorkSpace' }" @click="navigateTo('WorkSpace')">
+                                <font-awesome-icon :icon="['fas', 'gauge']" />&nbsp;&nbsp;{{ $t('navigateBar.WorkSpace') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Upload' }" @click="navigateTo('Upload')">
+                                <font-awesome-icon :icon="['fas', 'upload']" />&nbsp;&nbsp;{{ $t('navigateBar.Upload') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Feedback' }" @click="navigateTo('Feedback')">
+                                <font-awesome-icon :icon="['far', 'comment-dots']" />&nbsp;&nbsp;{{ $t('navigateBar.Feedback') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
+                                <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
+                            </div>
                         </div>
                     </template>
                     
-                    <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
-                        <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
-                    </div>
+                    <!-- 未登录状态下只显示可视化菜单 -->
+                    <template v-if="!userData.userName">
+                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
+                            <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
+                        </div>
+                    </template>
                 </div>
             </el-collapse-transition>
         </div>
@@ -489,6 +510,47 @@ export default {
     /* Tablet-specific styles */
     .el-menu-item, .el-sub-menu__title {
         padding: 0 10px;
+    }
+}
+
+/* 网格布局样式 */
+.mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 两列等宽 */
+    gap: 1px;
+    margin-bottom: 5px;
+}
+
+.grid-item {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+/* 调整图标和文字对齐方式 */
+.grid-item .svg-inline--fa {
+    min-width: 16px;
+}
+
+/* 深色模式样式 */
+.dark-mode .mobile-grid {
+    border-color: #555;
+}
+
+/* 确保未登录时的可视化菜单保持单列 */
+.mobile-menu-dropdown > template:last-child .mobile-menu-item {
+    grid-column: span 2;
+}
+
+/* 媒体查询，确保在更小屏幕上也能正常显示 */
+@media (max-width: 320px) {
+    .grid-item {
+        padding: 10px 8px;
+        font-size: 0.8rem;
     }
 }
 </style>

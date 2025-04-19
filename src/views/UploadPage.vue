@@ -367,29 +367,29 @@ export default {
           { file: this.scATACSeqFile[0]?.raw, fileType: 'scATACSeqFile' },
           { file: this.tagFile[0]?.raw, fileType: 'tagFile' }
         ];
-
-        const uploadPromises = files.map(({ file, fileType }) => {
-          const taskName = this.taskName;
-          // 获取文件的ArrayBuffer并计算MD5
-          const fileReader = new FileReader();
+        const uploadPromises = files.map( async ({ file, fileType }) => {
+          if (!(file instanceof Blob)) return;
+          // 获取固定的AES密钥和IV
+          const { aesKey, iv } = await this.getFixedEncryptionKeys();
+          // 读取文件并计算MD5
+          const arrayBuffer = await file.arrayBuffer();
           const spark = new SparkMD5.ArrayBuffer();
-          // 获取文件二进制数据
-          if (file instanceof Blob){
-            fileReader.readAsArrayBuffer(file);
-            fileReader.onload = async e =>{
-            spark.append(e.target.result);
-              const hash = spark.end();
-              const response = await axios.post('/api/fileHash', { hash, fileType, taskName});
-              if (response.data.code === 1){
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('taskName', taskName);
-                formData.append('fileType', fileType);
-                formData.append('hash', hash);
-                return axios.post('/api/uploadOneFile', formData);
-              }
-            };
-          }
+          spark.append(arrayBuffer);
+          const hash = spark.end();
+
+          // 加密文件
+          const encryptedData = await this.aesEncrypt(arrayBuffer, aesKey, iv);
+
+          // 创建FormData并附加加密的文件和相关信息
+          const encryptedFile = new Blob([encryptedData]);
+          const formData = new FormData();
+          // const taskName = this.taskName;
+          formData.append('file', encryptedFile);
+          formData.append('taskName', this.taskName);
+          formData.append('fileType', fileType);
+          formData.append('hash', hash);
+          // 发送请求上传加密文件
+          return axios.post('/api/uploadOneFile', formData);
         });
 
         await Promise.all(uploadPromises);
@@ -401,6 +401,51 @@ export default {
         this.scATACSeqFile = [];
         this.scRNASeqFile = [];
       }
+    },
+    // 获取固定的AES密钥和IV
+    async getFixedEncryptionKeys() {
+      try {
+        // 发送请求到后端接口以获取密钥和IV
+        const response = await axios.post('/api/getEncryptionKeys');
+        const { aesKeyHex, ivHex } = response.data; // 注意字段名改为Hex后缀
+        // console.log('AES Key (Hex):', aesKeyHex);
+        // console.log('IV (Hex):', ivHex);
+        // 将Hex字符串转换为Uint8Array
+        const aesKeyBytes = this.hexToBytes(aesKeyHex);
+        const ivBytes = this.hexToBytes(ivHex);
+        // 导入密钥
+        const aesKey = await crypto.subtle.importKey(
+          'raw',
+          aesKeyBytes,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        return { aesKey, iv: ivBytes };
+      } catch (error) {
+        // 处理错误情况
+        console.error('Error fetching encryption keys:', error);
+        throw error; // 或者根据需要处理错误
+      }
+    },
+    hexToBytes(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      }
+      return bytes;
+    },
+    // AES加密函数
+    async aesEncrypt(data, key, iv) {
+      const encryptedData = await crypto.subtle.encrypt(
+        {
+          name: 'AES-GCM',
+          iv: iv
+        },
+        key,
+        data
+      );
+      return encryptedData;
     },
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
@@ -512,6 +557,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .fullscreen-section{
+    padding: 10px;
     margin-top: 0;
   }
 }
