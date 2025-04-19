@@ -547,6 +547,12 @@ export default {
 }
 
 /* 媒体查询，确保在更小屏幕上也能正常显示 */
+@media (max-width: 768px) {
+    .grid-item {
+        font-size: 0.8rem;
+    }
+}
+
 @media (max-width: 320px) {
     .grid-item {
         padding: 10px 8px;
