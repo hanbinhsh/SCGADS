@@ -193,6 +193,12 @@
   .sidebar {
     display: none;
   }
+
+  .bottom-left-action-button {
+    width: auto;
+    margin-right:10px;
+  }
+
   .image-container{
     padding: 0;
     flex-direction: row;

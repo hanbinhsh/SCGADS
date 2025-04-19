@@ -557,6 +557,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .fullscreen-section{
+    padding: 10px;
     margin-top: 0;
   }
 }

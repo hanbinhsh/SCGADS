@@ -80,7 +80,7 @@
                     {{ formatDate(row.replyTime) }}
                   </template>
                 </el-table-column>
-                <el-table-column fixed="right" :label="$t('Operations')" width="220">
+                <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? 110 :220">
                   <template #default="{ row }">
                     <el-button link type="primary" size="small" @click="showMessageDialog(row)">
                       {{ $t('feedback.View') }}
@@ -254,6 +254,7 @@ export default {
 
 @media (max-width: 768px) {
   .fullscreen-section{
+    padding: 10px;
     margin-top: 0;
   }
 }
