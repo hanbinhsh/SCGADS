@@ -11,9 +11,45 @@
             style="width: 100%"
             @selection-change="handleSelectionChange"
             @sort-change="handleSortChange"
-            v-loading="loading">
+            v-loading="loading"
+            row-key="companyId"
+            :expand-row-keys="expandedRows"
+            @expand-change="handleExpandChange">
             <!-- 多选功能 -->
             <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column type="expand">
+              <template #default="props">
+                <div style="padding: 0 100px 20px 100px;">
+                  <div v-if="loadingCompanyUsers && currentExpandedCompany === props.row.companyId" class="loading-users">
+                    <el-icon class="is-loading"><loading /></el-icon> loading...
+                  </div>
+                  <div v-else-if="companyUsersMap[props.row.companyId] && companyUsersMap[props.row.companyId].length > 0">
+                    <el-table :data="companyUsersMap[props.row.companyId]" style="width: 100%">
+                      <el-table-column prop="username" label="用户">
+                        <template #default="{ row }">
+                          <div style="display: flex; align-items: center;">
+                            <el-avatar :size="20" :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar"></el-avatar>
+                            <span style="margin-left: 8px;">{{ row.userName }}</span>
+                          </div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="email" :label="$t('Email')"></el-table-column>
+                      <el-table-column prop="phone" :label="$t('Phone')"></el-table-column>
+                      <el-table-column :label="$t('Operations')" width="120">
+                        <template #default="{ row }">
+                          <el-button link type="danger" size="small" @click="removeUserFromCompany(row.userId, props.row.companyId)">
+                            {{ $t('delete') }}
+                          </el-button>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </div>
+                  <div v-else class="no-users">
+                    该公司暂无用户
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
             <el-table-column prop="companyName" :label="$t('database.company.company_name')" sortable>
               <template #default="{ row }">
                 <div style="display: flex; align-items: center;">
@@ -24,13 +60,12 @@
                 </div>
               </template>
             </el-table-column>
-            
-  
+    
             <!-- 操作列 -->
             <el-table-column fixed="right" :label="$t('Operations')" width="150">
               <template #default="{ row }">
+                <el-button link type="primary" size="small" @click="showAddUserDialog(row)">{{ $t('Add') }}</el-button>
                 <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
-                <!-- 可点击的删除按钮 -->
                 <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
                   {{ $t('Delete') }}
                 </el-button>
@@ -38,38 +73,33 @@
             </el-table-column>
           </el-table>
         </div>
-  
+
+        <!-- 添加用户到公司对话框 -->
+        <el-dialog v-model="addUserDialogVisible" :title="`添加用户到 ${selectedCompany ? selectedCompany.companyName : '公司'}`" width="500" align-center>
+          <el-form :model="addUserForm" label-width="100px" label-position="left">
+            <el-form-item label="用户" class="form-item">
+              <el-select v-model="addUserForm.userId" filterable placeholder="选择一个用户" class="form-input">
+                <el-option 
+                  v-for="user in availableUsers" 
+                  :key="user.userId" 
+                  :label="user.userName" 
+                  :value="user.userId">
+                  <div style="display: flex; align-items: center;">
+                    <el-avatar :size="24" :src="user.avatarBase64 ? 'data:image/jpeg;base64,' + user.avatarBase64 : defaultAvatar"></el-avatar>
+                      <span style="margin-left: 8px;">{{ user.userName }}</span>
+                  </div>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <div class="dialog-footer-desktop">
+             <el-button @click="addUserDialogVisible = false">取消</el-button>
+             <el-button type="primary" @click="confirmAddUserToCompany">确认</el-button>
+            </div>
+          </template>
+        </el-dialog>
         <!-- 移动端显示的表格 -->
-        <div class="mobile-view">
-          <el-table :data="paginatedUserList"
-            style="width: 100%"
-            @selection-change="handleSelectionChange"
-            @sort-change="handleSortChange"
-            v-loading="loading">
-            <!-- 多选功能 -->
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="userName" :label="$t('database.user.user_name')" sortable>
-              <template #default="{ row }">
-                <div style="display: flex; align-items: center;">
-                  <el-avatar :size="24"
-                    :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-                  </el-avatar>
-                  <span style="margin-left: 8px;">{{ row.userName }}</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-            <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-            <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
-  
-            <!-- 操作列 -->
-            <el-table-column fixed="right" :label="$t('Operations')" width="70">
-              <template #default="{ row }">
-                <el-button link type="primary" size="small" @click="showDetailDialog(row)">Detail</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
   
         <!-- 分页组件 -->
         <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -81,12 +111,12 @@
         <div class="footer">
           <div class="footer-button-row">
             <el-button type="success" @click="showCreateDialog">
-              {{ $t('Add') }}
+              {{ $t('Create') }}
             </el-button>
-            <el-button type="success" @click="fetchUserList">
+            <el-button type="success" @click="fetchCompanyList">
               {{ $t('Refresh') }}
             </el-button>
-            <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedUsers.length === 0">
+            <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedCompanys.length === 0">
               {{ $t('BatchDelete') }}
             </el-button>
           </div>
@@ -109,47 +139,12 @@
       </el-dialog>
   
       <!-- 移动端详情对话框 -->
-      <el-dialog v-model="detailDialogVisible" title="User Details" width="90%" align-center>
-        <el-form :model="selectedUser" label-width="100px" label-position="left" :disabled="!isEditing">
-          <el-form-item label="User Name" class="form-item">
-            <el-input v-model="selectedUser.userName" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Password" class="form-item" v-if="isEditing">
-            <el-input v-model="selectedUser.psw" type="password" show-password placeholder="Enter new password"
-              class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Email" class="form-item">
-            <el-input v-model="selectedUser.email" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Phone" class="form-item">
-            <el-input v-model="selectedUser.phone" class="form-input"></el-input>
-          </el-form-item>
-          <el-form-item label="Admin" class="form-item">
-            <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
-              :disabled="selectedUser.userId === this.userData.userId || !isEditing"></el-switch>
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <div class="dialog-footer">
-            <div>
-              <el-button v-if="isEditing" @click="detailDialogVisible = false">Cancel</el-button>
-              <el-button type="primary" v-if="isEditing" @click="confirmEdit">Save</el-button>
-            </div>
-            <div class="action-buttons" v-if="!isEditing">
-              <el-button type="primary" @click="enableEditing">Edit</el-button>
-              <el-button v-if="selectedUser && selectedUser.userId === this.userData.userId" 
-                type="danger" disabled>Delete</el-button>
-              <el-button v-else type="danger" @click="showDeleteDialog(selectedUser)">Delete</el-button>
-            </div>
-          </div>
-        </template>
-      </el-dialog>
   
       <!-- 桌面端编辑对话框 -->
       <el-dialog v-model="editDialogVisible" title="Edit Company" width="500" align-center>
-        <el-form :model="selectedCompanys" label-width="100px" label-position="left">
-          <el-form-item label="Company Name" class="form-item">
-            <el-input v-model="selectedCompanys.companyName" class="form-input"></el-input>
+        <el-form :model="selectedCompany" label-width="100px" label-position="left">
+          <el-form-item label="Name" class="form-item">
+            <el-input v-model="selectedCompany.companyName" class="form-input"></el-input>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -189,11 +184,13 @@
   import axios from "axios";
   import { ElMessage } from 'element-plus';
   import logo from '../assets/logo.png';
+  import { Loading } from '@element-plus/icons-vue';
   
   export default {
     name: "WorkSpace",
     components: {
       MainHeader,
+      Loading
     },
     data() {
       return {
@@ -207,15 +204,12 @@
         selectedCompany: null,
         paginatedCompanyList: [],
         userList: [], // 用于存储用户数据
-        paginatedUserList: [], // 当前页的用户数据
-        selectedUsers: [], // 存储多选选中的用户
         createDialogVisible: false,
         deleteDialogVisible: false,
         batchDeleteDialogVisible: false,
         editDialogVisible: false,
         detailDialogVisible: false,
         isEditing: false,
-        selectedUser: null,
         userData: JSON.parse(sessionStorage.getItem('userData')) || {},
         currentPage: 1, // 当前页
         pageSize: 10, // 每页显示条数
@@ -223,7 +217,17 @@
         sortOrder: '', // 当前排序方向
         defaultAvatar: logo,
         loading: false,
-        windowWidth: window.innerWidth
+        windowWidth: window.innerWidth,
+        expandedRows: [], // 当前展开的行
+        companyUsersMap: {}, // 存储每个公司的用户列表 {companyId: [users]}
+        loadingCompanyUsers: false, // 是否正在加载公司用户
+        currentExpandedCompany: null, // 当前展开的公司ID
+        addUserDialogVisible: false, // 添加用户对话框是否可见
+        addUserForm: {
+          userId: null,
+          companyId: null
+        },
+        availableUsers: [] // 可添加到公司的用户列表
       };
     },
     computed: {
@@ -233,9 +237,9 @@
     },
     methods: {
       // 显示详情对话框（移动端）
-      showDetailDialog(user) {
+      showDetailDialog(company) {
         this.detailDialogVisible = true;
-        this.selectedUser = { ...user, psw: '' }; // 创建用户数据的副本，且密码初始为空
+        this.selectedCompany = { ...company}; // 创建用户数据的副本，且密码初始为空
         this.isEditing = false; // 初始状态为查看模式
       },
       // 启用编辑模式（移动端）
@@ -243,15 +247,15 @@
         this.isEditing = true;
       },
       // 显示编辑对话框（桌面端）
-      showEditDialog(user) {
+      showEditDialog(company) {
         if (this.isMobile) {
           // 移动端使用详情对话框
-          this.showDetailDialog(user);
+          this.showDetailDialog(company);
           this.enableEditing();
         } else {
           // 桌面端使用原来的编辑对话框
           this.editDialogVisible = true;
-          this.selectedUser = { ...user, psw: '' };
+          this.selectedCompany = { ...company};
         }
       },
       // 显示删除对话框
@@ -266,7 +270,6 @@
       },
       showCreateDialog() {
         this.createDialogVisible = true;
-        console.log(11);
       },
       // 显示批量删除对话框
       showBatchDeleteDialog() {
@@ -315,16 +318,16 @@
       async confirmEdit() {
         try {
           const formData = new FormData();
-          for (const key in this.selectedUser) {
-            formData.append(key, this.selectedUser[key]);
+          for (const key in this.selectedCompany) {
+            formData.append(key, this.selectedCompany[key]);
           }
           formData.delete('avatarBase64')
-          await axios.post(`/api/updateUser`, formData, {
+          await axios.post(`/api/updateCompany`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
   
-          this.fetchUserList();
-          ElMessage.success('User updated successfully.');
+          this.fetchCompanyList();
+          ElMessage.success('Company updated successfully.');
           
           // 关闭相应的对话框
           if (this.editDialogVisible) {
@@ -344,6 +347,7 @@
           this.loading = true;
           const response = await axios.post("/api/insertCompany", this.companyForm);
           if (response.data.code === 1) {
+            this.fetchCompanyList();
             ElMessage.success('Company created successfully.');
           } else {
             ElMessage.error('Failed to create company.');
@@ -371,22 +375,6 @@
           this.loading = false;
         } catch (error) {
           console.error("Failed to fetch company list:", error);
-        }
-      },
-      // 获取用户数据
-      async fetchUserList() {
-        try {
-          this.loading = true;
-          const response = await axios.get("/api/findUsers");
-          if (response.data.code === 200) {
-            this.userList = response.data.data;
-            // this.applySorting(); // 调用排序函数
-          } else {
-            console.error("Failed to fetch user list:", response.data.msg);
-          }
-          this.loading = false;
-        } catch (error) {
-          console.error("Failed to fetch user list:", error);
         }
       },
       handleSortChange({ prop, order }) {
@@ -426,10 +414,136 @@
       // 监听窗口大小变化
       handleResize() {
         this.windowWidth = window.innerWidth;
+      },
+
+      // 处理行展开事件
+      handleExpandChange(row, expandedRows) {
+        if (expandedRows.length > 0) {
+          this.currentExpandedCompany = row.companyId;
+          this.expandedRows = [row.companyId];
+          this.loadCompanyUsers(row.companyId);
+        } else {
+          this.expandedRows = [];
+          this.currentExpandedCompany = null;
+        }
+      },
+      // 加载公司用户
+      async loadCompanyUsers(companyId) {
+        // if (this.companyUsersMap[companyId] && this.companyUsersMap[companyId].length > 0) {
+        //   return; // 如果已经加载过，就不再加载
+        // }
+    
+        try {
+          this.loadingCompanyUsers = true;
+          const response = await axios.get(`/api/getCompanyUsers?companyId=${companyId}`);
+      
+          if (response.data.code === 200) {
+            this.companyUsersMap[companyId] = response.data.data || [];
+          } else {
+            console.error("获取公司用户失败:", response.data.msg);
+            this.companyUsersMap[companyId] = [];
+          }
+        } catch (error) {
+          console.error("加载公司用户出错:", error);
+          this.companyUsersMap[companyId] = [];
+        } finally {
+          this.loadingCompanyUsers = false;
+        }
+      },
+      // 显示添加用户对话框
+      showAddUserDialog(company) {
+        this.selectedCompany = company;
+        this.addUserForm.companyId = company.companyId;
+        this.addUserForm.userId = null;
+        this.loadAvailableUsers(company.companyId);
+        this.addUserDialogVisible = true;
+        this.addUserForm = {
+          userId: null,
+          companyId: company.companyId // 设置当前选中公司的ID
+        };
+      },
+  
+      // 加载可添加到公司的用户
+      async loadAvailableUsers(companyId) {
+        try {
+          this.loading = true;
+          // 获取所有用户
+          const response = await axios.get("/api/findUsers");
+      
+          if (response.data.code === 200) {
+            const allUsers = response.data.data;
+            // 获取公司已有用户
+            const companyUsers = this.companyUsersMap[companyId] || [];
+            const companyUserIds = companyUsers.map(user => user.userId);
+        
+            // 过滤掉已经在公司的用户
+            this.availableUsers = allUsers.filter(user => !companyUserIds.includes(user.userId));
+          } else {
+            console.error("获取用户列表失败:", response.data.msg);
+            this.availableUsers = [];
+          }
+        } catch (error) {
+          console.error("加载可用用户失败:", error);
+          this.availableUsers = [];
+        } finally {
+          this.loading = false;
+        }
+      },
+      // 确认添加用户到公司
+      async confirmAddUserToCompany() {
+        if (!this.addUserForm.userId) {
+          ElMessage.warning('请选择一个用户');
+          return;
+          }
+    
+        try {
+          const response = await axios.post("/api/addUserToCompany", {
+            userId: this.addUserForm.userId,
+            companyId: this.addUserForm.companyId,
+          });
+      
+          if (response.data.code === 1) {
+            ElMessage.success('用户成功添加到公司');
+            this.addUserDialogVisible = false;
+        
+            // 重新加载公司用户
+            this.loadCompanyUsers(this.addUserForm.companyId);
+          } else {
+            ElMessage.error('添加用户到公司失败');
+          }
+            } catch (error) {
+              console.error("添加用户到公司失败:", error);
+              ElMessage.error('添加用户到公司失败');
+            }
+      },
+  
+      // 从公司中移除用户
+      async removeUserFromCompany(userId, companyId) {
+        try {
+          const response = await axios.post("/api/removeUserFromCompany", {
+            userId: userId,
+            companyId: companyId
+          });
+      
+          if (response.data.code === 1) {
+            ElMessage.success('用户已从公司中移除');
+        
+            // 更新本地数据
+            if (this.companyUsersMap[companyId]) {
+              this.companyUsersMap[companyId] = this.companyUsersMap[companyId].filter(
+                user => user.userId !== userId
+              );
+            }
+          } else {
+            ElMessage.error(response.data.msg || '移除用户失败');
+          }
+        } catch (error) {
+          console.error("从公司移除用户失败:", error);
+          ElMessage.error('从公司移除用户失败');
+        }
       }
     },
     mounted() {
-      this.fetchUserList();
       this.fetchCompanyList();
       window.addEventListener('resize', this.handleResize);
     },
@@ -439,86 +553,3 @@
   };
   </script>
   
-  <style scoped>
-  .desktop-view {
-    display: block;
-  }
-  
-  .mobile-view {
-    display: none;
-  }
-  
-  .dialog-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .dialog-footer-desktop {
-    text-align: right;
-  }
-  
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-  }
-  
-  .form-item {
-    margin-bottom: 15px;
-  }
-  
-  .form-input {
-    width: 100%;
-  }
-  
-  .footer {
-    margin-top: 20px;
-  }
-  
-  .footer-button-row {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .pagination {
-    margin-bottom: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    .desktop-view {
-      display: none;
-    }
-  
-    .mobile-view {
-      display: block;
-    }
-  
-    .el-dialog {
-      width: 95% !important;
-      margin: 0 auto;
-    }
-    
-    .dialog-footer {
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .dialog-footer > div {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .el-table {
-      font-size: 14px;
-    }
-    
-    .pagination {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: left;
-      margin-bottom: 20px;
-    }
-  }
-  </style>

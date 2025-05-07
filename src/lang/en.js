@@ -19,7 +19,8 @@ const en = {
   Notcompletedyet: 'Not completed yet',
   Confirm: 'Confirm',
   Reset: 'Reset',
-  Add: 'createCompany',
+  Create: 'CreateCompany',
+  Add: 'Add',
 
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
