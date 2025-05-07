@@ -27,19 +27,34 @@
           <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
           <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
           <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
+          <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable>
+            <template #default="{ row }">
+              <el-tag :type="row.isVerified ? 'success' : 'warning'">
+                {{ row.isVerified ? '已通过' : '未通过' }}
+              </el-tag>
+            </template>
+          </el-table-column>
 
           <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="150">
+          <el-table-column fixed="right" :label="$t('Operations')" width="220">
             <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
-              <!-- 禁用删除按钮 -->
-              <el-button v-if="row.userId === this.userData.userId" link type="default" size="small" disabled>
-                {{ $t('Delete') }}
-              </el-button>
-              <!-- 可点击的删除按钮 -->
-              <el-button v-else link type="danger" size="small" @click="showDeleteDialog(row)">
-                {{ $t('Delete') }}
-              </el-button>
+              <!-- 未审核用户显示通过和不通过按钮 -->
+              <template v-if="!row.isVerified">
+                <el-button link type="success" size="small" @click="approveUser(row)">{{ $t('Approve') }}</el-button>
+                <el-button link type="danger" size="small" @click="rejectUser(row)">{{ $t('Reject') }}</el-button>
+              </template>
+              <!-- 已审核用户显示编辑和删除按钮 -->
+              <template v-else>
+                <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
+                <!-- 禁用删除按钮 -->
+                <el-button v-if="row.userId === this.userData.userId" link type="default" size="small" disabled>
+                  {{ $t('Delete') }}
+                </el-button>
+                <!-- 可点击的删除按钮 -->
+                <el-button v-else link type="danger" size="small" @click="showDeleteDialog(row)">
+                  {{ $t('Delete') }}
+                </el-button>
+              </template>
             </template>
           </el-table-column>
         </el-table>
@@ -65,8 +80,13 @@
             </template>
           </el-table-column>
           <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
+          <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable>
+            <template #default="{ row }">
+              <el-tag :type="row.isVerified ? 'success' : 'warning'">
+                {{ row.isVerified ? '已通过' : '未通过' }}
+              </el-tag>
+            </template>
+          </el-table-column>
 
           <!-- 操作列 -->
           <el-table-column fixed="right" :label="$t('Operations')" width="70">
@@ -116,6 +136,9 @@
           <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
             :disabled="selectedUser.userId === this.userData.userId || !isEditing"></el-switch>
         </el-form-item>
+        <el-form-item label="Verified" class="form-item">
+          <el-switch v-model="selectedUser.isVerified" :active-value="1" :inactive-value="0" :disabled="!isEditing"></el-switch>
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -125,9 +148,17 @@
           </div>
           <div class="action-buttons" v-if="!isEditing">
             <el-button type="primary" @click="enableEditing">Edit</el-button>
-            <el-button v-if="selectedUser && selectedUser.userId === this.userData.userId" 
-              type="danger" disabled>Delete</el-button>
-            <el-button v-else type="danger" @click="showDeleteDialog(selectedUser)">Delete</el-button>
+            <!-- 未验证用户显示通过和拒绝按钮 -->
+            <template v-if="selectedUser && !selectedUser.isVerified">
+              <el-button type="success" @click="approveUser(selectedUser)">Approve</el-button>
+              <el-button type="danger" @click="rejectUser(selectedUser)">Reject</el-button>
+            </template>
+            <!-- 已验证用户显示删除按钮 -->
+            <template v-else>
+              <el-button v-if="selectedUser && selectedUser.userId === this.userData.userId" 
+                type="danger" disabled>Delete</el-button>
+              <el-button v-else type="danger" @click="showDeleteDialog(selectedUser)">Delete</el-button>
+            </template>
           </div>
         </div>
       </template>
@@ -153,6 +184,9 @@
           <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
             :disabled="selectedUser.userId === this.userData.userId"></el-switch>
         </el-form-item>
+        <el-form-item label="Verified" class="form-item">
+          <el-switch v-model="selectedUser.isVerified" :active-value="1" :inactive-value="0"></el-switch>
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer-desktop">
@@ -169,6 +203,17 @@
         <div class="dialog-footer-desktop">
           <el-button @click="deleteDialogVisible = false">Cancel</el-button>
           <el-button type="danger" @click="confirmDelete">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 拒绝用户确认对话框 -->
+    <el-dialog v-model="rejectDialogVisible" title="拒绝确认" :width="isMobile ? '90%' : '500'" align-center>
+      <span>确定要拒绝用户 <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> 的注册申请吗？</span>
+      <template #footer>
+        <div class="dialog-footer-desktop">
+          <el-button @click="rejectDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="confirmReject">确认拒绝</el-button>
         </div>
       </template>
     </el-dialog>
@@ -206,6 +251,7 @@ export default {
       batchDeleteDialogVisible: false,
       editDialogVisible: false,
       detailDialogVisible: false,
+      rejectDialogVisible: false, // 新增：拒绝对话框状态
       isEditing: false,
       selectedUser: null,
       userData: JSON.parse(sessionStorage.getItem('userData')) || {},
@@ -337,6 +383,7 @@ export default {
         const response = await axios.get("/api/findUsers");
         if (response.data.code === 200) {
           this.userList = response.data.data;
+          console.log('后端返回的用户数据:', response.data.data);
           this.applySorting(); // 调用排序函数
         } else {
           console.error("Failed to fetch user list:", response.data.msg);
@@ -383,6 +430,44 @@ export default {
     // 监听窗口大小变化
     handleResize() {
       this.windowWidth = window.innerWidth;
+    },
+    
+    // 新增：通过用户
+    async approveUser(user) {
+      this.selectedUser = user;
+      try {
+        await axios.get(`/api/approveUser?userId=${this.selectedUser.userId}`);
+        this.fetchUserList();
+        ElMessage.success('用户已通过审核');
+      } catch (error) {
+        ElMessage.error('审核操作失败');
+        console.error("Approve failed:", error);
+      }
+    },
+    
+    // 新增：显示拒绝对话框
+    rejectUser(user) {
+      this.selectedUser = user;
+      this.rejectDialogVisible = true;
+      
+      // 如果是从详情对话框打开的，关闭详情对话框
+      if (this.detailDialogVisible) {
+        this.detailDialogVisible = false;
+      }
+    },
+    
+    // 新增：确认拒绝操作
+    async confirmReject() {
+      try {
+        await axios.get(`/api/deleteUserByUserID?userID=${this.selectedUser.userId}`);
+        this.fetchUserList();
+        ElMessage.success('已拒绝用户注册申请');
+      } catch (error) {
+        ElMessage.error('拒绝操作失败');
+        console.error("Reject failed:", error);
+      } finally {
+        this.rejectDialogVisible = false;
+      }
     }
   },
   mounted() {

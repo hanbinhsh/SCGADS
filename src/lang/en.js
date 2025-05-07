@@ -144,7 +144,8 @@ const en = {
       email: "Email",
       is_admin: "Is Admin",
       phone: "Phone Number",
-      avatar: "User Avatar"
+      avatar: "User Avatar",
+      is_verified: "Is Verified"
     },
     company: {
       company_id: "Company ID",

@@ -145,7 +145,8 @@ const zh =  {
       email: "电子邮件",
       is_admin: "是否是管理员",
       phone: "电话号码",
-      avatar: "用户头像"
+      avatar: "用户头像",
+      is_verified: "是否已通过验证"
     },
     company: {
       company_id: "公司ID",

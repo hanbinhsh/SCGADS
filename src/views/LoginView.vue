@@ -55,7 +55,7 @@ const submitForm = async () => {
     window.location.href = '/HomeView';
   }
   else
-    ElMessage.error('The username or password is incorrect.');
+    ElMessage.error('The username or password is incorrect, or your request has not been approved by the administrator.');
 };
 
 const isShow = ref(false);
