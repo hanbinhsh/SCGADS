@@ -45,7 +45,7 @@
                     </el-table>
                   </div>
                   <div v-else class="no-users">
-                    该公司暂无用户
+                    NULL
                   </div>
                 </div>
               </template>
