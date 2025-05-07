@@ -19,7 +19,8 @@ const zh =  {
   Notcompletedyet: '未完成',
   Confirm: '确认',
   Reset: '重置',
-  Add: '新建公司',
+  Create: '新建公司',
+  Add: '添加',
 
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
