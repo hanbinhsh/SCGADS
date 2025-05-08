@@ -153,6 +153,11 @@ const zh =  {
       company_id: "公司ID",
       company_name: "公司名称",
     },
+    log:{
+      action: "行为",
+      importance: "重要性",
+      timestamp: "日志时间",
+    },
     task: {
       task_id: "任务ID",
       task_name: "任务名",
@@ -199,7 +204,7 @@ const zh =  {
     Logout: '登出',
 
     HomeView: '主页',
-
+    ManageLogs: '日志管理',
     Manage: '管理',
     ManageUsers: '用户管理',
     ManageCompanys: '公司管理',

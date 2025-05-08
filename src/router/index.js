@@ -26,6 +26,12 @@ const routes = [
     meta: { title: 'ManageCompany', requiresAuth:true, requiresLogin:true }
   },
   {
+    path: '/ManageLogs',
+    name: 'ManageLogs',
+    component: () => import('../views/ManageLogs.vue'),
+    meta: { title: 'ManageLogs', requiresAuth:true, requiresLogin:true }
+  },
+  {
     path: '/WorkSpace',
     name: 'WorkSpace',
     component: () => import('../views/WorkSpace.vue'),

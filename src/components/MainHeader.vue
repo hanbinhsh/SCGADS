@@ -47,6 +47,10 @@
                     v-if="userData.userName && userData.isAdmin">
                     <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
                 </el-menu-item>
+                <el-menu-item index="ManageLogs" :class="{ 'is-active': activeIndex === 'ManageLogs' }"
+                    v-if="userData.userName && userData.isAdmin">
+                    <font-awesome-icon :icon="['fas', 'clipboard-list']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageLogs') }}
+                </el-menu-item>
                 <el-menu-item index="ManageModel" :class="{ 'is-active': activeIndex === 'ManageModel' }"
                     v-if="userData.userName && userData.isAdmin">
                     <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
@@ -163,6 +167,9 @@
                             </div>
                             <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageFeedback' }" @click="navigateTo('ManageFeedback')">
                                 <font-awesome-icon :icon="['far', 'message']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageFeedbacks') }}
+                            </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageLogs' }" @click="navigateTo('ManageLogs')">
+                                <font-awesome-icon :icon="['fas', 'clipboard-list']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageLogs') }}
                             </div>
                             <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
                                 <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}

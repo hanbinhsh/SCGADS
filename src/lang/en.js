@@ -152,6 +152,11 @@ const en = {
       company_id: "Company ID",
       company_name: "Company Name",
     },
+    log:{
+      action: "Action",
+      importance: "Importance",
+      timestamp: "Log time",
+    },
     task: {
       task_id: "Task ID",
       task_name: "Task Name",
@@ -198,7 +203,7 @@ const en = {
     Logout: 'Log out',
 
     HomeView: 'Home View',
-
+    ManageLogs: 'Log Management',
     Manage: 'Manage',
     ManageUsers: 'User Management',
     ManageCompanys: 'Company Management',
