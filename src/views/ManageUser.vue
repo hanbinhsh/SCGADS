@@ -2,7 +2,7 @@
   <div class="main-page">
     <MainHeader></MainHeader>
     <el-main class="fullscreen-section">
-      <h1 class="page-name">{{ $t('navigateBar.ManageUsers') }}11</h1>
+      <h1 class="page-name">{{ $t('navigateBar.ManageUsers') }}</h1>
       <el-divider />
 
       <!-- 桌面端显示的表格 -->
