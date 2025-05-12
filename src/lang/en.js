@@ -115,6 +115,7 @@ const en = {
     Collapse: "Collapse",
     Expire: "Expire",
     Expired: "Expired",
+    Indefinite: "Indefinite",
     CopyLink: 'Copy Link',
     MyModels: "My Models",
     Nomodelsfound: "No models found",

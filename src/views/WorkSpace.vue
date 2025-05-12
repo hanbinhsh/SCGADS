@@ -16,7 +16,7 @@
           <div class="chart-container">
             <el-row style="height: 100%;">
               <!-- 左侧：圆环图 + 任务统计 -->
-              <el-col :span="isRightColumnExpanded ? 24 : 8" class="left-section">
+              <el-col v-if="!isMobileView" :span="isRightColumnExpanded ? 24 : 8" class="left-section">
                 <div ref="statusChart" class="status-chart"></div>
                 <!-- 任务统计信息 -->
                 <el-row>
@@ -36,7 +36,7 @@
               </el-col>
 
               <!-- 右侧：最近完成任务栏 -->
-              <el-col :span="isRightColumnExpanded ? 0 : 16" class="right-section">
+              <el-col :span="isMobileView ? 24 : isRightColumnExpanded ? 0 : 16" class="right-section">
                 <div class="success-tasks-list">
                   <div v-if="completedCount === 0" class="empty-state">
                     {{ $t('workSpace.Norecentcompletedtaskfound') }}
@@ -328,6 +328,96 @@
       </template>
     </el-dialog>
   </div>
+
+  <div class="mobile-task-drawer">
+    <el-drawer
+      v-model="mobileTaskDrawerVisible"
+      title="Tasks"
+      direction="btt"
+      size="80%"
+    >
+      <el-table 
+        :data="paginatedTaskList" 
+        style="width: 100%"
+        v-loading="loading">
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+          <template #default="{ row }">
+            <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+            {{ row.task_name }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" :label="$t('database.task.status')">
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="60">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showMobileActionSheet(row)">
+              <el-icon><MoreFilled /></el-icon>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <el-pagination 
+        class="pagination" 
+        @current-change="handleCurrentChange"
+        :current-page="currentPage" 
+        :page-size="pageSize"
+        layout="prev, pager, next" 
+        :total="taskList.length">
+      </el-pagination>
+    </el-drawer>
+
+    <!-- Mobile Action Sheet -->
+    <el-dialog
+      v-model="mobileActionSheetVisible"
+      :title="selectedTask?.task_name"
+      width="95%"
+      class="mobile-action-dialog"
+    >
+      <div class="mobile-task-details">
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <el-tag :type="statusType(selectedTask?.status)">{{ statusText(selectedTask?.status) }}</el-tag>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Type:</span>
+          <span>{{ getTaskType(selectedTask) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Model:</span>
+          <span>{{ selectedTask?.model_name ?? "Unknown" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Start Time:</span>
+          <span>{{ formatDate(selectedTask?.start_time) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">End Time:</span>
+          <span>{{ (selectedTask?.end_time && selectedTask?.status === 2) ? formatDate(selectedTask?.end_time) : $t('Notcompletedyet') }}</span>
+        </div>
+      </div>
+      <div class="mobile-action-buttons">
+        <el-button type="success" @click="showCharts(selectedTask?.task_name)" :disabled="selectedTask?.status !== 2" block>
+          {{ $t('navigateBar.Virtualization') }}
+        </el-button>
+        <el-button type="primary" @click="showDetailDialog(selectedTask)" block>
+          {{ $t('Detail') }}
+        </el-button>
+        <el-button type="danger" @click="showDeleteDialog(selectedTask)" block>
+          {{ $t('Delete') }}
+        </el-button>
+      </div>
+    </el-dialog>
+  </div>
+
+  <div class="mobile-task-button" v-if="isMobileView">
+    <el-button type="primary" circle @click="mobileTaskDrawerVisible = true">
+      <el-icon><List /></el-icon>
+    </el-button>
+  </div>
 </template>
 
 <script>
@@ -335,11 +425,14 @@ import MainHeader from "../components/MainHeader.vue";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import * as echarts from 'echarts';  // Import echarts
+import { List, MoreFilled } from '@element-plus/icons-vue';
 
 export default {
   name: "WorkSpace",
   components: {
     MainHeader,
+    List,
+    MoreFilled
   },
   data() {
     return {
@@ -361,6 +454,9 @@ export default {
       shareLoading: false,
       isRightColumnExpanded: false, // 控制右侧列表是否展开
       statusChart: null, // 存储ECharts实例
+      isMobileView: false,
+      mobileTaskDrawerVisible: false,
+      mobileActionSheetVisible: false,
     };
   },
   computed: {
@@ -645,11 +741,47 @@ export default {
       const end = start + this.pageSize;
       this.paginatedTaskList = this.taskList.slice(start, end);
     },
+    checkScreenSize() {
+      this.isMobileView = window.innerWidth < 768;
+      if (this.isMobileView && this.isRightColumnExpanded) {
+        this.isRightColumnExpanded = false;
+      }
+    },
+    
+    showMobileActionSheet(task) {
+      this.selectedTask = task;
+      this.mobileActionSheetVisible = true;
+    },
+    
+    getTaskType(row) {
+      if (!row) return '';
+      
+      let typeText = '';
+      
+      if (row.type?.split(':')[1]) {
+        typeText += (row.type.split(':')[1] === "single" ? this.$t('taskType.Singleomic') :
+                    row.type.split(':')[1] === "multi" ? this.$t('taskType.Multiomics') :
+                    row.type.split(':')[1] === "deno" ? this.$t('taskType.Denoising') : 
+                    this.$t('taskType.Unknown'));
+      }
+      
+      if (row.type?.split(':')[0]) {
+        if (row.type.split(':')[0] === "annotation") {
+          typeText += ' ' + this.$t('taskType.Annotation');
+        } else if (row.type.split(':')[0] === "trainning") {
+          typeText += ' ' + this.$t('taskType.Trainning');
+        }
+      }
+      
+      return typeText || this.$t('taskType.Unknown');
+    },
   },
   mounted() {
     this.Refresh(); // 组件挂载后获取任务数据
     // 设置图表响应式
     window.addEventListener('resize', this.resizeCharts);
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
   },
   beforeUnmount() {
     // 组件销毁前清理图表实例和事件监听
@@ -657,6 +789,7 @@ export default {
       this.statusChart.dispose();
     }
     window.removeEventListener('resize', this.resizeCharts);
+    window.removeEventListener('resize', this.checkScreenSize);
   }
 };
 </script>
@@ -864,5 +997,114 @@ export default {
 :deep(.dark-mode) .footer,
 :deep(.dark) .footer {
   border-top-color: #3e3e3e;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 767px) {
+  .content-container {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+  }
+  
+  .left-column {
+    width: 95% !important;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  
+  .right-column {
+    display: none;
+  }
+  
+  .dashboard-card {
+    height: auto;
+    min-height: 350px;
+  }
+
+  .success-tasks-list {
+    max-height: 230px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .left-column {
+    grid-template-columns: 1fr;
+    width: 70% !important;
+  }
+  
+  .right-column.collapsed {
+    width: 30%;
+  }
+}
+
+/* Mobile Task Drawer */
+.mobile-task-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: transparent;
+  width: 50px;
+  height: 50px;
+}
+
+.mobile-action-buttons .el-button + .el-button {
+  margin-left: 0;        /* 去除横向间距 */
+}
+
+.mobile-task-details {
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.detail-label {
+  font-weight: bold;
+  width: 100px;
+  color: #606266;
+}
+
+.mobile-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Chart responsive fix */
+.status-chart {
+  height: 150px;
+  min-height: 150px;
+}
+
+.left-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Adjust card for smaller screens */
+@media (max-width: 767px) {
+  .card-header {
+    padding: 10px;
+  }
+  
+  .status-count {
+    font-size: 14px;
+  }
+  
+  .status-chart {
+    height: 120px;
+  }
+}
+
+/* Make mobile dialog take more screen space */
+.mobile-action-dialog :deep(.el-dialog__body) {
+  padding-top: 10px;
 }
 </style>
