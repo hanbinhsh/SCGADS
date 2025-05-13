@@ -101,7 +101,7 @@
               </div>
 
               <div class="success-task-details">
-                {{ formatDate(data.shared_time) }}
+                {{ formatDate(data.shared_time) }} 
                 <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
                 </el-button>
