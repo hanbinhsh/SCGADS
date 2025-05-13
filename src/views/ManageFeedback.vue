@@ -418,14 +418,12 @@ export default {
     display: block;
   }
 
-  
   .pagination {
     display: flex;
     flex-wrap: wrap;
     justify-content: left;
     margin-bottom: 20px;
   }
-
 
 }
 </style>
