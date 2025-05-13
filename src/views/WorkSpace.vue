@@ -1051,6 +1051,11 @@ export default {
   height: 50px;
 }
 
+.mobile-task-button .el-button{
+  width: 50px;
+  height: 50px;
+}
+
 .mobile-action-buttons .el-button + .el-button {
   margin-left: 0;        /* 去除横向间距 */
 }
