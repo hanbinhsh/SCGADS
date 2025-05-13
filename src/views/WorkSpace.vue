@@ -1,4 +1,515 @@
+<template>
+  <div class="dashboard-container">
+    <MainHeader></MainHeader>
+    
+    <div class="content-container">
+      <!-- Left Column with 4 Cards -->
+      <div class="left-column" :class="{ 'with-expanded-right': isRightColumnExpanded }">
+        <!-- Card 1: Status Chart -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="loading">
+          <template #header>
+            <div class="card-header">
+              <span>{{ $t('workSpace.TaskStatus') }}</span>
+            </div>
+          </template>
 
+          <div class="chart-container">
+            <el-row style="height: 100%;">
+              <!-- 左侧：圆环图 + 任务统计 -->
+              <el-col v-if="!isMobileView" :span="isRightColumnExpanded ? 24 : 8" class="left-section">
+                <div ref="statusChart" class="status-chart"></div>
+                <!-- 任务统计信息 -->
+                <el-row>
+                  <el-col :span="12">
+                    <el-row><el-tag type="warning" style="width: 80px;">{{ $t('status.Pending') }}</el-tag></el-row>
+                    <el-row><el-tag type="primary" style="width: 80px;">{{ $t('status.Processing') }}</el-tag></el-row>
+                    <el-row><el-tag type="success" style="width: 80px;">{{ $t('status.Completed') }}</el-tag></el-row>
+                    <el-row><el-tag type="danger"  style="width: 80px;">{{ $t('status.Error') }}</el-tag></el-row>
+                  </el-col>
+                  <el-col :span="10">
+                    <el-row><span class="status-count">{{ pendingCount }}</span></el-row>
+                    <el-row><span class="status-count">{{ processingCount }}</span></el-row>
+                    <el-row><span class="status-count">{{ completedCount }}</span></el-row>
+                    <el-row><span class="status-count">{{ errorCount }}</span></el-row>
+                  </el-col>
+                </el-row>
+              </el-col>
+
+              <!-- 右侧：最近完成任务栏 -->
+              <el-col :span="isMobileView ? 24 : isRightColumnExpanded ? 0 : 16" class="right-section">
+                <div class="success-tasks-list">
+                  <div v-if="completedCount === 0" class="empty-state">
+                    {{ $t('workSpace.Norecentcompletedtaskfound') }}
+                  </div>
+                  <div v-for="(task, index) in sortedCompletedTasks" :key="index" class="success-task-item">
+                    <div class="success-task-header">
+                      <font-awesome-icon :style="{ color: '#67C23A' }" :icon="['fas', 'circle']" />
+                      <span class="success-task-name">{{ task.task_name }}</span>
+                      <el-button link type="success" size="small" @click="showCharts(task.task_name)" :disabled="task.status !== 2" style="margin-left: auto;">
+                        {{ $t('navigateBar.Virtualization') }}
+                      </el-button>
+                    </div>
+                    <div class="success-task-details">
+                      {{ task.details || "No details available" }}
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+        </el-card>
+
+        <!-- Card 2: Shares -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
+          <template #header>
+            <div class="card-header">
+              <span>{{ $t('workSpace.MyShares') }}</span>
+            </div>
+          </template>
+          <div class="success-tasks-list">
+            <div v-if="shareCount === 0" class="empty-state">
+              {{ $t('workSpace.Norecentsharesfound') }}
+            </div>
+            <div v-for="(data, index) in shareList" :key="index" class="success-task-item">
+              <div class="success-task-header">
+                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <span class="success-task-name">{{ data.task_name }}</span>
+
+                <!-- 任务分享时间状态 -->
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
+                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
+                </span>
+                <el-progress 
+                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
+                  type="line"
+                  style="margin-left: 10px; width: 80px;" 
+                  :stroke-width="10"
+                  :show-text="false"
+                />
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
+                  {{ $t('Edit') }}
+                </el-button>
+                <el-button link type="danger" size="small" @click="" v-if="!isRightColumnExpanded">
+                  {{ $t('Delete') }}
+                </el-button>
+              </div>
+
+              <div class="success-task-details">
+                {{ formatDate(data.shared_time) }}
+                <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </el-card>
+        
+        <!-- My Models -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
+          <template #header>
+            <div class="card-header">
+              <span>{{ $t('workSpace.MyModels') }}</span>
+            </div>
+          </template>
+          <div class="empty-state">
+            {{ $t('workSpace.Nomodelsfound') }}
+          </div>
+        </el-card>
+        
+        <!-- Shares Received -->
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
+          <template #header>
+            <div class="card-header">
+              <span>{{ $t('workSpace.ShareReceived') }}</span>
+            </div>
+          </template>
+          <div class="success-tasks-list">
+            <div v-if="receivedShareCount === 0" class="empty-state">
+              {{ $t('workSpace.Norecentreceivedsharesfound') }}
+            </div>
+            <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
+              <div class="success-task-header">
+                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <span class="success-task-name">{{ data.task_name }}</span>
+
+                <!-- 任务分享时间状态 -->
+                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
+                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
+                </span>
+                <el-progress 
+                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
+                  type="line"
+                  style="margin-left: 10px; width: 80px;" 
+                  :stroke-width="10"
+                  :show-text="false"
+                />
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="info" size="small" @click=""  v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
+                </el-button>
+              </div>
+
+              <div class="success-task-details">
+                {{ formatDate(data.shared_time) }}
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </el-card>
+      </div>
+      
+      <!-- Right Column with Collapsible Task List -->
+      <div class="right-column animate__animated animate__fadeInRight"
+        :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
+        <div class="column-toggle" @click="toggleRightColumn">
+          <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
+            {{ isRightColumnExpanded ? $t('workSpace.Collapse') : $t('workSpace.Expand') }}
+          </el-button>
+        </div>
+        
+        <!-- Collapsed -->
+        <div v-if="!isRightColumnExpanded" class="collapsed-task-list">
+          <el-table :data="paginatedTaskList" 
+            style="width: 100%" 
+            v-loading="loading">
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+              <template #default="{ row }">
+                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+                {{ row.task_name }}
+              </template>
+            </el-table-column>
+          </el-table>
+          
+          <!-- Simplified Pagination -->
+          <el-pagination 
+            class="pagination" 
+            @current-change="handleCurrentChange"
+            :current-page="currentPage" 
+            :page-size="pageSize"
+            layout="prev, pager, next" 
+            :total="taskList.length">
+          </el-pagination>
+        </div>
+        
+        <!-- Expanded -->
+        <div v-else class="expanded-task-list">
+          <!-- Original Full Table Layout -->
+          <el-table :data="paginatedTaskList" 
+            style="width: 100%"
+            @selection-change="handleSelectionChange"
+            @sort-change="handleSortChange"
+            v-loading="loading">
+            <!-- 多选框 -->
+            <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
+              <template #default="{ row }">
+                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+                {{ row.task_name }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="type" :label="$t('database.task.type')" sortable>
+              <template #default="{ row }">
+                {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+                   (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+                   (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+                {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+                   (row.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+                   (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+              </template>
+            </el-table-column>
+            <el-table-column prop="model_name" :label="$t('database.models.model_name')" sortable>
+              <template #default="{ row }">
+                {{ row.model_name ?? "Unknown" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
+              <template #default="{ row }">
+                {{ formatDate(row.start_time) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
+              <template #default="{ row }">
+                {{ (row.end_time&&row.status===2) ? formatDate(row.end_time) :  $t('Notcompletedyet') }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" :label="$t('database.task.status')" sortable>
+              <template #default="{ row }">
+                <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" :label="$t('Operations')" width="300">
+              <template #default="{ row }">
+                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+                <el-button link type="primary" size="small" @click="showDetailDialog(row)">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
+                  {{ $t('Delete') }}
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <!-- Full Pagination -->
+          <el-pagination 
+            class="pagination" 
+            @size-change="handleSizeChange" 
+            @current-change="handleCurrentChange"
+            :current-page="currentPage" 
+            :page-sizes="[5, 10, 20, 50]" 
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="taskList.length">
+          </el-pagination>
+          
+          <!-- Button Row -->
+          <div class="footer">
+            <div class="footer-button-row">
+              <el-button type="success" @click="Refresh">
+                Refresh
+              </el-button>
+              <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
+                Batch Delete
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dialogs (unchanged) -->
+    <el-dialog v-model="batchDeleteDialogVisible" title="Warning" width="500">
+      <span>The selected tasks will be deleted. Are you sure?</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
+          <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
+      <span>Task <strong style="color: #e74c3c;">{{ selectedTask?.task_name }}</strong> will be deleted</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">Cancel</el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">
+            Confirm
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="detailDialogVisible" title="Detail" width="500" align-center>
+      <span>{{ selectedTask?.details }}</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="">Parameters</el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+
+  <div class="mobile-task-drawer">
+    <el-drawer
+      v-model="mobileTaskDrawerVisible"
+      title="Tasks"
+      direction="btt"
+      size="80%"
+    >
+      <el-table 
+        :data="paginatedTaskList" 
+        style="width: 100%"
+        v-loading="loading">
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+          <template #default="{ row }">
+            <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+            {{ row.task_name }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" :label="$t('database.task.status')">
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="60">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showMobileActionSheet(row)">
+              <el-icon><MoreFilled /></el-icon>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <el-pagination 
+        class="pagination" 
+        @current-change="handleCurrentChange"
+        :current-page="currentPage" 
+        :page-size="pageSize"
+        layout="prev, pager, next" 
+        :total="taskList.length">
+      </el-pagination>
+    </el-drawer>
+
+    <!-- Mobile Action Sheet -->
+    <el-dialog
+      v-model="mobileActionSheetVisible"
+      :title="selectedTask?.task_name"
+      width="95%"
+      class="mobile-action-dialog"
+    >
+      <div class="mobile-task-details">
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <el-tag :type="statusType(selectedTask?.status)">{{ statusText(selectedTask?.status) }}</el-tag>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Type:</span>
+          <span>{{ getTaskType(selectedTask) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Model:</span>
+          <span>{{ selectedTask?.model_name ?? "Unknown" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Start Time:</span>
+          <span>{{ formatDate(selectedTask?.start_time) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">End Time:</span>
+          <span>{{ (selectedTask?.end_time && selectedTask?.status === 2) ? formatDate(selectedTask?.end_time) : $t('Notcompletedyet') }}</span>
+        </div>
+      </div>
+      <div class="mobile-action-buttons">
+        <el-button type="success" @click="showCharts(selectedTask?.task_name)" :disabled="selectedTask?.status !== 2" block>
+          {{ $t('navigateBar.Virtualization') }}
+        </el-button>
+        <el-button type="primary" @click="showDetailDialog(selectedTask)" block>
+          {{ $t('Detail') }}
+        </el-button>
+        <el-button type="danger" @click="showDeleteDialog(selectedTask)" block>
+          {{ $t('Delete') }}
+        </el-button>
+      </div>
+    </el-dialog>
+  </div>
+
+  <div class="mobile-task-button" v-if="isMobileView">
+    <el-button type="primary" circle @click="mobileTaskDrawerVisible = true">
+      <el-icon><List /></el-icon>
+    </el-button>
+  </div>
+</template>
+
+<script>
+import MainHeader from "../components/MainHeader.vue";
+import axios from "axios";
+import { ElMessage } from "element-plus";
+import * as echarts from 'echarts';  // Import echarts
+import { List, MoreFilled } from '@element-plus/icons-vue';
+
+export default {
+  name: "WorkSpace",
+  components: {
+    MainHeader,
+    List,
+    MoreFilled
+  },
+  data() {
+    return {
+      userData: JSON.parse(sessionStorage.getItem("userData")) || {},
+      taskList: [], // 存储任务数据
+      shareList: [], // 分享数据
+      shareReceivedList: [], // 收到的分享数据
+      paginatedTaskList: [], // 当前页的任务数据
+      deleteDialogVisible: false,
+      batchDeleteDialogVisible: false,
+      detailDialogVisible: false,
+      selectedTask: null,
+      selectedTasks: [], // 存储多选选中的任务
+      currentPage: 1, // 当前页
+      pageSize: 10, // 每页显示条数
+      sortOrder: '', // 当前排序方向
+      sortProp: '', // 当前排序属性
+      loading: false,
+      shareLoading: false,
+      isRightColumnExpanded: false, // 控制右侧列表是否展开
+      statusChart: null, // 存储ECharts实例
+      isMobileView: false,
+      mobileTaskDrawerVisible: false,
+      mobileActionSheetVisible: false,
+    };
+  },
+  computed: {
+    // 计算各状态任务数量
+    pendingCount() {
+      return this.taskList.filter(task => task.status === 0).length;
+    },
+    processingCount() {
+      return this.taskList.filter(task => task.status === 1).length;
+    },
+    completedCount() {
+      return this.taskList.filter(task => task.status === 2).length;
+    },
+    errorCount() {
+      return this.taskList.filter(task => task.status === -1).length;
+    },
+    receivedShareCount() {
+      return this.shareReceivedList.length;
+    },
+    shareCount(){
+      return this.shareList.length;
+    },
+    // 获取错误任务列表
+    completedTasks() {
+      return this.taskList.filter(task => task.status === 2);
+    },
+    sortedCompletedTasks() {
+      return [...this.completedTasks].sort((a, b) => new Date(b.endTime) - new Date(a.endTime));
+    }
+  },
+  methods: {
+    getShareProgress(startTime, dueTime) {
+      if (!startTime || !dueTime) return 100; // 处理异常情况，默认 100%
+
+      const start = new Date(startTime).getTime();
+      const end = new Date(dueTime).getTime();
+      const now = new Date().getTime();
+
+      if (now >= end) return 100; // 已过期
+      if (now <= start) return 0;  // 刚开始
+
+      return Math.min(100, ((now - start) / (end - start)) * 100); // 计算进度
+    },
+    Refresh() {
+      this.fetchShareList();
+      this.fetchTaskList();
+    },
+    // 切换右侧列表的展开/折叠状态
+    toggleRightColumn() {
+      this.isRightColumnExpanded = !this.isRightColumnExpanded;
+      // 如果展开，可能需要重新计算分页
+      if (this.isRightColumnExpanded) {
+        this.updatePaginatedTaskList();
       }
       this.$nextTick(() => {
         setTimeout(() => {
