@@ -295,7 +295,6 @@
       </div>
     </div>
     
-    <!-- Dialogs (unchanged) -->
     <el-dialog v-model="batchDeleteDialogVisible" title="Warning" width="500">
       <span>The selected tasks will be deleted. Are you sure?</span>
       <template #footer>
@@ -318,12 +317,46 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="detailDialogVisible" title="Detail" width="500" align-center>
-      <span>{{ selectedTask?.details }}</span>
+    <!-- 任务详细信息对话框 -->
+    <el-dialog v-model="detailDialogVisible" title="Task Detail" width="550px" align-center>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item :label="$t('database.task.task_name')">
+          {{ selectedTask.task_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.details')">
+          {{ selectedTask.details }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.type')">
+          {{ (selectedTask.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+             (selectedTask.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+             (selectedTask.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+          {{ (selectedTask.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+             (selectedTask.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+             (selectedTask.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.models.model_name')">
+          {{ selectedTask.model_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.parameters')">
+          <el-scrollbar max-height="150px">
+            <el-row v-for="(param, index) in (selectedTask.parameters || selectedTask.default_parameters || '').split(',')" :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
+        </el-descriptions-item>
+      </el-descriptions>
+
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="">Parameters</el-button>
-          <el-button type="primary" @click="detailDialogVisible = false">Confirm</el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -1111,5 +1144,13 @@ export default {
 /* Make mobile dialog take more screen space */
 .mobile-action-dialog :deep(.el-dialog__body) {
   padding-top: 10px;
+}
+
+.param-tag {
+  margin: 2px 0;
+}
+
+.el-scrollbar__view .el-row{
+  margin-bottom: 0;
 }
 </style>
