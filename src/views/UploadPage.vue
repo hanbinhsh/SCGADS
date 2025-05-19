@@ -123,13 +123,16 @@
 
           <!-- 右侧：参数设置 -->
           <el-col :xs="24" :sm="24" :md="10" :lg="10" :xl="10">
-            <el-card class="form-card animate__animated animate__fadeInRight" style="height: auto;" id="model-select">
+            <el-card class="form-card animate__animated animate__fadeInRight" style="height: auto; padding-bottom: 0;" id="model-select">
               <el-form label-width="40%">
                 <!-- 模型选择 -->
                 <el-form-item :label="$t('uploadPage.ModelSelect')">
                   <el-select v-model="parameters.model" @change="selectModel(parameters.model)" placeholder="Select Model" class="full-width">
                     <el-option v-for="model in filteredModels" :key="model.modelName" :label="model.modelName" :value="model.modelName" />
                   </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('database.models.remark')">
+                  {{ selectedModel.remark }}
                 </el-form-item>
               </el-form>
             </el-card>

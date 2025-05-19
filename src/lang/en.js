@@ -137,7 +137,8 @@ const en = {
       predict_file_path: "Prediction File Storage Path",
       train_file_path: "Training File Storage Path",
       figure_path: "Model Image Storage Path",
-      default_parameters: "Default Parameters"
+      default_parameters: "Default Parameters",
+      remark: "Remark"
     },
     user: {
       user_id: "User ID",

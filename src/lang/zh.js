@@ -137,7 +137,8 @@ const zh =  {
       predict_file_path: "预测文件存储路径",
       train_file_path: "训练文件存储路径",
       figure_path: "模型图存储路径",
-      default_parameters: "默认参数"
+      default_parameters: "默认参数",
+      remark: "备注"
     },
     user: {
       user_id: "用户ID",

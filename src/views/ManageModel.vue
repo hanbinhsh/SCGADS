@@ -19,6 +19,7 @@
         <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
         <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
         <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
+        <el-table-column prop="remark" :label="$t('database.models.remark')" sortable></el-table-column>
         <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
           <template #default="{ row }">
             <el-button link type="info" size="small" @click="showFigureDialog(row)">{{ $t('ModelManage.Figure') }}</el-button>
@@ -108,6 +109,9 @@
             <el-form-item label="Figure Path">
               <el-input v-model="selectedData.figurePath"></el-input>
             </el-form-item>
+            <el-form-item label="Remark">
+              <el-input v-model="selectedData.remark"></el-input>
+            </el-form-item>
           </div>
 
           <!-- 右侧：参数输入框 -->
@@ -169,6 +173,9 @@
             </el-form-item>
             <el-form-item label="Figure Path">
               <el-input v-model="modelAdding.figurePath"></el-input>
+            </el-form-item>
+            <el-form-item label="Remark">
+              <el-input v-model="modelAdding.remark"></el-input>
             </el-form-item>
           </div>
 
@@ -268,7 +275,8 @@ export default {
         predictFilePath: "",
         trainFilePath: "",
         figurePath: "model.png",
-        parameters: [] // 存储参数列表
+        parameters: [], // 存储参数列表
+        remark: "",
       },
     };
   },
@@ -303,6 +311,7 @@ export default {
       formData.append('predictFilePath', data.predictFilePath);
       formData.append('trainFilePath', data.trainFilePath);
       formData.append('figurePath', data.figurePath);
+      formData.append('remark', data.remark);
       formData.append('defaultParameters', paramString);
       const response = await axios.post('api/models/addModel', formData);
       if (response.data.code === 1) {
@@ -335,6 +344,7 @@ export default {
       formData.append('predictFilePath', data.predictFilePath);
       formData.append('trainFilePath', data.trainFilePath);
       formData.append('figurePath', data.figurePath);
+      formData.append('remark', data.remark);
       formData.append('defaultParameters', paramString);
       const response = await axios.post('api/models/updateModel', formData);
       if (response.data.code === 1) {
@@ -359,6 +369,7 @@ export default {
       this.modelAdding.predictFilePath = "";
       this.modelAdding.trainFilePath = "";
       this.modelAdding.figurePath = "model.png";
+      this.modelAdding.remark = "";
     },
     modelEditingReset(){
       this.selectedData = {}
