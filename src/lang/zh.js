@@ -138,7 +138,8 @@ const zh =  {
       train_file_path: "训练文件存储路径",
       figure_path: "模型图存储路径",
       default_parameters: "默认参数",
-      remark: "备注"
+      remark: "备注",
+      extract_labels: "标签映射"
     },
     user: {
       user_id: "用户ID",

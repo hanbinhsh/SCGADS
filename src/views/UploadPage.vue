@@ -266,6 +266,7 @@ export default {
       // single(单模态注释) multi(双模态注释) eno(降噪)
       // TODO 下拉框增加一级菜单显示是什么类型的模型
       // 此处单模态模型仅上传一种模态的数据
+      // R=RNA A=ATAC T=Label
       //        单模态    多模态    降噪
       // 注释   R/A       R+A      /
       // 训练   R/A+T     R+A+T    /

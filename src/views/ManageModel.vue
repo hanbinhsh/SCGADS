@@ -18,6 +18,7 @@
         <el-table-column prop="modelPath" :label="$t('database.models.model_path')" sortable></el-table-column>
         <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
         <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
+        <el-table-column prop="extractLabels" :label="$t('database.models.extract_labels')" sortable></el-table-column>
         <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
         <el-table-column prop="remark" :label="$t('database.models.remark')" sortable></el-table-column>
         <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
@@ -106,6 +107,9 @@
             <el-form-item label="Train File Path">
               <el-input v-model="selectedData.trainFilePath"></el-input>
             </el-form-item>
+            <el-form-item label="Labels Path">
+              <el-input v-model="selectedData.extractLabels"></el-input>
+            </el-form-item>
             <el-form-item label="Figure Path">
               <el-input v-model="selectedData.figurePath"></el-input>
             </el-form-item>
@@ -170,6 +174,9 @@
             </el-form-item>
             <el-form-item label="Train File Path">
               <el-input v-model="modelAdding.trainFilePath"></el-input>
+            </el-form-item>
+            <el-form-item label="Labels Path">
+              <el-input v-model="modelAdding.extractLabels"></el-input>
             </el-form-item>
             <el-form-item label="Figure Path">
               <el-input v-model="modelAdding.figurePath"></el-input>
@@ -277,6 +284,7 @@ export default {
         figurePath: "model.png",
         parameters: [], // 存储参数列表
         remark: "",
+        extractLabels: "",
       },
     };
   },
@@ -312,6 +320,7 @@ export default {
       formData.append('trainFilePath', data.trainFilePath);
       formData.append('figurePath', data.figurePath);
       formData.append('remark', data.remark);
+      formData.append('extractLabels', data.extractLabels);
       formData.append('defaultParameters', paramString);
       const response = await axios.post('api/models/addModel', formData);
       if (response.data.code === 1) {
@@ -345,6 +354,7 @@ export default {
       formData.append('trainFilePath', data.trainFilePath);
       formData.append('figurePath', data.figurePath);
       formData.append('remark', data.remark);
+      formData.append('extractLabels', data.extractLabels);
       formData.append('defaultParameters', paramString);
       const response = await axios.post('api/models/updateModel', formData);
       if (response.data.code === 1) {
@@ -360,6 +370,7 @@ export default {
       }
       this.editDialogVisible = false;
       this.fetchListData();
+      this.modelAddingReset();
     },
     modelAddingReset(){
       this.modelAdding.parameters = [];
@@ -370,6 +381,7 @@ export default {
       this.modelAdding.trainFilePath = "";
       this.modelAdding.figurePath = "model.png";
       this.modelAdding.remark = "";
+      this.modelAdding.extractLabels = "";
     },
     modelEditingReset(){
       this.selectedData = {}

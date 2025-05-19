@@ -138,7 +138,8 @@ const en = {
       train_file_path: "Training File Storage Path",
       figure_path: "Model Image Storage Path",
       default_parameters: "Default Parameters",
-      remark: "Remark"
+      remark: "Remark",
+      extract_labels: "Extract Labels"
     },
     user: {
       user_id: "User ID",
