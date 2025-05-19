@@ -22,6 +22,15 @@ const en = {
   Create: 'CreateCompany',
   Add: 'Add',
 
+  modelPage:{
+    SingleModality: "Single",
+    MultiModality: "Multi",
+    Denoising: "Denoising",
+    MyModels: "My Models",
+    Models: "Models",
+    ModelImage: "Model Image",
+    View: "View",
+  },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
     AutoProgress: "Auto Progress",
@@ -217,6 +226,7 @@ const en = {
     
     Applications: 'Applications',
     WorkSpace: 'Work Space',
+    ModelMarket: "Model Market",
     Upload: 'Upload',
     Virtualization: 'Virtualization',
     Feedback: 'Feedback',

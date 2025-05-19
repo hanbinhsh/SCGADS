@@ -74,6 +74,12 @@ const routes = [
     meta: { title: 'Feedback', requiresLogin:true }
   },
   {
+    path: '/ModelMarket',
+    name: 'ModelMarket',
+    component: () => import('../views/ModelMarket.vue'),
+    meta: { title: 'ModelMarket', requiresLogin:true }
+  },
+  {
     path: '/ManageFeedback',
     name: 'ManageFeedback',
     component: () => import('../views/ManageFeedback.vue'),

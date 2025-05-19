@@ -22,6 +22,15 @@ const zh =  {
   Create: '新建公司',
   Add: '添加',
 
+  modelPage:{
+    SingleModality: "单模态模型",
+    MultiModality: "多模态模型",
+    Denoising: "降噪模型",
+    MyModels: "我的模型",
+    Models: "模型",
+    ModelImage: "模型图",
+    View: "查看",
+  },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
     AutoProgress: "自动处理",
@@ -217,6 +226,7 @@ const zh =  {
     
     Applications: '应用',
     WorkSpace: '仪表盘',
+    ModelMarket: "模型市场",
     Upload: '上传任务',
     Virtualization: '数据可视化',
     Feedback: '反馈',
