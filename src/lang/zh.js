@@ -21,6 +21,7 @@ const zh =  {
   Reset: '重置',
   Create: '新建公司',
   Add: '添加',
+  Close: "关闭",
 
   modelPage:{
     SingleModality: "单模态模型",
@@ -30,6 +31,17 @@ const zh =  {
     Models: "模型",
     ModelImage: "模型图",
     View: "查看",
+    SingleModalityModels: "单模态模型",
+    MultiModalityModels: "多模态模型",
+    DenoisingModels: "降噪模型",
+    NoModelsFound: "未找到模型",
+    UploadModel: "上传模型",
+    Details: "详情",
+    ModelType: "模型类型",
+    DefaultParameters: "模型参数",
+    Remark: "备注",
+    Image: "模型图",
+    SearchModels: "查找模型",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
@@ -148,7 +160,10 @@ const zh =  {
       figure_path: "模型图存储路径",
       default_parameters: "默认参数",
       remark: "备注",
-      extract_labels: "标签映射"
+      extract_labels: "标签映射",
+      user_name: "上传者",
+      company_name: "公司",
+      created_time: "上传时间"
     },
     user: {
       user_id: "用户ID",

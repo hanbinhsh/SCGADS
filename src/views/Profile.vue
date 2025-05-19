@@ -33,7 +33,7 @@
             <input type="file" ref="fileInput" style="display: none;" @change="handleFileChange" />
           </el-form-item>
           <el-form-item :label="$t('UserName')">
-            <el-input v-model="User.userName"></el-input>
+            <el-input v-model="User.userName" disabled="true"></el-input>
           </el-form-item>
           <el-form-item :label="$t('Password')">
             <el-input v-model="User.psw" type="password" show-password :placeholder="$t('Enternewpassword')"></el-input>

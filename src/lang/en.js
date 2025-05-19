@@ -21,6 +21,7 @@ const en = {
   Reset: 'Reset',
   Create: 'CreateCompany',
   Add: 'Add',
+  Close: "Close",
 
   modelPage:{
     SingleModality: "Single",
@@ -30,6 +31,17 @@ const en = {
     Models: "Models",
     ModelImage: "Model Image",
     View: "View",
+    SingleModalityModels: "Single Modality Models",
+    MultiModalityModels: "Multi Modality Models",
+    DenoisingModels: "Denoising Models",
+    NoModelsFound: "No Models Found",
+    UploadModel: "Upload Model",
+    Details: "Details",
+    ModelType: "ModelType",
+    DefaultParameters: "Parameters",
+    Remark: "Remark",
+    Image: "Image",
+    SearchModels: "Search Models",
   },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
@@ -148,7 +160,10 @@ const en = {
       figure_path: "Model Image Storage Path",
       default_parameters: "Default Parameters",
       remark: "Remark",
-      extract_labels: "Extract Labels"
+      extract_labels: "Extract Labels",
+      user_name: "Uploader name",
+      company_name: "Company Name",
+      created_time: "Upload Time"
     },
     user: {
       user_id: "User ID",

@@ -20,6 +20,9 @@
         <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
         <el-table-column prop="extractLabels" :label="$t('database.models.extract_labels')" sortable></el-table-column>
         <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
+        <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable></el-table-column>
+        <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable></el-table-column>
+        <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable></el-table-column>
         <el-table-column prop="remark" :label="$t('database.models.remark')" sortable></el-table-column>
         <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
           <template #default="{ row }">
@@ -113,6 +116,12 @@
             <el-form-item label="Figure Path">
               <el-input v-model="selectedData.figurePath"></el-input>
             </el-form-item>
+            <el-form-item :label="$t('database.models.user_name')">
+              <el-input v-model="selectedData.userName"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('database.models.company_name')">
+              <el-input v-model="selectedData.companyName"></el-input>
+            </el-form-item>
             <el-form-item label="Remark">
               <el-input v-model="selectedData.remark"></el-input>
             </el-form-item>
@@ -180,6 +189,12 @@
             </el-form-item>
             <el-form-item label="Figure Path">
               <el-input v-model="modelAdding.figurePath"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('database.models.user_name')">
+              <el-input v-model="modelAdding.userName"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('database.models.company_name')">
+              <el-input v-model="modelAdding.companyName"></el-input>
             </el-form-item>
             <el-form-item label="Remark">
               <el-input v-model="modelAdding.remark"></el-input>
@@ -285,6 +300,8 @@ export default {
         parameters: [], // 存储参数列表
         remark: "",
         extractLabels: "",
+        companyName: "",
+        userName: "",
       },
     };
   },

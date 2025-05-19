@@ -83,6 +83,10 @@
                     <el-icon><View /></el-icon>
                     {{ $t('modelPage.View') }}
                   </el-button>
+                  <el-button type="success" size="small" @click="viewModelImage(model)">
+                    <el-icon><View /></el-icon>
+                    {{ $t('modelPage.Image') }}
+                  </el-button>
                   <el-button 
                     type="warning" 
                     size="small" 
@@ -140,22 +144,38 @@
     </el-main>
   </div>
 
+  <el-dialog v-model="showModelImage" :title="selectedModel.modelName" width="550px" align-center>
+    <div class="model-details-image">
+      <img :src="`data:image/png;base64,${selectedModel.figureByte}`" alt="Model Figure" />
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showModelImage = false">{{ $t('Close') }}</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
   <!-- Model Details Dialog -->
-  <el-dialog v-model="showModelDetails" :title="selectedModel.modelName" width="70%" align-center>
-    <div class="model-details-container">
-      <div class="model-details-image">
-        <img :src="`data:image/png;base64,${selectedModel.figureByte}`" alt="Model Figure" />
-      </div>
-      <div class="model-details-info">
-        <h3>{{ $t('modelPage.Details') }}</h3>
-        <el-descriptions :column="1" border>
-          <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedModel.modelType) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('modelPage.Uploader')">{{ selectedModel.uploaderName }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('modelPage.UploadDate')">{{ formatDate(selectedModel.createdAt) }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('modelPage.DefaultParameters')">{{ selectedModel.defaultParameters }}</el-descriptions-item>
-          <el-descriptions-item :label="$t('modelPage.Description')">{{ selectedModel.remark }}</el-descriptions-item>
-        </el-descriptions>
-      </div>
+  <el-dialog v-model="showModelDetails" :title="selectedModel.modelName" width="550px" align-center>
+    <div class="model-details-info" style="width: 100%;">
+      <el-descriptions :column="1" border>
+        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedModel.modelType) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedModel.userName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedModel.companyName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedModel.createdTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.Remark')">{{ selectedModel.remark }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.DefaultParameters')">
+          <el-scrollbar max-height="150px">
+            <el-row v-for="(param, index) in (selectedModel.defaultParameters || '').split(',')" :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
+        </el-descriptions-item>
+      </el-descriptions>
     </div>
     <template #footer>
       <div class="dialog-footer">
@@ -186,7 +206,7 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item :label="$t('modelPage.Description')" prop="remark">
+      <el-form-item :label="$t('modelPage.Remark')" prop="remark">
         <el-input v-model="modelForm.remark" type="textarea" :rows="3" />
       </el-form-item>
       
@@ -251,7 +271,7 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item :label="$t('modelPage.Description')" prop="remark">
+      <el-form-item :label="$t('modelPage.Remark')" prop="remark">
         <el-input v-model="editModelForm.remark" type="textarea" :rows="3" />
       </el-form-item>
       
@@ -334,6 +354,7 @@ export default {
       showUploadDialog: false,
       showEditDialog: false,
       showPreviewDialog: false,
+      showModelImage: false,
       
       // Selected model for details view
       selectedModel: {},
@@ -430,8 +451,8 @@ export default {
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
         result = result.filter(model => 
-          model.modelName.toLowerCase().includes(query) ||
-          model.remark.toLowerCase().includes(query)
+          model.modelName?.toLowerCase().includes(query) ||
+          model.remark?.toLowerCase().includes(query)
         );
       }
       
@@ -472,6 +493,11 @@ export default {
     viewModelDetails(model) {
       this.selectedModel = { ...model };
       this.showModelDetails = true;
+    },
+
+    viewModelImage(model) {
+      this.selectedModel = { ...model };
+      this.showModelImage = true;
     },
     
     // Edit model
@@ -754,6 +780,10 @@ onUnmounted(() => {
   color: #303133;
 }
 
+.dark-mode .page-header h2 {
+  color: #fff;
+}
+
 .header-actions {
   display: flex;
   gap: 12px;
@@ -817,6 +847,10 @@ onUnmounted(() => {
   color: #303133;
 }
 
+.dark-mode .model-info h3 {
+  color: #fff;
+}
+
 .model-type {
   color: #409EFF;
   font-size: 14px;
@@ -829,6 +863,10 @@ onUnmounted(() => {
   margin-bottom: 16px;
   height: 60px;
   overflow: hidden;
+}
+
+.dark-mode .model-description {
+  color: #eee;
 }
 
 .model-actions {
@@ -854,22 +892,9 @@ onUnmounted(() => {
   margin-bottom: 24px;
 }
 
-/* Model Details Dialog */
-.model-details-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-@media (min-width: 768px) {
-  .model-details-container {
-    flex-direction: row;
-  }
-}
-
 .model-details-image {
   flex: 0 0 40%;
-  max-width: 400px;
+  max-width: 550px;
 }
 
 .model-details-image img {
@@ -877,10 +902,6 @@ onUnmounted(() => {
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.model-details-info {
-  flex: 1;
 }
 
 .model-details-info h3 {
@@ -968,5 +989,13 @@ onUnmounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.param-tag {
+  margin: 2px 0;
+}
+
+.el-scrollbar__view .el-row{
+  margin-bottom: 0;
 }
 </style>
