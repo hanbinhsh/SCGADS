@@ -8,7 +8,7 @@
           <ArrowLeft />
         </el-icon>
       </div>
-      <el-menu :default-active="activeTask" class="task-menu" @select="handleMenuSelect" mode="vertical" :collapse="isCollapsed">
+      <el-menu :default-active="activeMenu" class="task-menu" @select="handleMenuSelect" mode="vertical" :collapse="isCollapsed">
         <el-menu-item index="feedback">
           <font-awesome-icon :icon="['fas', 'message']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('feedback.sendfeedback') }}</span>
@@ -21,7 +21,7 @@
     </el-aside>
     <!-- 移动端侧边栏（顶部水平菜单） -->
     <el-header class="mobile-nav animate__animated animate__fadeInDown" v-if="isMobile">
-      <el-menu :default-active="activeTask" class="task-menu" @select="handleMenuSelect" mode="horizontal">
+      <el-menu :default-active="activeMenu" class="task-menu" @select="handleMenuSelect" mode="horizontal">
         <el-menu-item index="feedback">
           <font-awesome-icon :icon="['fas', 'message']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('feedback.sendfeedback') }}</span>
