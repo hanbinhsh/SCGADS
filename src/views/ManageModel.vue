@@ -292,14 +292,14 @@ export default {
       
       modelAdding: {
         modelName: "",
-        modelType: "",
+        modelType: "single",
         modelPath: "",
-        predictFilePath: "",
-        trainFilePath: "",
+        predictFilePath: "pred.py",
+        trainFilePath: "train.py",
         figurePath: "model.png",
         parameters: [], // 存储参数列表
         remark: "",
-        extractLabels: "",
+        extractLabels: "extract_labels.csv",
         companyName: "",
         userName: "",
       },
@@ -339,6 +339,8 @@ export default {
       formData.append('remark', data.remark);
       formData.append('extractLabels', data.extractLabels);
       formData.append('defaultParameters', paramString);
+      formData.append('companyName', data.companyName);
+      formData.append('userName', data.userName);
       const response = await axios.post('api/models/addModel', formData);
       if (response.data.code === 1) {
         ElMessage({
@@ -373,6 +375,8 @@ export default {
       formData.append('remark', data.remark);
       formData.append('extractLabels', data.extractLabels);
       formData.append('defaultParameters', paramString);
+      formData.append('companyName', data.companyName);
+      formData.append('userName', data.userName);
       const response = await axios.post('api/models/updateModel', formData);
       if (response.data.code === 1) {
         ElMessage({
@@ -392,13 +396,15 @@ export default {
     modelAddingReset(){
       this.modelAdding.parameters = [];
       this.modelAdding.modelName = "";
-      this.modelAdding.modelType = "";
+      this.modelAdding.modelType = "single";
       this.modelAdding.modelPath = "";
-      this.modelAdding.predictFilePath = "";
-      this.modelAdding.trainFilePath = "";
+      this.modelAdding.predictFilePath = "pred.py";
+      this.modelAdding.trainFilePath = "train.py";
       this.modelAdding.figurePath = "model.png";
       this.modelAdding.remark = "";
-      this.modelAdding.extractLabels = "";
+      this.modelAdding.extractLabels = "extract_labels.csv";
+      this.modelAdding.companyName = "";
+      this.modelAdding.userName = "";
     },
     modelEditingReset(){
       this.selectedData = {}
@@ -421,18 +427,29 @@ export default {
       const base64Image = `data:image/png;base64,${data.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
       this.figure = base64Image;
     },
-    paramTrans(data){
-      const paramArray = data.defaultParameters.split(',').map(param => {
-      const [key, value] = param.split(':');
-      return {
-          name: key.trim(),
-          value: isNaN(value) ? value.trim() : parseFloat(value)
-        };
-      });
+    paramTrans(data) {
+      if (!data || !data.defaultParameters) {
+        this.parameters = [];
+        return;
+      }
+
+      const paramArray = data.defaultParameters
+        .split(',')
+        .map(param => {
+          const [key, value] = param.split(':');
+          if (!key || !value) return null; // 忽略无效项
+          return {
+            name: key.trim(),
+            value: isNaN(value) ? value.trim() : parseFloat(value)
+          };
+        })
+        .filter(p => p !== null); // 过滤掉不合法的
+
       this.parameters = paramArray;
       this.selectedData = JSON.parse(JSON.stringify(data)); // 防止表单不更新
       this.selectedDataDefault = data;
     },
+
     handleSelectionChange(data) {
       this.selectedDatas = data;
     },
