@@ -192,67 +192,18 @@
   </el-dialog>
 
   <!-- 修改对话框 -->
-  <el-dialog v-model="showEditDialog" title="Edit Model" width="700px" align-center>
+  <el-dialog v-model="showEditDialog" title="Edit Model" width="500px" align-center>
     <!-- 添加提示信息 -->
-    <div class="card-alart">
-      Note: Upload the models into the algorithm folder of back-end.
-    </div>
     <el-form :model="selectedData" label-width="120px" label-position="left">
       <div style="display: flex; gap: 20px;">
         <!-- 左侧：现有输入框 -->
         <div style="flex: 1;">
           <el-form-item label="Model Name">
-            <el-input v-model="selectedData.modelName"></el-input>
-          </el-form-item>
-          <el-form-item label="Model Type">
-            <el-select v-model="selectedData.modelType">
-              <el-option label="Single-omic Annotation" value="single" />
-              <el-option label="Multi-omics Annotation" value="multi" />
-              <el-option label="Denoising" value="deno" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Model Path">
-            <el-input v-model="selectedData.modelPath"></el-input>
-          </el-form-item>
-          <el-form-item label="Predict File Path">
-            <el-input v-model="selectedData.predictFilePath"></el-input>
-          </el-form-item>
-          <el-form-item label="Train File Path">
-            <el-input v-model="selectedData.trainFilePath"></el-input>
-          </el-form-item>
-          <el-form-item label="Labels Path">
-            <el-input v-model="selectedData.extractLabels"></el-input>
-          </el-form-item>
-          <el-form-item label="Figure Path">
-            <el-input v-model="selectedData.figurePath"></el-input>
-          </el-form-item>
-          <el-form-item :label="$t('database.models.user_name')">
-            <el-input v-model="selectedData.userName"></el-input>
-          </el-form-item>
-          <el-form-item :label="$t('database.models.company_name')">
-            <el-input v-model="selectedData.companyName"></el-input>
+            <el-input v-model="selectedData.modelName" disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="Remark">
             <el-input v-model="selectedData.remark"></el-input>
           </el-form-item>
-        </div>
-
-        <!-- 右侧：参数输入框 -->
-        <div style="flex: 1; border-left: 1px solid #ddd; padding-left: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: bold;">Parameters</span>
-            <el-button type="primary" icon="plus" @click="addEditingParameter">Add</el-button>
-          </div>
-          <div style="max-height: 500px; overflow-y: auto; margin-top: 10px;">
-            <el-form-item v-for="(param, index) in parameters" :key="index" label-width="0px">
-              <div style="display: flex; align-items: center; width: 100%;">
-                <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
-                <el-input v-model="param.name" placeholder="Parameter" style="width: 45%;"></el-input>
-                <el-input v-model="param.value" placeholder="Default Value" style="width: 45%; margin-left: 10px;"></el-input>
-                <el-button type="danger" icon="delete" @click="removeEditingParameter(index)" style="margin-left: 10px;"></el-button>
-              </div>
-            </el-form-item>
-          </div>
         </div>
       </div>
     </el-form>
@@ -307,7 +258,6 @@ export default {
       
       // 模型编辑
       selectedData: {},
-      parameters: [], // 选中的模型参数
       
       // Form validation rules
       modelFormRules: {
@@ -338,40 +288,17 @@ export default {
         return;
       }
       this.selectedData = model;
-      this.paramTrans(model)
       this.showEditDialog = true;
-    },
-    addEditingParameter() {
-      this.parameters.push({ name: "", value: "" });
-    },
-    removeEditingParameter(index) {
-      this.parameters.splice(index, 1);
     },
     modelEditingReset(){
       this.selectedData = {}
-      this.paramTrans(this.selectedDataDefault)
     },
     async modelEditingSave() {
       const formData = new FormData();
       const data = this.selectedData;
-      const paramString = this.parameters.map(param => {
-        // 如果值是数字，不需要转换，否则使用 toString()
-        const value = typeof param.value === 'number' ? param.value : param.value.toString();
-        return `${param.name}:${value}`;
-      }).join(',');
       formData.append('modelId', data.modelId);
-      formData.append('modelName', data.modelName);
-      formData.append('modelType', data.modelType);
-      formData.append('modelPath', data.modelPath);
-      formData.append('predictFilePath', data.predictFilePath);
-      formData.append('trainFilePath', data.trainFilePath);
-      formData.append('figurePath', data.figurePath);
       formData.append('remark', data.remark);
-      formData.append('extractLabels', data.extractLabels);
-      formData.append('defaultParameters', paramString);
-      formData.append('companyName', data.companyName);
-      formData.append('userName', data.userName);
-      const response = await axios.post('api/models/updateModel', formData);
+      const response = await axios.post('api/models/updateModelRemark', formData);
       if (response.data.code === 1) {
         ElMessage({
           message: 'Model update successfully',
@@ -386,29 +313,6 @@ export default {
       this.showEditDialog = false;
       this.fetchModels();
     },
-    paramTrans(data) {
-      if (!data || !data.defaultParameters) {
-        this.parameters = [];
-        return;
-      }
-
-      const paramArray = data.defaultParameters
-        .split(',')
-        .map(param => {
-          const [key, value] = param.split(':');
-          if (!key || !value) return null; // 忽略无效项
-          return {
-            name: key.trim(),
-            value: isNaN(value) ? value.trim() : parseFloat(value)
-          };
-        })
-        .filter(p => p !== null); // 过滤掉不合法的
-
-      this.parameters = paramArray;
-      this.selectedData = JSON.parse(JSON.stringify(data)); // 防止表单不更新
-      this.selectedDataDefault = data;
-    },
-
 
 
     goToUpload() {

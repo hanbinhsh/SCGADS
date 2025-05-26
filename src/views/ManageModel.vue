@@ -15,11 +15,6 @@
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable></el-table-column>
         <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable></el-table-column>
-        <!-- <el-table-column prop="modelPath" :label="$t('database.models.model_path')" sortable></el-table-column>
-        <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
-        <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
-        <el-table-column prop="extractLabels" :label="$t('database.models.extract_labels')" sortable></el-table-column>
-        <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column> -->
         <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable></el-table-column>
         <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable></el-table-column>
         <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable></el-table-column>
