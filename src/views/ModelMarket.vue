@@ -83,10 +83,6 @@
                     <el-icon><View /></el-icon>
                     {{ $t('modelPage.View') }}
                   </el-button>
-                  <el-button type="success" size="small" @click="viewModelImage(model)">
-                    <el-icon><View /></el-icon>
-                    {{ $t('modelPage.Image') }}
-                  </el-button>
                   <el-button 
                     type="warning" 
                     size="small" 
@@ -95,6 +91,10 @@
                     v-if="activeModelType === 'myModels' || isUserModel(model)">
                     <el-icon><Edit /></el-icon>
                     {{ $t('modelPage.Edit') }}
+                  </el-button>
+                  <el-button type="success" size="small" @click="viewModelImage(model)">
+                    <el-icon><View /></el-icon>
+                    {{ $t('modelPage.Image') }}
                   </el-button>
                 </div>
               </div>
@@ -105,7 +105,7 @@
         <!-- Empty State -->
         <div v-if="filteredModels.length === 0" class="empty-state animate__animated animate__fadeIn">
           <el-empty :description="$t('modelPage.NoModelsFound')">
-            <el-button type="primary" @click="showUploadDialog = true">{{ $t('modelPage.UploadModel') }}</el-button>
+            <el-button type="primary" @click="goToUpload">{{ $t('modelPage.UploadModel') }}</el-button>
           </el-empty>
         </div>
 
@@ -135,7 +135,7 @@
               @input="handleSearch"
               class="search-input"
             />&nbsp;&nbsp;&nbsp;
-            <el-button type="primary" @click="showUploadDialog = true">
+            <el-button type="primary" @click="goToUpload">
               <el-icon><Upload /></el-icon>
               {{ $t('modelPage.UploadModel') }}
             </el-button>
@@ -144,9 +144,9 @@
     </el-main>
   </div>
 
-  <el-dialog v-model="showModelImage" :title="selectedModel.modelName" width="550px" align-center>
+  <el-dialog v-model="showModelImage" :title="selectedData.modelName" width="550px" align-center>
     <div class="model-details-image">
-      <img :src="`data:image/png;base64,${selectedModel.figureByte}`" alt="Model Figure" />
+      <img :src="`data:image/png;base64,${selectedData.figureByte}`" alt="Model Figure" />
     </div>
     <template #footer>
       <div class="dialog-footer">
@@ -156,17 +156,17 @@
   </el-dialog>
 
   <!-- Model Details Dialog -->
-  <el-dialog v-model="showModelDetails" :title="selectedModel.modelName" width="550px" align-center>
+  <el-dialog v-model="showModelDetails" :title="selectedData.modelName" width="550px" align-center>
     <div class="model-details-info" style="width: 100%;">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedModel.modelType) }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedModel.userName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedModel.companyName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedModel.createdTime }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('modelPage.Remark')">{{ selectedModel.remark }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedData.modelType) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedData.companyName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedData.createdTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.Remark')">{{ selectedData.remark }}</el-descriptions-item>
         <el-descriptions-item :label="$t('modelPage.DefaultParameters')">
           <el-scrollbar max-height="150px">
-            <el-row v-for="(param, index) in (selectedModel.defaultParameters || '').split(',')" :key="index">
+            <el-row v-for="(param, index) in (selectedData.defaultParameters || '').split(',')" :key="index">
               <el-col :span="24">
                 <el-tag type="info" class="param-tag">
                   {{ param.trim() }}
@@ -182,136 +182,87 @@
         <el-button @click="showModelDetails = false">{{ $t('Close') }}</el-button>
         <el-button 
           type="warning" 
-          @click="editModel(selectedModel)" 
-          :disabled="!isUserModel(selectedModel)" 
-          v-if="isUserModel(selectedModel)">
+          @click="editModel(selectedData)" 
+          :disabled="!isUserModel(selectedData)" 
+          v-if="isUserModel(selectedData)">
           {{ $t('modelPage.Edit') }}
         </el-button>
       </div>
     </template>
   </el-dialog>
 
-  <!-- Upload Model Dialog -->
-  <el-dialog v-model="showUploadDialog" :title="$t('modelPage.UploadModel')" width="70%" align-center>
-    <el-form :model="modelForm" label-width="120px" :rules="modelFormRules" ref="modelFormRef">
-      <el-form-item :label="$t('modelPage.ModelName')" prop="modelName">
-        <el-input v-model="modelForm.modelName" />
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.ModelType')" prop="modelType">
-        <el-select v-model="modelForm.modelType" class="full-width">
-          <el-option label="Single Modality" value="single" />
-          <el-option label="Multi Modality" value="multi" />
-          <el-option label="Denoising" value="deno" />
-        </el-select>
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.Remark')" prop="remark">
-        <el-input v-model="modelForm.remark" type="textarea" :rows="3" />
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.Parameters')" prop="defaultParameters">
-        <el-input v-model="modelForm.defaultParameters" type="textarea" :rows="2" placeholder="param1:value1,param2:value2,..." />
-        <div class="form-hint">{{ $t('modelPage.ParametersHint') }}</div>
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.ModelFile')" prop="modelFile">
-        <el-upload
-          class="model-upload"
-          drag
-          action=""
-          :limit="1"
-          :auto-upload="false"
-          :on-change="handleModelFileChange">
-          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">{{ $t('modelPage.DropFileHere') }} <em>{{ $t('modelPage.ClickToUpload') }}</em></div>
-          <template #tip>
-            <div class="el-upload__tip">{{ $t('modelPage.ModelFileTypes') }}</div>
-          </template>
-        </el-upload>
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.ModelImage')" prop="figureFile">
-        <el-upload
-          class="image-upload"
-          drag
-          action=""
-          :limit="1"
-          :auto-upload="false"
-          :on-change="handleImageFileChange"
-          :on-preview="handlePreview">
-          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">{{ $t('modelPage.DropImageHere') }} <em>{{ $t('modelPage.ClickToUpload') }}</em></div>
-          <template #tip>
-            <div class="el-upload__tip">{{ $t('modelPage.ImageFileTypes') }}</div>
-          </template>
-        </el-upload>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="cancelUpload">{{ $t('Cancel') }}</el-button>
-        <el-button type="primary" @click="submitModelUpload">{{ $t('Confirm') }}</el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-  <!-- Edit Model Dialog -->
-  <el-dialog v-model="showEditDialog" :title="$t('modelPage.EditModel')" width="70%" align-center>
-    <el-form :model="editModelForm" label-width="120px" :rules="modelFormRules" ref="editModelFormRef">
-      <el-form-item :label="$t('modelPage.ModelName')" prop="modelName">
-        <el-input v-model="editModelForm.modelName" />
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.ModelType')" prop="modelType">
-        <el-select v-model="editModelForm.modelType" class="full-width" disabled>
-          <el-option label="Single Modality" value="single" />
-          <el-option label="Multi Modality" value="multi" />
-          <el-option label="Denoising" value="deno" />
-        </el-select>
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.Remark')" prop="remark">
-        <el-input v-model="editModelForm.remark" type="textarea" :rows="3" />
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.Parameters')" prop="defaultParameters">
-        <el-input v-model="editModelForm.defaultParameters" type="textarea" :rows="2" placeholder="param1:value1,param2:value2,..." />
-        <div class="form-hint">{{ $t('modelPage.ParametersHint') }}</div>
-      </el-form-item>
-      
-      <el-form-item :label="$t('modelPage.ModelImage')">
-        <div class="current-image" v-if="editModelForm.figureByte">
-          <img :src="`data:image/png;base64,${editModelForm.figureByte}`" alt="Current Model Image" class="edit-preview-image" />
-        </div>
-        <el-upload
-          class="image-upload"
-          drag
-          action=""
-          :limit="1"
-          :auto-upload="false"
-          :on-change="handleEditImageFileChange">
-          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">{{ $t('modelPage.UpdateImageHere') }} <em>{{ $t('modelPage.ClickToUpload') }}</em></div>
-          <template #tip>
-            <div class="el-upload__tip">{{ $t('modelPage.ImageFileTypes') }}</div>
-          </template>
-        </el-upload>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="cancelEdit">{{ $t('Cancel') }}</el-button>
-        <el-button type="primary" @click="submitModelEdit">{{ $t('Confirm') }}</el-button>
-      </div>
-    </template>
-  </el-dialog>
-
-  <!-- Image Preview Dialog -->
-  <el-dialog v-model="showPreviewDialog" :title="$t('modelPage.ImagePreview')">
-    <div class="preview-container">
-      <img :src="previewImage" alt="Preview" class="preview-image" />
+  <!-- 修改对话框 -->
+  <el-dialog v-model="showEditDialog" title="Edit Model" width="700px" align-center>
+    <!-- 添加提示信息 -->
+    <div class="card-alart">
+      Note: Upload the models into the algorithm folder of back-end.
     </div>
+    <el-form :model="selectedData" label-width="120px" label-position="left">
+      <div style="display: flex; gap: 20px;">
+        <!-- 左侧：现有输入框 -->
+        <div style="flex: 1;">
+          <el-form-item label="Model Name">
+            <el-input v-model="selectedData.modelName"></el-input>
+          </el-form-item>
+          <el-form-item label="Model Type">
+            <el-select v-model="selectedData.modelType">
+              <el-option label="Single-omic Annotation" value="single" />
+              <el-option label="Multi-omics Annotation" value="multi" />
+              <el-option label="Denoising" value="deno" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Model Path">
+            <el-input v-model="selectedData.modelPath"></el-input>
+          </el-form-item>
+          <el-form-item label="Predict File Path">
+            <el-input v-model="selectedData.predictFilePath"></el-input>
+          </el-form-item>
+          <el-form-item label="Train File Path">
+            <el-input v-model="selectedData.trainFilePath"></el-input>
+          </el-form-item>
+          <el-form-item label="Labels Path">
+            <el-input v-model="selectedData.extractLabels"></el-input>
+          </el-form-item>
+          <el-form-item label="Figure Path">
+            <el-input v-model="selectedData.figurePath"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('database.models.user_name')">
+            <el-input v-model="selectedData.userName"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('database.models.company_name')">
+            <el-input v-model="selectedData.companyName"></el-input>
+          </el-form-item>
+          <el-form-item label="Remark">
+            <el-input v-model="selectedData.remark"></el-input>
+          </el-form-item>
+        </div>
+
+        <!-- 右侧：参数输入框 -->
+        <div style="flex: 1; border-left: 1px solid #ddd; padding-left: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold;">Parameters</span>
+            <el-button type="primary" icon="plus" @click="addEditingParameter">Add</el-button>
+          </div>
+          <div style="max-height: 500px; overflow-y: auto; margin-top: 10px;">
+            <el-form-item v-for="(param, index) in parameters" :key="index" label-width="0px">
+              <div style="display: flex; align-items: center; width: 100%;">
+                <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
+                <el-input v-model="param.name" placeholder="Parameter" style="width: 45%;"></el-input>
+                <el-input v-model="param.value" placeholder="Default Value" style="width: 45%; margin-left: 10px;"></el-input>
+                <el-button type="danger" icon="delete" @click="removeEditingParameter(index)" style="margin-left: 10px;"></el-button>
+              </div>
+            </el-form-item>
+          </div>
+        </div>
+      </div>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showEditDialog = false; modelEditingReset()">{{ $t('Cancel') }}</el-button>
+        <el-button type="warning" @click="modelEditingReset()">{{ $t('Reset') }}</el-button>
+        <el-button type="primary" @click="modelEditingSave()">{{ $t('Save') }}</el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 
@@ -343,7 +294,7 @@ export default {
       // Model data
       models: [],
       filteredModels: [],
-      activeModelType: 'single', // Default selected model type
+      activeModelType: 'single',
       searchQuery: '',
       currentPage: 1,
       pageSize: 8,
@@ -351,34 +302,12 @@ export default {
       
       // Dialogs
       showModelDetails: false,
-      showUploadDialog: false,
       showEditDialog: false,
-      showPreviewDialog: false,
       showModelImage: false,
       
-      // Selected model for details view
-      selectedModel: {},
-      
-      // Upload form
-      modelForm: {
-        modelName: '',
-        modelType: 'single',
-        remark: '',
-        defaultParameters: '',
-        modelFile: null,
-        figureFile: null
-      },
-      
-      // Edit form
-      editModelForm: {
-        modelId: '',
-        modelName: '',
-        modelType: '',
-        remark: '',
-        defaultParameters: '',
-        figureByte: '',
-        newFigureFile: null
-      },
+      // 模型编辑
+      selectedData: {},
+      parameters: [], // 选中的模型参数
       
       // Form validation rules
       modelFormRules: {
@@ -402,6 +331,90 @@ export default {
     };
   },
   methods: {
+    // 模型修改
+    editModel(model) {
+      if (!this.isUserModel(model)) {
+        ElMessage.warning('You can only edit your own models');
+        return;
+      }
+      this.selectedData = model;
+      this.paramTrans(model)
+      this.showEditDialog = true;
+    },
+    addEditingParameter() {
+      this.parameters.push({ name: "", value: "" });
+    },
+    removeEditingParameter(index) {
+      this.parameters.splice(index, 1);
+    },
+    modelEditingReset(){
+      this.selectedData = {}
+      this.paramTrans(this.selectedDataDefault)
+    },
+    async modelEditingSave() {
+      const formData = new FormData();
+      const data = this.selectedData;
+      const paramString = this.parameters.map(param => {
+        // 如果值是数字，不需要转换，否则使用 toString()
+        const value = typeof param.value === 'number' ? param.value : param.value.toString();
+        return `${param.name}:${value}`;
+      }).join(',');
+      formData.append('modelId', data.modelId);
+      formData.append('modelName', data.modelName);
+      formData.append('modelType', data.modelType);
+      formData.append('modelPath', data.modelPath);
+      formData.append('predictFilePath', data.predictFilePath);
+      formData.append('trainFilePath', data.trainFilePath);
+      formData.append('figurePath', data.figurePath);
+      formData.append('remark', data.remark);
+      formData.append('extractLabels', data.extractLabels);
+      formData.append('defaultParameters', paramString);
+      formData.append('companyName', data.companyName);
+      formData.append('userName', data.userName);
+      const response = await axios.post('api/models/updateModel', formData);
+      if (response.data.code === 1) {
+        ElMessage({
+          message: 'Model update successfully',
+          type: 'success',
+        });
+      } else {
+        ElMessage({
+          message: 'Failed to update Model',
+          type: 'error',
+        });
+      }
+      this.showEditDialog = false;
+      this.fetchModels();
+    },
+    paramTrans(data) {
+      if (!data || !data.defaultParameters) {
+        this.parameters = [];
+        return;
+      }
+
+      const paramArray = data.defaultParameters
+        .split(',')
+        .map(param => {
+          const [key, value] = param.split(':');
+          if (!key || !value) return null; // 忽略无效项
+          return {
+            name: key.trim(),
+            value: isNaN(value) ? value.trim() : parseFloat(value)
+          };
+        })
+        .filter(p => p !== null); // 过滤掉不合法的
+
+      this.parameters = paramArray;
+      this.selectedData = JSON.parse(JSON.stringify(data)); // 防止表单不更新
+      this.selectedDataDefault = data;
+    },
+
+
+
+    goToUpload() {
+      this.$router.push('/upload');
+    },
+
     // Sidebar methods
     toggleSidebar() {
       this.isCollapsed = !this.isCollapsed;
@@ -439,7 +452,7 @@ export default {
       if (this.activeModelType === 'myModels') {
         const userData = JSON.parse(sessionStorage.getItem('userData'));
         if (userData) {
-          result = result.filter(model => model.uploaderId === userData.userId);
+          result = result.filter(model => model.userName === userData.userName);
         } else {
           result = [];
         }
@@ -491,54 +504,19 @@ export default {
     
     // View model details
     viewModelDetails(model) {
-      this.selectedModel = { ...model };
+      this.selectedData = { ...model };
       this.showModelDetails = true;
     },
 
     viewModelImage(model) {
-      this.selectedModel = { ...model };
+      this.selectedData = { ...model };
       this.showModelImage = true;
-    },
-    
-    // Edit model
-    editModel(model) {
-      if (!this.isUserModel(model)) {
-        ElMessage.warning('You can only edit your own models');
-        return;
-      }
-      
-      this.editModelForm = {
-        modelId: model.modelId,
-        modelName: model.modelName,
-        modelType: model.modelType,
-        remark: model.remark,
-        defaultParameters: model.defaultParameters,
-        figureByte: model.figureByte,
-        newFigureFile: null
-      };
-      
-      this.showEditDialog = true;
     },
     
     // Check if model belongs to current user
     isUserModel(model) {
       const userData = JSON.parse(sessionStorage.getItem('userData'));
-      return userData && model.uploaderId === userData.userId;
-    },
-    
-    // Upload handlers
-    handleModelFileChange(file) {
-      this.modelForm.modelFile = file.raw;
-    },
-    
-    handleImageFileChange(file) {
-      this.modelForm.figureFile = file.raw;
-      this.createPreviewImage(file.raw);
-    },
-    
-    handleEditImageFileChange(file) {
-      this.editModelForm.newFigureFile = file.raw;
-      this.createPreviewImage(file.raw);
+      return userData && model.userName === userData.userName;
     },
     
     createPreviewImage(file) {
@@ -547,135 +525,6 @@ export default {
         this.previewImage = e.target.result;
       };
       reader.readAsDataURL(file);
-    },
-    
-    handlePreview() {
-      if (this.previewImage) {
-        this.showPreviewDialog = true;
-      }
-    },
-    
-    // Submit model upload
-    async submitModelUpload() {
-      this.$refs.modelFormRef.validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-        
-        if (!this.modelForm.modelFile) {
-          ElMessage.error('Please upload model file');
-          return;
-        }
-        
-        if (!this.modelForm.figureFile) {
-          ElMessage.error('Please upload model image');
-          return;
-        }
-        
-        try {
-          this.loading = true;
-          
-          // Create form data
-          const formData = new FormData();
-          formData.append('modelName', this.modelForm.modelName);
-          formData.append('modelType', this.modelForm.modelType);
-          formData.append('remark', this.modelForm.remark);
-          formData.append('defaultParameters', this.modelForm.defaultParameters);
-          formData.append('modelFile', this.modelForm.modelFile);
-          formData.append('figureFile', this.modelForm.figureFile);
-          
-          // Get user ID from session
-          const userData = JSON.parse(sessionStorage.getItem('userData'));
-          formData.append('uploaderId', userData.userId);
-          
-          // Send request
-          const response = await axios.post('/api/models/uploadModel', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-          
-          if (response.data.code === 1) {
-            ElMessage.success('Model uploaded successfully');
-            this.showUploadDialog = false;
-            this.resetModelForm();
-            this.fetchModels(); // Refresh the model list
-          } else {
-            ElMessage.error(response.data.message || 'Failed to upload model');
-          }
-        } catch (error) {
-          console.error('Error uploading model:', error);
-          ElMessage.error('Error uploading model');
-        } finally {
-          this.loading = false;
-        }
-      });
-    },
-    
-    // Submit model edit
-    async submitModelEdit() {
-      this.$refs.editModelFormRef.validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-        
-        try {
-          this.loading = true;
-          
-          // Create form data
-          const formData = new FormData();
-          formData.append('modelId', this.editModelForm.modelId);
-          formData.append('modelName', this.editModelForm.modelName);
-          formData.append('remark', this.editModelForm.remark);
-          formData.append('defaultParameters', this.editModelForm.defaultParameters);
-          
-          if (this.editModelForm.newFigureFile) {
-            formData.append('figureFile', this.editModelForm.newFigureFile);
-          }
-          
-          // Send request
-          const response = await axios.post('/api/models/updateModel', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-          
-          if (response.data.code === 1) {
-            ElMessage.success('Model updated successfully');
-            this.showEditDialog = false;
-            this.fetchModels(); // Refresh the model list
-          } else {
-            ElMessage.error(response.data.message || 'Failed to update model');
-          }
-        } catch (error) {
-          console.error('Error updating model:', error);
-          ElMessage.error('Error updating model');
-        } finally {
-          this.loading = false;
-        }
-      });
-    },
-    
-    // Cancel upload/edit
-    cancelUpload() {
-      this.showUploadDialog = false;
-      this.resetModelForm();
-    },
-    
-    cancelEdit() {
-      this.showEditDialog = false;
-    },
-    
-    resetModelForm() {
-      this.modelForm = {
-        modelName: '',
-        modelType: 'single',
-        remark: '',
-        defaultParameters: '',
-        modelFile: null,
-        figureFile: null
-      };
-      this.previewImage = '';
     },
     
     // Helper methods
@@ -934,16 +783,6 @@ onUnmounted(() => {
   max-height: 200px;
   border-radius: 4px;
   border: 1px solid #ebeef5;
-}
-
-/* Preview Dialog */
-.preview-container {
-  text-align: center;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 70vh;
 }
 
 /* Responsive Adjustments */

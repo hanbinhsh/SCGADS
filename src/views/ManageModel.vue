@@ -15,19 +15,18 @@
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable></el-table-column>
         <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable></el-table-column>
-        <el-table-column prop="modelPath" :label="$t('database.models.model_path')" sortable></el-table-column>
+        <!-- <el-table-column prop="modelPath" :label="$t('database.models.model_path')" sortable></el-table-column>
         <el-table-column prop="predictFilePath" :label="$t('database.models.predict_file_path')" sortable></el-table-column>
         <el-table-column prop="trainFilePath" :label="$t('database.models.train_file_path')" sortable></el-table-column>
         <el-table-column prop="extractLabels" :label="$t('database.models.extract_labels')" sortable></el-table-column>
-        <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column>
+        <el-table-column prop="figurePath" :label="$t('database.models.figure_path')" sortable></el-table-column> -->
         <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable></el-table-column>
         <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable></el-table-column>
         <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable></el-table-column>
         <el-table-column prop="remark" :label="$t('database.models.remark')" sortable></el-table-column>
-        <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '250px'">
+        <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '180px'">
           <template #default="{ row }">
-            <el-button link type="info" size="small" @click="showFigureDialog(row)">{{ $t('ModelManage.Figure') }}</el-button>
-            <el-button link type="success" size="small" @click="showParametersDialog(row)">{{ $t('ModelManage.Parameters') }}</el-button>
+            <el-button link type="info" size="small" @click="showDetailsDialog(row)">{{ $t('Detail') }}</el-button>
             <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
           </template>
@@ -133,7 +132,7 @@
               <span style="font-weight: bold;">Parameters</span>
               <el-button type="primary" icon="plus" @click="addEditingParameter">Add</el-button>
             </div>
-            <div style="max-height: 250px; overflow-y: auto; margin-top: 10px;">
+            <div style="max-height: 500px; overflow-y: auto; margin-top: 10px;">
               <el-form-item v-for="(param, index) in parameters" :key="index" label-width="0px">
                 <div style="display: flex; align-items: center; width: 100%;">
                   <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
@@ -148,9 +147,9 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="editDialogVisible = false; modelEditingReset()">Cancel</el-button>
-          <el-button type="warning" @click="modelEditingReset()">Reset</el-button>
-          <el-button type="primary" @click="modelEditingSave()">Save</el-button>
+          <el-button @click="editDialogVisible = false; modelEditingReset()">{{ $t('Cancel') }}</el-button>
+          <el-button type="warning" @click="modelEditingReset()">{{ $t('Reset') }}</el-button>
+          <el-button type="primary" @click="modelEditingSave()">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -255,6 +254,66 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 详情对话框 -->
+    <el-dialog v-model="detailsDialogVisible" title="Model Storage Details" width="600px" align-center>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item label="Model Name">
+          <span style="font-weight: bold; color: #409eff;">{{ selectedData.modelName }}</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="Model Type">
+          <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
+            {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
+              selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="Model Storage Path">
+          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+            {{ selectedData.modelPath || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="Prediction File Storage Path">
+          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+            {{ selectedData.predictFilePath || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="Training File Storage Path">
+          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+            {{ selectedData.trainFilePath || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="Extract Labels Path">
+          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+            {{ selectedData.extractLabels || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="Model Image Storage Path">
+          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+            {{ selectedData.figurePath || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item label="Created Time">
+          {{ selectedData.createdTime }}
+        </el-descriptions-item>
+        <el-descriptions-item label="User Name" v-if="selectedData.userName">
+          {{ selectedData.userName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Company Name" v-if="selectedData.companyName">
+          {{ selectedData.companyName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Remark" v-if="selectedData.remark">
+          {{ selectedData.remark }}
+        </el-descriptions-item>
+      </el-descriptions>
+      
+      <template #footer>
+        <div class="dialog-footer">
+            <el-button type="primary" @click="showFigureDialog(selectedData)">{{ $t('ModelManage.Figure') }}</el-button>
+            <el-button type="success" @click="showParametersDialog(selectedData)">{{ $t('ModelManage.Parameters') }}</el-button>
+          <el-button @click="detailsDialogVisible = false">{{ $t('Close') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -279,17 +338,21 @@ export default {
       figureDialogVisible: false,
       figure: "",
       addDialogVisible: false,
-      selectedData: {},
+      detailsDialogVisible: false, // 详情对话框可见性
+      
       selectedDatas: [],
       selectedDataDefault: {},
       currentPage: 1,
       pageSize: 10,
       sortProp: '',
       sortOrder: '',
-      parameters: [], // 选中的模型参数
       loading: false,
       isMobile: false,
       
+      // 模型编辑
+      selectedData: {},
+      parameters: [], // 选中的模型参数
+
       modelAdding: {
         modelName: "",
         modelType: "single",
@@ -309,53 +372,17 @@ export default {
     checkMobile() {
       this.isMobile = window.innerWidth <= 768;
     },
+
+    // 模型修改
     addEditingParameter() {
       this.parameters.push({ name: "", value: "" });
     },
     removeEditingParameter(index) {
       this.parameters.splice(index, 1);
     },
-    addParameter() {
-      this.modelAdding.parameters.push({ name: "", value: "" });
-    },
-    removeParameter(index) {
-      this.modelAdding.parameters.splice(index, 1);
-    },
-    async modelSave() {
-      // console.log("Saving model:", this.modelAdding);
-      const data = this.modelAdding;
-      const paramString = data.parameters.map(param => {
-        // 如果值是数字，不需要转换，否则使用 toString()
-        const value = typeof param.value === 'number' ? param.value : param.value.toString();
-        return `${param.name}:${value}`;
-      }).join(',');
-      const formData = new FormData();
-      formData.append('modelName', data.modelName);
-      formData.append('modelType', data.modelType);
-      formData.append('modelPath', data.modelPath);
-      formData.append('predictFilePath', data.predictFilePath);
-      formData.append('trainFilePath', data.trainFilePath);
-      formData.append('figurePath', data.figurePath);
-      formData.append('remark', data.remark);
-      formData.append('extractLabels', data.extractLabels);
-      formData.append('defaultParameters', paramString);
-      formData.append('companyName', data.companyName);
-      formData.append('userName', data.userName);
-      const response = await axios.post('api/models/addModel', formData);
-      if (response.data.code === 1) {
-        ElMessage({
-          message: 'Model add successfully',
-          type: 'success',
-        });
-      } else {
-        ElMessage({
-          message: 'Failed to add Model',
-          type: 'error',
-        });
-      }
-      this.addDialogVisible = false;
-      this.fetchListData();
-      this.modelAddingReset();
+    modelEditingReset(){
+      this.selectedData = {}
+      this.paramTrans(this.selectedDataDefault)
     },
     async modelEditingSave() {
       const formData = new FormData();
@@ -393,40 +420,6 @@ export default {
       this.fetchListData();
       this.modelAddingReset();
     },
-    modelAddingReset(){
-      this.modelAdding.parameters = [];
-      this.modelAdding.modelName = "";
-      this.modelAdding.modelType = "single";
-      this.modelAdding.modelPath = "";
-      this.modelAdding.predictFilePath = "pred.py";
-      this.modelAdding.trainFilePath = "train.py";
-      this.modelAdding.figurePath = "model.png";
-      this.modelAdding.remark = "";
-      this.modelAdding.extractLabels = "extract_labels.csv";
-      this.modelAdding.companyName = "";
-      this.modelAdding.userName = "";
-    },
-    modelEditingReset(){
-      this.selectedData = {}
-      this.paramTrans(this.selectedDataDefault)
-    },
-    showDeleteDialog(data) {
-      this.deleteDialogVisible = true;
-      this.selectedData = data;
-    },
-    showEditDialog(data) {
-      this.paramTrans(data)
-      this.editDialogVisible = true;
-    },
-    showParametersDialog(data) {
-      this.paramTrans(data)
-      this.parametersDialogVisible = true;
-    },
-    showFigureDialog(data){
-      this.figureDialogVisible = true;
-      const base64Image = `data:image/png;base64,${data.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
-      this.figure = base64Image;
-    },
     paramTrans(data) {
       if (!data || !data.defaultParameters) {
         this.parameters = [];
@@ -450,6 +443,80 @@ export default {
       this.selectedDataDefault = data;
     },
 
+    // 增加模型
+    addParameter() {
+      this.modelAdding.parameters.push({ name: "", value: "" });
+    },
+    removeParameter(index) {
+      this.modelAdding.parameters.splice(index, 1);
+    },
+    modelAddingReset(){
+      this.modelAdding.parameters = [];
+      this.modelAdding.modelName = "";
+      this.modelAdding.modelType = "single";
+      this.modelAdding.modelPath = "";
+      this.modelAdding.predictFilePath = "pred.py";
+      this.modelAdding.trainFilePath = "train.py";
+      this.modelAdding.figurePath = "model.png";
+      this.modelAdding.remark = "";
+      this.modelAdding.extractLabels = "extract_labels.csv";
+      this.modelAdding.companyName = "";
+      this.modelAdding.userName = "";
+    },
+    async modelSave() {
+      // console.log("Saving model:", this.modelAdding);
+      const data = this.modelAdding;
+      const paramString = data.parameters.map(param => {
+        // 如果值是数字，不需要转换，否则使用 toString()
+        const value = typeof param.value === 'number' ? param.value : param.value.toString();
+        return `${param.name}:${value}`;
+      }).join(',');
+      const formData = new FormData();
+      formData.append('modelName', data.modelName);
+      formData.append('modelType', data.modelType);
+      formData.append('modelPath', data.modelPath);
+      formData.append('predictFilePath', data.predictFilePath);
+      formData.append('trainFilePath', data.trainFilePath);
+      formData.append('figurePath', data.figurePath);
+      formData.append('remark', data.remark);
+      formData.append('extractLabels', data.extractLabels);
+      formData.append('defaultParameters', paramString);
+      formData.append('companyName', data.companyName);
+      formData.append('userName', data.userName);
+      const response = await axios.post('api/models/addModel', formData);
+      if (response.data.code === 1) {
+        ElMessage({
+          message: 'Model add successfully',
+          type: 'success',
+        });
+      } else {
+        ElMessage({
+          message: 'Failed to add Model',
+          type: 'error',
+        });
+      }
+      this.addDialogVisible = false;
+      this.fetchListData();
+      this.modelAddingReset();
+    },
+    showDeleteDialog(data) {
+      this.deleteDialogVisible = true;
+      this.selectedData = data;
+    },
+    showEditDialog(data) {
+      this.paramTrans(data)
+      this.editDialogVisible = true;
+    },
+    showParametersDialog(data) {
+      this.paramTrans(data)
+      this.parametersDialogVisible = true;
+    },
+    showFigureDialog(data){
+      this.figureDialogVisible = true;
+      const base64Image = `data:image/png;base64,${data.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
+      this.figure = base64Image;
+    },
+    
     handleSelectionChange(data) {
       this.selectedDatas = data;
     },
@@ -527,6 +594,10 @@ export default {
       }
       ElMessage.success('Batch delete success.');
       this.fetchListData();
+    },
+    showDetailsDialog(data) {
+      this.selectedData = data;
+      this.detailsDialogVisible = true;
     },
     formatDate(dateString) {
       const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };

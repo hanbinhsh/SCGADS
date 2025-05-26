@@ -42,6 +42,7 @@ const en = {
     Remark: "Remark",
     Image: "Image",
     SearchModels: "Search Models",
+    Edit: "Edit",
   },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",

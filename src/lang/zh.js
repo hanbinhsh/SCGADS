@@ -42,6 +42,7 @@ const zh =  {
     Remark: "备注",
     Image: "模型图",
     SearchModels: "查找模型",
+    Edit: "编辑",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
