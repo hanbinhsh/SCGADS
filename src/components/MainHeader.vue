@@ -64,7 +64,7 @@
                 v-if="userData.userName">
                 {{ $t('navigateBar.WorkSpace') }}
             </el-menu-item>
-            <el-menu-item index="ModelMarket" :class="{ 'is-active': activeIndex === 'Feedback' }"
+            <el-menu-item index="ModelMarket" :class="{ 'is-active': activeIndex === 'ModelMarket' }"
                 v-if="userData.userName">
                 {{ $t('navigateBar.ModelMarket') }}
             </el-menu-item>
