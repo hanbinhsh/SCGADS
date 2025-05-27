@@ -143,6 +143,9 @@
                   <p>{{ $t('uploadPage.annoAlart') }}</p>
                 </el-alert>
                 <br v-if="activeTask === 'annotation'">
+                <el-form-item :label="$t('uploadPage.RePretrain')" v-if="selectedModel.pretrainModel == true&&activeTask == 'training'">
+                  <el-switch v-model="pretrain" style="margin-left: auto;"></el-switch>
+                </el-form-item>
                 <el-form-item v-for="(value, key) in parameterDefaults" :key="key" :label="key">
                   <el-input v-model.number="parameters[key]" :placeholder="value.toString()" class="full-width" />
                 </el-form-item>
@@ -218,6 +221,8 @@ export default {
       loading:false,
       activeTask: 'annotation', // 默认选中的任务
       isCollapsed: false,
+
+      pretrain: false
     };
   },
   methods: {

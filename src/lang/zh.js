@@ -43,6 +43,7 @@ const zh =  {
     Image: "模型图",
     SearchModels: "查找模型",
     Edit: "编辑",
+    Pretrain: "预训练",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
@@ -113,6 +114,7 @@ const zh =  {
     Inputparametersifnecessary: "如有必要，可输入参数。",
     Clicktoupload: "点击上传。",
     Resultswillbeshownhere: "结果会在这里展示。",
+    RePretrain: "重新预训练",
   },
   status: {
     Pending: "待处理",
@@ -127,7 +129,7 @@ const zh =  {
     Denoising: "降噪",
     Unknown: "未知",
     Annotation: "注释",
-    Trainning: "训练",
+    Training: "训练",
   },
   workSpace: {
     TaskStatus: "任务状态",
@@ -165,7 +167,8 @@ const zh =  {
       extract_labels: "标签映射",
       user_name: "上传者",
       company_name: "公司",
-      created_time: "上传时间"
+      created_time: "上传时间",
+      pretrainModel: "预训练模型",
     },
     user: {
       user_id: "用户ID",
@@ -196,7 +199,8 @@ const zh =  {
       uploader_id: "上传者ID",
       type: "任务类型",
       parameters: "任务参数",
-      model_id: "模型ID"
+      model_id: "模型ID",
+      re_pretrain: "重新预训练",
     },
     files: {
       file_id: "文件ID",

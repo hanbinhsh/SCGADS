@@ -268,8 +268,14 @@
              (selectedTask.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
              (selectedTask.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
           {{ (selectedTask.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-             (selectedTask.type?.split(':')[0] || "") === "trainning"  ? $t('taskType.Trainning')  :
+             (selectedTask.type?.split(':')[0] || "") === "training"  ? $t('taskType.Training')  :
              (selectedTask.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.re_pretrain')" v-if="(selectedTask.type?.split(':')[0] || '') === 'training'">
+          <el-tag :type="selectedTask.re_pretrain == true ? 'success' : 'warning'">
+            {{ selectedTask.re_pretrain == true ? 'Yes' : 'No' }}
+          </el-tag>
         </el-descriptions-item>
 
         <el-descriptions-item :label="$t('database.models.model_name')">

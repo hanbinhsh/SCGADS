@@ -76,7 +76,7 @@
               </div>
               <div class="model-info">
                 <h3>{{ model.modelName }}</h3>
-                <p class="model-type">{{ getModelTypeLabel(model.modelType) }}</p>
+                <p class="model-type">{{ model.pretrainModel ? $t('modelPage.Pretrain')+"-" : "" }}{{ getModelTypeLabel(model.modelType) }}</p>
                 <p class="model-description">{{ truncateText(model.remark, 100) }}</p>
                 <div class="model-actions">
                   <el-button type="primary" size="small" @click="viewModelDetails(model)">
@@ -159,7 +159,17 @@
   <el-dialog v-model="showModelDetails" :title="selectedData.modelName" width="550px" align-center>
     <div class="model-details-info" style="width: 100%;">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedData.modelType) }}</el-descriptions-item>
+        <el-descriptions-item label="Model Type">
+          <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
+            {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
+              selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="Pretrain Model">
+          <el-tag :type="selectedData.pretrainModel == true ? 'success' : 'warning'">
+            {{ selectedData.pretrainModel == true ? 'Yes' : 'No' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName }}</el-descriptions-item>
         <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedData.companyName }}</el-descriptions-item>
         <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedData.createdTime }}</el-descriptions-item>

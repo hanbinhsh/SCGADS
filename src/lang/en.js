@@ -43,6 +43,7 @@ const en = {
     Image: "Image",
     SearchModels: "Search Models",
     Edit: "Edit",
+    Pretrain: "Pretrain",
   },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
@@ -113,6 +114,7 @@ const en = {
     Inputparametersifnecessary: "Input parameters if necessary.",
     Clicktoupload: "Click to upload.",
     Resultswillbeshownhere: "Results will be shown here.",
+    RePretrain: "Re-Pretrain",
   },
   status: {
     Pending: "Pending",
@@ -127,7 +129,7 @@ const en = {
     Denoising: "Denoising",
     Unknown: "Unknown",
     Annotation: "Annotation",
-    Trainning: "Trainning",
+    Training: "Training",
   },
   workSpace: {
     TaskStatus: "Task Status",
@@ -165,7 +167,8 @@ const en = {
       extract_labels: "Extract Labels",
       user_name: "Uploader name",
       company_name: "Company Name",
-      created_time: "Upload Time"
+      created_time: "Upload Time",
+      pretrainModel: "Pretrain Model",
     },
     user: {
       user_id: "User ID",
@@ -196,7 +199,8 @@ const en = {
       uploader_id: "Uploader ID",
       type: "Task Type",
       parameters: "Task Parameters",
-      model_id: "Model ID"
+      model_id: "Model ID",
+      re_pretrain: "Re-Pretrain",
     },
     files: {
       file_id: "File ID",

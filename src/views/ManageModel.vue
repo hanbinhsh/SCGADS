@@ -76,12 +76,12 @@
     </el-dialog>
 
     <!-- 修改对话框 -->
-    <el-dialog v-model="editDialogVisible" title="Edit Model" width="700px" align-center>
+    <el-dialog v-model="editDialogVisible" title="Edit Model" width="850px" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
         Note: Upload the models into the algorithm folder of back-end.
       </div>
-      <el-form :model="selectedData" label-width="120px" label-position="left">
+      <el-form :model="selectedData" label-width="150px" label-position="left">
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->
           <div style="flex: 1;">
@@ -95,8 +95,14 @@
                 <el-option label="Denoising" value="deno" />
               </el-select>
             </el-form-item>
+            <el-form-item :label="$t('database.models.pretrainModel')">
+              <el-switch v-model="selectedData.pretrainModel" style="margin-left: auto;"></el-switch>
+            </el-form-item>
             <el-form-item label="Model Path">
               <el-input v-model="selectedData.modelPath"></el-input>
+            </el-form-item>
+            <el-form-item label="Pretrain Model Path" v-if="selectedData.pretrainModel">
+              <el-input v-model="selectedData.pretrainModelPath"></el-input>
             </el-form-item>
             <el-form-item label="Predict File Path">
               <el-input v-model="selectedData.predictFilePath"></el-input>
@@ -156,12 +162,12 @@
     </el-dialog>
 
     <!-- 添加对话框 -->
-    <el-dialog v-model="addDialogVisible" title="Add Model" width="700px" align-center>
+    <el-dialog v-model="addDialogVisible" title="Add Model" width="850px" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
         Note: Upload the models into the algorithm folder of back-end.
       </div>
-      <el-form :model="modelAdding" label-width="120px" label-position="left">
+      <el-form :model="modelAdding" label-width="150px" label-position="left">
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->
           <div style="flex: 1;">
@@ -175,8 +181,14 @@
                 <el-option label="Denoising" value="deno" />
               </el-select>
             </el-form-item>
+            <el-form-item :label="$t('database.models.pretrainModel')">
+              <el-switch v-model="modelAdding.pretrainModel" style="margin-left: auto;"></el-switch>
+            </el-form-item>
             <el-form-item label="Model Path">
               <el-input v-model="modelAdding.modelPath"></el-input>
+            </el-form-item>
+            <el-form-item label="Pretrain Model Path" v-if="modelAdding.pretrainModel">
+              <el-input v-model="modelAdding.pretrainModelPath"></el-input>
             </el-form-item>
             <el-form-item label="Predict File Path">
               <el-input v-model="modelAdding.predictFilePath"></el-input>
@@ -274,28 +286,38 @@
               selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
           </el-tag>
         </el-descriptions-item>
+        <el-descriptions-item label="Pretrain Model">
+          <el-tag :type="selectedData.pretrainModel == true ? 'success' : 'warning'">
+            {{ selectedData.pretrainModel == true ? 'Yes' : 'No' }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="Model Storage Path">
-          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+          <div class="path-item">
             {{ selectedData.modelPath || 'Not specified' }}
           </div>
         </el-descriptions-item>
+        <el-descriptions-item label="Pretrain Model Path" v-if="selectedData.pretrainModel">
+          <div class="path-item">
+            {{ selectedData.pretrainModelPath || 'Not specified' }}
+          </div>
+        </el-descriptions-item>
         <el-descriptions-item label="Prediction File Storage Path">
-          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+          <div class="path-item">
             {{ selectedData.predictFilePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="Training File Storage Path">
-          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+          <div class="path-item">
             {{ selectedData.trainFilePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="Extract Labels Path">
-          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+          <div class="path-item">
             {{ selectedData.extractLabels || 'Not specified' }}
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="Model Image Storage Path">
-          <div style="word-break: break-all; font-family: monospace; background-color: #f5f5f5; padding: 5px; border-radius: 4px;">
+          <div class="path-item">
             {{ selectedData.figurePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
@@ -373,6 +395,8 @@ export default {
         extractLabels: "extract_labels.csv",
         companyName: "",
         userName: "",
+        pretrainModel: false,
+        pretrainModelPath: "",
       },
     };
   },
@@ -450,6 +474,8 @@ export default {
       formData.append('defaultParameters', paramString);
       formData.append('companyName', data.companyName);
       formData.append('userName', data.userName);
+      formData.append('pretrainModel', data.pretrainModel);
+      formData.append('pretrainModelPath', data.pretrainModelPath);
       const response = await axios.post('api/models/updateModel', formData);
       if (response.data.code === 1) {
         ElMessage({
@@ -508,6 +534,8 @@ export default {
       this.modelAdding.extractLabels = "extract_labels.csv";
       this.modelAdding.companyName = "";
       this.modelAdding.userName = "";
+      this.modelAdding.pretrainModel = false;
+      pretrain_model_path = "";
     },
     async modelSave() {
       // console.log("Saving model:", this.modelAdding);
@@ -529,6 +557,8 @@ export default {
       formData.append('defaultParameters', paramString);
       formData.append('companyName', data.companyName);
       formData.append('userName', data.userName);
+      formData.append('pretrainModel', data.pretrainModel);
+      formData.append('pretrainModelPath', data.pretrainModelPath);
       const response = await axios.post('api/models/addModel', formData);
       if (response.data.code === 1) {
         ElMessage({
@@ -664,6 +694,18 @@ export default {
 /* 批量操作按钮样式 */
 .batch-actions {
   margin-bottom: 15px;
+}
+
+.path-item {
+  word-break: break-all;
+  font-family: monospace;
+  background-color: #f5f5f5;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.dark-mode .path-item {
+  background-color: #333333;
 }
 
 /* 分页组件样式 */
