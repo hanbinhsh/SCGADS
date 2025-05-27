@@ -6,7 +6,7 @@
       <!-- Left Column with 4 Cards -->
       <div class="left-column" :class="{ 'with-expanded-right': isRightColumnExpanded }">
         <!-- Card 1: Status Chart -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="loading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto'}" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.TaskStatus') }}</span>
@@ -60,7 +60,7 @@
         </el-card>
 
         <!-- Card 2: Shares -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.MyShares') }}</span>
@@ -75,22 +75,14 @@
                 <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <!-- 任务分享时间状态 -->
-                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
-                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
-                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
-                </span>
-                <el-progress 
-                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
-                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
-                  type="line"
-                  style="margin-left: 10px; width: 80px;"
-                  :stroke-width="10"
-                  :show-text="false"
-                />
-                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                  {{ $t('navigateBar.Virtualization') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('Edit') }}
@@ -102,19 +94,26 @@
 
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }} 
-                <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
+                <span v-if="!data.due_time && !isRightColumnExpanded" class="share-status-badge share-status-indefinite"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666; margin-left: auto">
+                  {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
+                </span>
+                <el-progress 
+                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
+                  type="line"
+                  style="margin-left: 10px; width: 80px;"
+                  :stroke-width="10"
+                  :show-text="false"
+                />
               </div>
             </div>
           </div>
         </el-card>
         
         <!-- My Models -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="modelLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="modelLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.MyModels') }}</span>
@@ -131,14 +130,14 @@
                 <el-tag size="small" type="info" style="margin-left: 10px;" v-if="!isRightColumnExpanded">
                   {{ getModelTypeText(model.modelType) }}
                 </el-tag>
-                <el-button link type="primary" size="small" @click="viewModelDetails(model)" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                <el-button link type="primary" size="small" @click="showModelDetails = true; selectedData = model" style="margin-left: auto;" v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
                 </el-button>
               </div>
               <div class="success-task-details">
                 <span>{{ $t('workSpace.Created') }}: {{ formatDate(model.createdTime) }}</span>
-                <span v-if="model.description && !isRightColumnExpanded" style="margin-left: 10px; color: #909399;">
-                  {{ model.description.length > 30 ? model.description.substring(0, 30) + '...' : model.description }}
+                <span v-if="model.remark && !isRightColumnExpanded" style="margin-left: 10px; color: #909399;">
+                  {{ model.remark.length > 30 ? model.remark.substring(0, 30) + '...' : model.remark }}
                 </span>
               </div>
             </div>
@@ -146,7 +145,7 @@
         </el-card>
         
         <!-- Shares Received -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="shareLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.ShareReceived') }}</span>
@@ -161,33 +160,33 @@
                 <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <!-- 任务分享时间状态 -->
-                <span v-if="!data.due_time && !isRightColumnExpanded" style="color: #409EFF; margin-left: 10px;"> {{ $t('workSpace.Indefinite') }} </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" style="color: red; margin-left: 10px;"> {{ $t('workSpace.Expired') }} </span>
-                <span v-if="data.due_time && !isRightColumnExpanded" style="margin-left: 10px; font-size: 12px; color: #666;">
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
+                </el-button>
+                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
+                  {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+              </div>
+
+              <div class="success-task-details">
+                {{ formatDate(data.shared_time) }}
+                
+                <span v-if="!data.due_time && !isRightColumnExpanded" class="share-status-badge share-status-indefinite"> {{ $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
+                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
                 <el-progress 
                   v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
                   :percentage="getShareProgress(data.shared_time, data.due_time)" 
                   type="line"
-                  style="margin-left: 10px; width: 80px;" 
+                  style="margin-left: 10px; width: 80px;"
                   :stroke-width="10"
                   :show-text="false"
                 />
-                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
-                  {{ $t('workSpace.CopyLink') }}
-                </el-button>
-                <el-button link type="info" size="small" @click=""  v-if="!isRightColumnExpanded">
-                  {{ $t('Detail') }}
-                </el-button>
-              </div>
-
-              <div class="success-task-details">
-                {{ formatDate(data.shared_time) }}
-                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" style="margin-left: auto" v-if="!isRightColumnExpanded">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
               </div>
             </div>
           </div>
@@ -471,6 +470,80 @@
       <el-icon><List /></el-icon>
     </el-button>
   </div>
+
+  <!-- Model Details Dialog -->
+  <el-dialog v-model="showModelDetails" :title="selectedData?.modelName" width="550px" align-center>
+    <div class="model-details-info" style="width: 100%;">
+      <el-descriptions :column="1" border>
+        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedData.modelType) }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedData.companyName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedData.createdTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.Remark')">{{ selectedData.remark }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.DefaultParameters')">
+          <el-scrollbar max-height="150px">
+            <el-row v-for="(param, index) in (selectedData.defaultParameters || '').split(',')" :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
+        </el-descriptions-item>
+      </el-descriptions>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showModelDetails = false">{{ $t('Close') }}</el-button>
+        <el-button 
+          type="warning" 
+          @click="editModel(selectedData)" 
+          :disabled="!isUserModel(selectedData)" 
+          v-if="isUserModel(selectedData)">
+          {{ $t('modelPage.Edit') }}
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 修改对话框 -->
+  <el-dialog v-model="showEditDialog" title="Edit Model" width="500px" align-center>
+    <!-- 添加提示信息 -->
+    <el-form :model="selectedData" label-width="120px" label-position="left">
+      <div style="display: flex; gap: 20px;">
+        <!-- 左侧：现有输入框 -->
+        <div style="flex: 1;">
+          <el-form-item label="Model Name">
+            <el-input v-model="selectedData.modelName" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="Remark">
+            <el-input v-model="selectedData.remark"></el-input>
+          </el-form-item>
+        </div>
+      </div>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showEditDialog = false">{{ $t('Cancel') }}</el-button>
+        <el-button type="danger" @click="showDeleteModelDialog = true;">{{ $t('Delete') }}</el-button>
+        <el-button type="primary" @click="modelEditingSave()">{{ $t('Save') }}</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 删除确认对话框 -->
+  <el-dialog v-model="showDeleteModelDialog" title="Warning" width="500" align-center>
+    <span>Model <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong> will be deleted</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showDeleteModelDialog = false">Cancel</el-button>
+        <el-button type="danger" @click="showDeleteModelDialog = false; deleteData(selectedData.modelId)">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -513,6 +586,10 @@ export default {
       // 我的模型
       modelList: [], // 存储模型数据
       modelLoading: false, // 模型加载状态
+      selectedData: {}, //需要展示详情的模型
+      showModelDetails: false,
+      showEditDialog: false,
+      showDeleteModelDialog: false,
     };
   },
   computed: {
@@ -569,6 +646,67 @@ export default {
         this.modelLoading = false;
         this.modelList = [];
       }
+    },
+    editModel(model) {
+      if (!this.isUserModel(model)) {
+        ElMessage.warning('You can only edit your own models');
+        return;
+      }
+      this.selectedData = model;
+      this.showEditDialog = true;
+    },
+    isUserModel(model) {
+      const userData = JSON.parse(sessionStorage.getItem('userData'));
+      return userData && model.userName === userData.userName;
+    },
+    getModelTypeLabel(type) {
+      switch (type) {
+        case 'single': 
+          return this.$t('modelPage.SingleModality');
+        case 'multi': 
+          return this.$t('modelPage.MultiModality');
+        case 'deno': 
+          return this.$t('modelPage.Denoising');
+        default: 
+          return type;
+      }
+    },
+    async modelEditingSave() {
+      const formData = new FormData();
+      const data = this.selectedData;
+      formData.append('modelId', data.modelId);
+      formData.append('remark', data.remark);
+      const response = await axios.post('api/models/updateModelRemark', formData);
+      if (response.data.code === 1) {
+        ElMessage({
+          message: 'Model update successfully',
+          type: 'success',
+        });
+      } else {
+        ElMessage({
+          message: 'Failed to update Model',
+          type: 'error',
+        });
+      }
+      this.showEditDialog = false;
+      this.showModelDetails = false;
+    },
+    async deleteData(dataId) {
+      try {
+        const response = await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
+        if (response.data.code === 1) {
+          ElMessage.success('Model deleted successfully');
+        } else {
+          console.error('Failed to delete:', response.data.msg);
+          ElMessage.error(response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to delete:', error);
+      }
+      this.showDeleteModelDialog = false;
+      this.showEditDialog = false;
+      this.showModelDetails = false;
+      window.location.reload();
     },
     // 获取模型类型显示文本
     getModelTypeText(type) {
@@ -838,7 +976,7 @@ export default {
       this.paginatedTaskList = this.taskList.slice(start, end);
     },
     checkScreenSize() {
-      this.isMobileView = window.innerWidth < 768;
+      this.isMobileView = window.innerWidth < 1151;
       if (this.isMobileView && this.isRightColumnExpanded) {
         this.isRightColumnExpanded = false;
       }
@@ -932,6 +1070,15 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .chart-container {
@@ -973,18 +1120,41 @@ export default {
   background-color: #302E2C;
 }
 
+.right-section{
+  max-height: 100%;
+}
+
 .success-task-item {
-  margin: 15px 15px 0px 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #302E2C;
+  background: white;
+  margin-bottom: 12px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.dark-mode .success-task-item{
-  border-bottom: 1px solid #f0f0f0;
+.success-task-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #409eff;
 }
 
-.success-task-item:last-child {
-  border-bottom: none;
+.dark-mode .success-task-item {
+  background: #383838;
+  border-color: #4a4a4a;
+}
+
+.dark-mode .success-task-item:hover {
+  border-color: #409eff;
+  background: #404040;
+}
+
+.success-task-item:first-child {
+  margin-top: 10px;
 }
 
 .success-task-header {
@@ -995,14 +1165,23 @@ export default {
 }
 
 .success-task-name {
-  font-weight: bold;
+  font-weight: 600;
+  color: #303133;
+  flex: 1;
+  font-size: 14px;
+}
+
+.dark-mode .success-task-name {
+  color: #e0e0e0;
 }
 
 .success-task-details {
   display: flex;
-  padding-left: 20px;
-  color: #606266;
-  font-size: 14px;
+  align-items: center;
+  justify-content: space-between;
+  color: #909399;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .empty-state {
@@ -1096,7 +1275,7 @@ export default {
 }
 
 /* Mobile Responsive Styles */
-@media (max-width: 767px) {
+@media (max-width: 1150px) {
   .content-container {
     flex-direction: column;
     height: auto;
@@ -1122,17 +1301,6 @@ export default {
 
   .success-tasks-list {
     max-height: 230px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .left-column {
-    grid-template-columns: 1fr;
-    width: 70% !important;
-  }
-  
-  .right-column.collapsed {
-    width: 30%;
   }
 }
 
@@ -1187,10 +1355,11 @@ export default {
 .left-section {
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* 保证上下空间拉满并底部对齐 */
+  height: 100%;
 }
-
 /* Adjust card for smaller screens */
-@media (max-width: 767px) {
+@media (max-width: 1150px) {
   .card-header {
     padding: 10px;
   }
@@ -1215,5 +1384,25 @@ export default {
 
 .el-scrollbar__view .el-row{
   margin-bottom: 0;
+}
+
+.share-status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.share-status-indefinite {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.share-status-expired {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
 }
 </style>

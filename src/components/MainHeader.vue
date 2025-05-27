@@ -102,7 +102,7 @@
         <!-- Mobile Menu -->
         <div class="mobile-header" v-if="isMobile">
             <div class="mobile-header-top">
-                <img style="width: 40px" src="../assets/logo.png" alt="logo" @click="navigateTo('HomeView')" />
+                <img style="width: 45px" src="../assets/logo.png" alt="logo" @click="navigateTo('HomeView')" />
                 <div class="mobile-controls">
                     <el-dropdown @command="changeLanguage" trigger="click">
                         <span class="language-icon-mobile">
@@ -226,7 +226,7 @@ const isDarkTag = ref(false);
 const isMobile = ref(false);
 
 const checkMobile = () => {
-  isMobile.value = window.innerWidth < 768;
+  isMobile.value = window.innerWidth < 900;
 };
 
 onMounted(() => {
@@ -410,7 +410,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
+    padding: 0px 15px;
     height: 56px;
 }
 

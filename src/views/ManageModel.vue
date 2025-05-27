@@ -192,7 +192,7 @@
             </el-form-item>
             <el-form-item :label="$t('database.models.user_name')">
               <el-autocomplete
-                v-model="selectedData.userName"
+                v-model="modelAdding.userName"
                 :fetch-suggestions="querySearchUsers"
                 placeholder="请输入用户名"
                 @select="handleUserSelect"
@@ -200,7 +200,7 @@
               ></el-autocomplete>
             </el-form-item>
             <el-form-item :label="$t('database.models.company_name')">
-              <el-input v-model="selectedData.companyName" :disabled="true"></el-input>
+              <el-input v-model="modelAdding.companyName" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="Remark">
               <el-input v-model="modelAdding.remark"></el-input>
@@ -551,6 +551,7 @@ export default {
     },
     showEditDialog(data) {
       this.paramTrans(data)
+      this.selectedData = data;
       this.editDialogVisible = true;
     },
     showParametersDialog(data) {

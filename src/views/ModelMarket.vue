@@ -199,7 +199,7 @@
         <!-- 左侧：现有输入框 -->
         <div style="flex: 1;">
           <el-form-item label="Model Name">
-            <el-input v-model="selectedData.modelName" disabled="true"></el-input>
+            <el-input v-model="selectedData.modelName" disabled></el-input>
           </el-form-item>
           <el-form-item label="Remark">
             <el-input v-model="selectedData.remark"></el-input>
@@ -209,8 +209,7 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="showEditDialog = false; modelEditingReset()">{{ $t('Cancel') }}</el-button>
-        <el-button type="warning" @click="modelEditingReset()">{{ $t('Reset') }}</el-button>
+        <el-button @click="showEditDialog = false">{{ $t('Cancel') }}</el-button>
         <el-button type="danger" @click="showDeleteDialog = true;">{{ $t('Delete') }}</el-button>
         <el-button type="primary" @click="modelEditingSave()">{{ $t('Save') }}</el-button>
       </div>
@@ -304,9 +303,6 @@ export default {
       }
       this.selectedData = model;
       this.showEditDialog = true;
-    },
-    modelEditingReset(){
-      this.selectedData = {}
     },
     async modelEditingSave() {
       const formData = new FormData();
