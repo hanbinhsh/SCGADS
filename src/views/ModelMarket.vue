@@ -211,7 +211,21 @@
       <div class="dialog-footer">
         <el-button @click="showEditDialog = false; modelEditingReset()">{{ $t('Cancel') }}</el-button>
         <el-button type="warning" @click="modelEditingReset()">{{ $t('Reset') }}</el-button>
+        <el-button type="danger" @click="showDeleteDialog = true;">{{ $t('Delete') }}</el-button>
         <el-button type="primary" @click="modelEditingSave()">{{ $t('Save') }}</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 删除确认对话框 -->
+  <el-dialog v-model="showDeleteDialog" title="Warning" width="500" align-center>
+    <span>Model <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong> will be deleted</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="showDeleteDialog = false">Cancel</el-button>
+        <el-button type="danger" @click="showDeleteDialog = false; deleteData(selectedData.modelId)">
+          Confirm
+        </el-button>
       </div>
     </template>
   </el-dialog>
@@ -255,6 +269,7 @@ export default {
       showModelDetails: false,
       showEditDialog: false,
       showModelImage: false,
+      showDeleteDialog: false,
       
       // 模型编辑
       selectedData: {},
@@ -314,6 +329,22 @@ export default {
       this.fetchModels();
     },
 
+    async deleteData(dataId) {
+      try {
+        const response = await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
+        if (response.data.code === 1) {
+          ElMessage.success('Model deleted successfully');
+          this.fetchModels();
+        } else {
+          console.error('Failed to delete:', response.data.msg);
+          ElMessage.error(response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to delete:', error);
+      }
+      this.showDeleteDialog = false;
+      this.showEditDialog = false;
+    },
 
     goToUpload() {
       this.$router.push('/upload');
