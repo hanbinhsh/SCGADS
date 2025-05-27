@@ -111,10 +111,16 @@
               <el-input v-model="selectedData.figurePath"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.user_name')">
-              <el-input v-model="selectedData.userName"></el-input>
+              <el-autocomplete
+                v-model="selectedData.userName"
+                :fetch-suggestions="querySearchUsers"
+                placeholder="请输入用户名"
+                @select="handleUserSelect"
+                clearable
+              ></el-autocomplete>
             </el-form-item>
             <el-form-item :label="$t('database.models.company_name')">
-              <el-input v-model="selectedData.companyName"></el-input>
+              <el-input v-model="selectedData.companyName" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="Remark">
               <el-input v-model="selectedData.remark"></el-input>
@@ -185,10 +191,16 @@
               <el-input v-model="modelAdding.figurePath"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.user_name')">
-              <el-input v-model="modelAdding.userName"></el-input>
+              <el-autocomplete
+                v-model="selectedData.userName"
+                :fetch-suggestions="querySearchUsers"
+                placeholder="请输入用户名"
+                @select="handleUserSelect"
+                clearable
+              ></el-autocomplete>
             </el-form-item>
             <el-form-item :label="$t('database.models.company_name')">
-              <el-input v-model="modelAdding.companyName"></el-input>
+              <el-input v-model="selectedData.companyName" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="Remark">
               <el-input v-model="modelAdding.remark"></el-input>
@@ -347,6 +359,7 @@ export default {
       // 模型编辑
       selectedData: {},
       parameters: [], // 选中的模型参数
+      allUsers: [], // 所有用户数据列表
 
       modelAdding: {
         modelName: "",
@@ -364,6 +377,44 @@ export default {
     };
   },
   methods: {
+    // 用户筛选和公司自动填写
+    // 获取所有用户
+    async fetchUsers() {
+      try {
+        const response = await axios.get('/api/findUsers');
+        if (response.data.code === 200 && Array.isArray(response.data.data)) {
+          this.allUsers = response.data.data;
+        }
+      } catch (error) {
+        console.error('获取用户列表失败', error);
+      }
+    },
+    // 自动补全查询用户
+    querySearchUsers(queryString, cb) {
+      const results = this.allUsers
+        .filter(user => user.userName.toLowerCase().includes(queryString.toLowerCase()))
+        .map(user => ({
+          value: user.userName,
+          userId: user.userId
+        }));
+      cb(results);
+    },
+    // 用户选中后的回调，获取其公司信息
+    async handleUserSelect(item) {
+      this.selectedData.userName = item.value;
+      try {
+        const response = await axios.get(`/api/findCompanyByUserID?userId=${item.userId}`);
+        if (response.data.code === 200 && response.data.data) {
+          this.selectedData.companyName = response.data.data.companyName;
+        } else {
+          this.selectedData.companyName = '';
+        }
+      } catch (error) {
+        console.error('获取公司信息失败', error);
+        this.selectedData.companyName = '';
+      }
+    },
+
     checkMobile() {
       this.isMobile = window.innerWidth <= 768;
     },
@@ -602,6 +653,7 @@ export default {
   mounted() {
     this.fetchListData();
     this.checkMobile(); // Initial check
+    this.fetchUsers();
     window.addEventListener('resize', this.checkMobile);
   },
 };
