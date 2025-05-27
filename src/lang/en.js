@@ -144,6 +144,7 @@ const en = {
     Norecentreceivedsharesfound: "No recent received shares found",
     Norecentsharesfound: "No recent shares found",
     Norecentcompletedtaskfound: "No recent completed task found",
+    Created: "Created",
   },
   taskManage: {
     Auto: "Auto",

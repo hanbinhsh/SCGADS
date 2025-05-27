@@ -144,6 +144,7 @@ const zh =  {
     Norecentreceivedsharesfound: "暂无数据",
     Norecentsharesfound: "暂无数据",
     Norecentcompletedtaskfound: "没有最近完成的任务",
+    Created: "创建时间",
   },
   taskManage: {
     Auto: "自动处理",

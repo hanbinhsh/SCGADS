@@ -85,7 +85,7 @@
                   v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
                   :percentage="getShareProgress(data.shared_time, data.due_time)" 
                   type="line"
-                  style="margin-left: 10px; width: 80px;" 
+                  style="margin-left: 10px; width: 80px;"
                   :stroke-width="10"
                   :show-text="false"
                 />
@@ -114,14 +114,34 @@
         </el-card>
         
         <!-- My Models -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%' }" v-loading="modelLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.MyModels') }}</span>
             </div>
           </template>
-          <div class="empty-state">
-            {{ $t('workSpace.Nomodelsfound') }}
+          <div class="success-tasks-list">
+            <div v-if="modelCount === 0" class="empty-state">
+              {{ $t('workSpace.Nomodelsfound') }}
+            </div>
+            <div v-for="(model, index) in sortedRecentModels" :key="index" class="success-task-item">
+              <div class="success-task-header">
+                <font-awesome-icon :style="{ color: '#409EFF' }" :icon="['fas', 'cube']" />
+                <span class="success-task-name">{{ model.modelName }}</span>
+                <el-tag size="small" type="info" style="margin-left: 10px;" v-if="!isRightColumnExpanded">
+                  {{ getModelTypeText(model.modelType) }}
+                </el-tag>
+                <el-button link type="primary" size="small" @click="viewModelDetails(model)" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
+                </el-button>
+              </div>
+              <div class="success-task-details">
+                <span>{{ $t('workSpace.Created') }}: {{ formatDate(model.createdTime) }}</span>
+                <span v-if="model.description && !isRightColumnExpanded" style="margin-left: 10px; color: #909399;">
+                  {{ model.description.length > 30 ? model.description.substring(0, 30) + '...' : model.description }}
+                </span>
+              </div>
+            </div>
           </div>
         </el-card>
         
@@ -490,6 +510,9 @@ export default {
       isMobileView: false,
       mobileTaskDrawerVisible: false,
       mobileActionSheetVisible: false,
+      // 我的模型
+      modelList: [], // 存储模型数据
+      modelLoading: false, // 模型加载状态
     };
   },
   computed: {
@@ -518,9 +541,48 @@ export default {
     },
     sortedCompletedTasks() {
       return [...this.completedTasks].sort((a, b) => new Date(b.endTime) - new Date(a.endTime));
-    }
+    },
+    modelCount() {
+      return this.modelList.length;
+    },
+    // 获取最近的模型（按创建时间排序）
+    sortedRecentModels() {
+      return [...this.modelList]
+        .sort((a, b) => new Date(b.create_time || b.createdAt) - new Date(a.create_time || a.createdAt))
+        .slice(0, 5); // 只显示最近5个
+    },
   },
   methods: {
+     async fetchModelList() {
+      try {
+        this.modelLoading = true;
+        const response = await axios.get("/api/models/findModelsByUserName?userName=" + this.userData.userName);
+        if (response.data.code === 200) {
+          this.modelList = response.data.data || [];
+        } else {
+          console.error("Failed to fetch model list:", response.data.msg);
+          this.modelList = [];
+        }
+        this.modelLoading = false;
+      } catch (error) {
+        console.error("Failed to fetch model list:", error);
+        this.modelLoading = false;
+        this.modelList = [];
+      }
+    },
+    // 获取模型类型显示文本
+    getModelTypeText(type) {
+      if (!type) return this.$t('taskType.Unknown');
+      
+      const typeMap = {
+        'single': this.$t('taskType.Singleomic'),
+        'multi': this.$t('taskType.Multiomics'),
+        'deno': this.$t('taskType.Denoising'),
+      };
+      
+      return typeMap[type.split(':')[0]] || type;
+    },
+
     getShareProgress(startTime, dueTime) {
       if (!startTime || !dueTime) return 100; // 处理异常情况，默认 100%
 
@@ -536,6 +598,7 @@ export default {
     Refresh() {
       this.fetchShareList();
       this.fetchTaskList();
+      this.fetchModelList();
     },
     // 切换右侧列表的展开/折叠状态
     toggleRightColumn() {
