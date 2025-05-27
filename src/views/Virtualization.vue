@@ -355,7 +355,7 @@ export default {
         // config
         const formData3 = new FormData();
         formData3.append('taskName', taskName);
-        formData3.append('type', 'config_' + (this.trueLabel ? '' : 'pred_') + this.activeTask);
+        formData3.append('type', 'config_' + (this.trueLabel ? '' : '') + this.activeTask); // pred_ 这里标签和预测的颜色映射应当相同
         formData3.append('userName', this.userData.userName);
         const response3 = await axios.post('/api/downloadResult', formData3);
         const match = response3.data.match(/export const pieces = (.*?);/);
