@@ -320,6 +320,8 @@ export default {
     async confirmDelete() {
       try {
         await axios.get(`/api/deleteUserByUserID?userID=${this.selectedUser.userId}`);
+        const Action = `删除用户${this.selectedUser.userName}`;
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":Action,"importance":3});
         this.fetchUserList();
         ElMessage.success('User deleted successfully.');
       } catch (error) {
@@ -341,6 +343,8 @@ export default {
       }
 
       for (const user of usersToDelete) {
+        const Action = `删除用户${user.userName}`;
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":Action,"importance":3});
         await this.deleteUserByID(user.userId);
       }
 
@@ -366,7 +370,8 @@ export default {
         await axios.post(`/api/updateUser`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-
+        const Action = `更改用户${this.selectedUser.userName}信息`;
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":Action,"importance":1});
         this.fetchUserList();
         ElMessage.success('User updated successfully.');
         
@@ -443,6 +448,8 @@ export default {
       this.selectedUser = user;
       try {
         await axios.get(`/api/approveUser?userId=${this.selectedUser.userId}`);
+        const Action = `通过用户${this.selectedUser.userName}注册申请`;
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":Action,"importance":3});
         this.fetchUserList();
         ElMessage.success('用户已通过审核');
       } catch (error) {
@@ -465,6 +472,8 @@ export default {
     // 新增：确认拒绝操作
     async confirmReject() {
       try {
+        const Action = `拒绝用户${this.selectedUser.userName}注册申请`;
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":Action,"importance":3});
         await axios.get(`/api/deleteUserByUserID?userID=${this.selectedUser.userId}`);
         this.fetchUserList();
         ElMessage.success('已拒绝用户注册申请');

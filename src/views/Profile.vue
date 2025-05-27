@@ -96,7 +96,7 @@ export default {
         await axios.post(`/api/updateUser`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-
+        await axios.post('/api/insertLog', { "userId": this.userData.userId,"act":"修改个人信息","importance":1});
         const response = await axios.post('/api/findUserByUserId', { userId: this.User.userId });
         const updatedUser = response.data;
         sessionStorage.setItem('userData', JSON.stringify(updatedUser));
