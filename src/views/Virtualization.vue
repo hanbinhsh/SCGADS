@@ -462,7 +462,7 @@ export default {
     },
     async findTaskType(taskName){
       const response = await axios.post('/api/findTaskByTaskName?taskName='+taskName);
-      this.type = response.data.type
+      this.type = response.data.data.type
     },
     checkMobile() {
       this.isMobile = window.innerWidth < 768;
