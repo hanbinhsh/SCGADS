@@ -59,7 +59,7 @@
           </div>
         </el-card>
 
-        <!-- Card 2: Shares -->
+        <!-- Card 2: MyShares -->
         <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
@@ -81,7 +81,7 @@
                 <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
-                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                <el-button link type="success" size="small" @click="showCharts(data.task_name)" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
                   {{ $t('navigateBar.Virtualization') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
@@ -166,7 +166,7 @@
                 <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
-                <el-button link type="success" size="small" @click="" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                <el-button link type="success" size="small" @click="showCharts(data.task_name)" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
                   {{ $t('navigateBar.Virtualization') }}
                 </el-button>
               </div>

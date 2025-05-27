@@ -26,7 +26,13 @@
           </el-table-column>
           <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
           <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable></el-table-column>
+          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable>
+            <template #default="{ row }">
+              <el-tag :type="row.isAdmin ? 'success' : 'warning'">
+                {{ row.isAdmin ? '是' : '否' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable>
             <template #default="{ row }">
               <el-tag :type="row.isVerified ? 'success' : 'warning'">
