@@ -389,31 +389,75 @@
   </div>
 
   <!-- 新增分享对话框 -->
-  <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
-    <el-form :model="shareForm" label-width="120px">
-      <el-form-item :label="$t('workSpace.Expiration')">
-        <el-date-picker
-          v-model="shareForm.due_time"
-          type="datetime"
-          :placeholder="$t('workSpace.SelectExpirationDate')"
-          :disabled-date="disabledDate"
-          value-format="YYYY-MM-DD HH:mm:ss"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('workSpace.Permission')">
-        <el-radio-group v-model="shareForm.permission">
-          <el-radio label="read">{{ $t('workSpace.ReadOnly') }}</el-radio>
-          <el-radio label="write">{{ $t('workSpace.ReadWrite') }}</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
-        <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+ <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
+  <el-form :model="shareForm" label-width="120px">
+    <el-form-item :label="$t('workSpace.Expiration')">
+      <div class="time-input-group">
+        <el-input 
+          v-model.number="shareForm.day" 
+          :placeholder="$t('workSpace.Days')" 
+          type="number" 
+          min="0"
+          class="time-input"
+          @input="validateTime('day')">
+        </el-input>
+        <el-input 
+          v-model.number="shareForm.hour" 
+          :placeholder="$t('workSpace.Hours')" 
+          type="number" 
+          min="0" 
+          max="23"
+          class="time-input"
+          @input="validateTime('hour')">
+        </el-input>
+        <el-input 
+          v-model.number="shareForm.minute" 
+          :placeholder="$t('workSpace.Minutes')" 
+          type="number" 
+          min="0" 
+          max="59"
+          class="time-input"
+          @input="validateTime('minute')">
+        </el-input>
       </div>
-    </template>
-  </el-dialog>
+      <div v-if="timeError" class="time-error">{{ timeError }}</div>
+    </el-form-item>
+    
+    <el-form-item :label="$t('workSpace.Recipient')">
+      <el-input 
+        v-model="shareForm.accepter" 
+        :placeholder="$t('workSpace.RecipientPlaceholder')"
+        clearable>
+      </el-input>
+    </el-form-item>
+    
+    <el-form-item :label="$t('workSpace.Company')">
+      <el-input 
+        v-model="shareForm.companyName" 
+        :placeholder="$t('workSpace.CompanyPlaceholder')"
+        clearable>
+      </el-input>
+    </el-form-item>
+
+    <el-form-item :label="$t('workSpace.Password')">
+      <el-input 
+        v-model="shareForm.password" 
+        type="password"
+        :placeholder="$t('workSpace.PasswordPlaceholder')"
+        show-password
+        clearable>
+      </el-input>
+      <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
+    </el-form-item>
+  </el-form>
+  
+  <template #footer>
+    <div class="dialog-footer">
+      <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
+      <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+    </div>
+  </template>
+</el-dialog>
     </div>
     
     <el-dialog v-model="batchDeleteDialogVisible" title="Warning" width="500">
@@ -707,6 +751,16 @@ export default {
       },
       shareCurrentPage: 1, // 分享列表当前页
       sharePageSize: 10, // 分享列表每页大小
+
+      timeError: '',
+      shareForm: {
+      day: 0,
+      hour: 0,
+      minute: 0,
+      accepter: '',
+      companyName: '', //  companyName
+      password: '',
+    },
     };
   },
   computed: {
@@ -763,26 +817,86 @@ export default {
       this.shareDialogVisible = true;
     },
     async confirmShare() {
-      try {
-        const response = await axios.post('/api/share/create', {
-          task_id: this.selectedTask.task_id,
-          due_time: this.shareForm.due_time,
-          permission: this.shareForm.permission,
-          user_id: this.userData.userId
-        });
-        
-        if (response.data.code === 200) {
-          ElMessage.success(this.$t('workSpace.ShareSuccess'));
-          this.fetchShareList(); // 刷新分享列表
-        } else {
-          ElMessage.error(response.data.msg);
+    // 验证输入
+    if (this.shareForm.day < 0) {
+      this.timeError = this.$t('workSpace.DaysPositive');
+      return;
+    }
+    
+    if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
+      this.timeError = this.$t('workSpace.HoursRange');
+      return;
+    }
+    
+    if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
+      this.timeError = this.$t('workSpace.MinutesRange');
+      return;
+    }
+    
+    try {
+      let userId = null;
+      let companyId = null;
+      
+      // 验证接收者
+      if (this.shareForm.accepter) {
+        if (this.shareForm.accepter === this.userData.userName) {
+          ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
+          return;
         }
-      } catch (error) {
-        console.error('Failed to share task:', error);
-        ElMessage.error(this.$t('workSpace.ShareFailed'));
+        
+        const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.shareForm.accepter}`);
+        const userData = userResponse.data.data;
+        if (userData.state === 0) {
+          ElMessage.error(this.$t('workSpace.UserNotExist'));
+          return;
+        }
+        userId = userData.userId;
       }
+      
+      // 验证公司
+      if (this.shareForm.companyName) {
+        const companyResponse = await axios.post(`/api/findCompanyByName?name=${this.shareForm.companyName}`);
+        const companyData = companyResponse.data.data;
+        if (companyData.state === 0) {
+          ElMessage.error(this.$t('workSpace.CompanyNotExist'));
+          return;
+        }
+        companyId = companyData.companyId;
+      }
+      
+      // 计算分享时间
+      const shareTime = new Date();
+      const dueTime = new Date(
+        shareTime.getTime() + 
+        (this.shareForm.day || 0) * 24 * 60 * 60 * 1000 + 
+        (this.shareForm.hour || 0) * 60 * 60 * 1000 + 
+        (this.shareForm.minute || 0) * 60 * 1000
+      );
+      
+      // 创建分享
+      const response = await axios.post('/api/share/create', {
+        task_id: this.selectedTask.task_id,
+        share_time: shareTime,
+        due_time: dueTime,
+        accepter_id: userId ?? -2,
+        company_id: companyId ?? -2,
+        user_id: this.userData.userId,
+        password: this.shareForm.password,
+      });
+      
+      if (response.data.code === 200) {
+        ElMessage.success(this.$t('workSpace.ShareSuccess'));
+        this.fetchShareList();
+      } else {
+        ElMessage.error(response.data.msg);
+      }
+      
       this.shareDialogVisible = false;
-    },
+    } catch (error) {
+      console.error('Failed to share task:', error);
+      ElMessage.error(this.$t('workSpace.ShareFailed'));
+    }
+  },
     
     disabledDate(time) {
       return time.getTime() < Date.now() - 8.64e7; // 不能选择今天之前的日期
@@ -1613,5 +1727,21 @@ export default {
 
 .right-column-tabs :deep(.el-tabs__content) {
   padding: 0;
+}
+
+.time-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.time-input {
+  flex: 1;
+  max-width: 100px;
+}
+
+.time-error {
+  color: #f56c6c;
+  font-size: 12px;
+  margin-top: 5px;
 }
 </style>
