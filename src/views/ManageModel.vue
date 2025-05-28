@@ -15,6 +15,11 @@
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable></el-table-column>
         <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable></el-table-column>
+        <el-table-column :label="$t('database.models.base_model')" sortable>
+          <template #default="{ row }">
+            {{ row.baseModel == 0 ? 'None' : listData[row.baseModel-1]?.modelName || 'None' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable></el-table-column>
         <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable></el-table-column>
         <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable></el-table-column>
@@ -95,7 +100,7 @@
                 <el-option label="Denoising" value="deno" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="$t('database.models.pretrainModel')">
+            <el-form-item :label="$t('database.models.pretrain_model')">
               <el-switch v-model="selectedData.pretrainModel" style="margin-left: auto;"></el-switch>
             </el-form-item>
             <el-form-item label="Model Path">
@@ -139,7 +144,7 @@
               <span style="font-weight: bold;">Parameters</span>
               <el-button type="primary" icon="plus" @click="addEditingParameter">Add</el-button>
             </div>
-            <div style="max-height: 500px; overflow-y: auto; margin-top: 10px;">
+            <div style="max-height: 550px; overflow-y: auto; margin-top: 10px;">
               <el-form-item v-for="(param, index) in parameters" :key="index" label-width="0px">
                 <div style="display: flex; align-items: center; width: 100%;">
                   <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
@@ -181,7 +186,7 @@
                 <el-option label="Denoising" value="deno" />
               </el-select>
             </el-form-item>
-            <el-form-item :label="$t('database.models.pretrainModel')">
+            <el-form-item :label="$t('database.models.pretrain_model')">
               <el-switch v-model="modelAdding.pretrainModel" style="margin-left: auto;"></el-switch>
             </el-form-item>
             <el-form-item label="Model Path">
@@ -225,7 +230,7 @@
               <span style="font-weight: bold;">Parameters</span>
               <el-button type="primary" icon="plus" @click="addParameter">Add</el-button>
             </div>
-            <div style="max-height: 250px; overflow-y: auto; margin-top: 10px;">
+            <div style="max-height: 550px; overflow-y: auto; margin-top: 10px;">
               <el-form-item v-for="(param, index) in modelAdding.parameters" :key="index" label-width="0px">
                 <div style="display: flex; align-items: center; width: 100%;">
                   <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
@@ -284,6 +289,11 @@
           <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
             {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
               selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.base_model')">
+          <el-tag>
+            {{ selectedData.baseModel == 0 ? 'None' : listData[selectedData.baseModel-1]?.modelName || 'None' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="Pretrain Model">
