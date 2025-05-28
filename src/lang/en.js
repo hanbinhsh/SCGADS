@@ -168,7 +168,8 @@ const en = {
       user_name: "Uploader name",
       company_name: "Company Name",
       created_time: "Upload Time",
-      pretrainModel: "Pretrain Model",
+      pretrain_model: "Pretrain Model",
+      base_model: "Base Model",
     },
     user: {
       user_id: "User ID",

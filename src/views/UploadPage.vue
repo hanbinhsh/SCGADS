@@ -364,6 +364,7 @@ export default {
         type : this.activeTask + ':' +this.selectedModel.modelType,
         parameters : paramString,
         modelId : this.selectedModel.modelId,
+        rePretrain: this.pretrain
       }
       const response = await axios.post('/api/insertTask', task);
       console.log(response);
@@ -469,7 +470,7 @@ export default {
           return model.modelType === "single" || model.modelType === "multi";
         }
         if (this.activeTask === "training") {
-          return model.modelType === "single" || model.modelType === "multi";
+          return (model.modelType === "single" || model.modelType === "multi") && model.baseModel==0;
         }
         if (this.activeTask === "denoising") {
           return model.modelType === "deno";

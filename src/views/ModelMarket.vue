@@ -535,12 +535,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Main Layout */
-.main-page {
-  display: flex;
-  min-height: 100vh;
-}
-
 /* Sidebar */
 .sidebar {
   position: relative;
@@ -752,6 +746,11 @@ onUnmounted(() => {
   
   .dialog-footer {
     text-align: center;
+  }
+
+  .fullscreen-section{
+    margin-top: 0px;
+    margin-bottom: 20px;
   }
 }
 

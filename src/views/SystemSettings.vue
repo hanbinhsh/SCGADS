@@ -61,6 +61,7 @@ export default {
     return {
       parameters: {
         "Auto Progress": true,
+        "Encrypt Files": true,
       },
       parameterDefaults: {
         "Auto Progress": true,

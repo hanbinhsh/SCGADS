@@ -200,12 +200,15 @@
                             <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
                                 <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
                             </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ModelMarket' } " @click="navigateTo('ModelMarket')">
+                                <font-awesome-icon :icon="['fas', 'box-archive']" />&nbsp;&nbsp;{{ $t('navigateBar.ModelMarket') }}
+                            </div>
                         </div>
                     </template>
                     
                     <!-- 未登录状态下只显示可视化菜单 -->
                     <template v-if="!userData.userName">
-                        <div class="mobile-menu-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
+                        <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'Virtualization' }" @click="navigateTo('Virtualization')">
                             <font-awesome-icon :icon="['fas', 'magnifying-glass-chart']" />&nbsp;&nbsp;{{ $t('navigateBar.Virtualization') }}
                         </div>
                     </template>

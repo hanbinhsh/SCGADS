@@ -168,7 +168,8 @@ const zh =  {
       user_name: "上传者",
       company_name: "公司",
       created_time: "上传时间",
-      pretrainModel: "预训练模型",
+      pretrain_model: "预训练模型",
+      base_model: "基础模型",
     },
     user: {
       user_id: "用户ID",

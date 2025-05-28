@@ -49,10 +49,10 @@
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" :label="$t('Operations')" width="380" class-name="operations-column">
+        <el-table-column fixed="right" :label="$t('Operations')" :width="systemSettings['Auto Progress'] ? 380 : 320" class-name="operations-column">
           <template #default="{ row }">
             <!-- Desktop view - show all buttons -->
-                <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)">
+                <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)" v-if="systemSettings['Auto Progress']">
                   {{ $t('taskManage.Auto') }}
                 </el-button>
                 <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
@@ -129,28 +129,28 @@
       </div>
 
       <!-- 移动端详情对话框 -->
-    <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
-      <div class="operation-buttons">
-                <el-button link type="primary" size="small" @click="showAutoProgressDialog(currentRow)">
-                  {{ $t('taskManage.Auto') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showDownloadFileDialog(currentRow)">
-                  {{ $t('Download') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showDetailDialog(currentRow)">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showCharts(currentRow.task_name)" :disabled="currentRow.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-                <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
-                  {{ $t('Edit') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
-                  {{ $t('Delete') }}
-                </el-button>
-      </div>
-    </el-dialog>
+      <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
+        <div class="operation-buttons">
+          <el-button link type="primary" size="small" @click="showAutoProgressDialog(currentRow)" v-if="systemSettings['Auto Progress']">
+            {{ $t('taskManage.Auto') }}
+          </el-button>
+          <el-button link type="success" size="small" @click="showDownloadFileDialog(currentRow)">
+            {{ $t('Download') }}
+          </el-button>
+          <el-button link type="" size="small" @click="showDetailDialog(currentRow)">
+            {{ $t('Detail') }}
+          </el-button>
+          <el-button link type="" size="small" @click="showCharts(currentRow.task_name)" :disabled="currentRow.status !== 2">
+            {{ $t('navigateBar.Virtualization') }}
+          </el-button>
+          <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
+            {{ $t('Edit') }}
+          </el-button>
+          <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
+            {{ $t('Delete') }}
+          </el-button>
+        </div>
+      </el-dialog>
 
       <!-- 分页组件 -->
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -347,8 +347,8 @@
           <template #tip>
             <div class="el-upload__tip">
               Required files pattern: <br>
-              • data_(tsne|umap).js<br>
-              • (label|config)[_pred]_(tsne|umap).js
+              • (data|config)_(tsne|umap).js<br>
+              • label[_pred]_(tsne|umap).js
             </div>
             <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
               {{ file.name }}
@@ -405,9 +405,19 @@ export default {
       sortOrder: '', // 当前排序顺序
       defaultAvatar: logo,
       loading:false,
+      systemSettings: {}, // 系统设置
     };
   },
   methods: {
+    // 请求后端配置文件并应用到表单
+    async fetchConfig() {
+      try {
+        const response = await axios.get("/api/system-settings/config");
+        this.systemSettings = response.data || this.parameters; // 如果没有配置，使用默认值
+      } catch (error) {
+        console.error('Error fetching config:', error);
+      }
+    },
     closeUploadDialog() {
       this.uploadDialogVisible = false;
       // 当对话框关闭时，将状态设置为 "Processing"
@@ -816,6 +826,7 @@ export default {
   
   mounted() {
     this.fetchTaskList();
+    this.fetchConfig();
   },
 };
 </script>

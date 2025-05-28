@@ -739,7 +739,7 @@ export default {
     sortedRecentModels() {
       return [...this.modelList]
         .sort((a, b) => new Date(b.create_time || b.createdAt) - new Date(a.create_time || a.createdAt))
-        .slice(0, 5); // 只显示最近5个
+        // .slice(0, 5); // 只显示最近5个
     },
   },
   methods: {
