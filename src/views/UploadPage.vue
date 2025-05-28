@@ -364,6 +364,7 @@ export default {
         type : this.activeTask + ':' +this.selectedModel.modelType,
         parameters : paramString,
         modelId : this.selectedModel.modelId,
+        rePretrain: this.pretrain
       }
       const response = await axios.post('/api/insertTask', task);
       console.log(response);

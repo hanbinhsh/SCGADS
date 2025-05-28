@@ -347,8 +347,8 @@
           <template #tip>
             <div class="el-upload__tip">
               Required files pattern: <br>
-              • data_(tsne|umap).js<br>
-              • (label|config)[_pred]_(tsne|umap).js
+              • (data|config)_(tsne|umap).js<br>
+              • label[_pred]_(tsne|umap).js
             </div>
             <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
               {{ file.name }}
