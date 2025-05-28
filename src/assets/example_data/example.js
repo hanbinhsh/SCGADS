@@ -2,6 +2,7 @@ import * as echarts from 'echarts';
 import { data } from './data.js';
 import { pieces } from './config.js';
 import { labels } from './label.js';
+import { markRaw } from 'vue';
 
 export function initializeChart(dark, newChart, axisSettings, newData, newPieces, newLabel, isMobile = false) {
   const chartDom = document.getElementById('main');
@@ -10,7 +11,7 @@ export function initializeChart(dark, newChart, axisSettings, newData, newPieces
     myChart1.dispose();
   }
 
-  const myChart = echarts.init(chartDom, false);
+  const myChart = markRaw(echarts.init(chartDom, false));
 
   const rawData = newChart ? newData : data;
   const rawLabel = newChart ? newLabel : labels;

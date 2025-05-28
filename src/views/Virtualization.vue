@@ -251,6 +251,7 @@ import 'element-plus/theme-chalk/el-pagination.css';
 import axios from 'axios';
 import { pieces } from "@/assets/example_data/config";
 import * as echarts from 'echarts';
+import { markRaw } from 'vue';
 export default {
   name: "Virtualization",
   components: {
@@ -415,7 +416,7 @@ export default {
       if (this.trainChart) {
         this.trainChart.dispose();
       }
-      this.trainChart = echarts.init(chartDom, this.isDarkMode ? 'dark' : null);
+      this.trainChart = markRaw(echarts.init(chartDom, this.isDarkMode ? 'dark' : null));
       
       const { epochs, series, headers } = trainData;
       const seriesConfig = [];
@@ -445,7 +446,15 @@ export default {
             },
             itemStyle: {
               color: colors[colorIndex % colors.length]
-            }
+            },
+            showSymbol: true,
+            emphasis: {
+              focus: 'series'
+            },
+            // 动画配置
+            animation: true,
+            animationDuration: 1000,
+            animationEasing: 'cubicOut'
           };
           
           seriesConfig.push(seriesItem);
@@ -559,7 +568,10 @@ export default {
           }
         },
         yAxis: yAxisConfig,
-        series: seriesConfig
+        series: seriesConfig,
+        // 全局配置
+        animation: true,
+        animationDuration: 1000
       };
       
       this.trainChart.setOption(option);
