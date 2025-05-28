@@ -129,28 +129,28 @@
       </div>
 
       <!-- 移动端详情对话框 -->
-    <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
-      <div class="operation-buttons">
-                <el-button link type="primary" size="small" @click="showAutoProgressDialog(currentRow)">
-                  {{ $t('taskManage.Auto') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showDownloadFileDialog(currentRow)">
-                  {{ $t('Download') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showDetailDialog(currentRow)">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showCharts(currentRow.task_name)" :disabled="currentRow.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-                <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
-                  {{ $t('Edit') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
-                  {{ $t('Delete') }}
-                </el-button>
-      </div>
-    </el-dialog>
+      <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
+        <div class="operation-buttons">
+          <el-button link type="primary" size="small" @click="showAutoProgressDialog(currentRow)" v-if="systemSettings['Auto Progress']">
+            {{ $t('taskManage.Auto') }}
+          </el-button>
+          <el-button link type="success" size="small" @click="showDownloadFileDialog(currentRow)">
+            {{ $t('Download') }}
+          </el-button>
+          <el-button link type="" size="small" @click="showDetailDialog(currentRow)">
+            {{ $t('Detail') }}
+          </el-button>
+          <el-button link type="" size="small" @click="showCharts(currentRow.task_name)" :disabled="currentRow.status !== 2">
+            {{ $t('navigateBar.Virtualization') }}
+          </el-button>
+          <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
+            {{ $t('Edit') }}
+          </el-button>
+          <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
+            {{ $t('Delete') }}
+          </el-button>
+        </div>
+      </el-dialog>
 
       <!-- 分页组件 -->
       <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
