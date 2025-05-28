@@ -414,7 +414,6 @@ export default {
       try {
         const response = await axios.get("/api/system-settings/config");
         this.systemSettings = response.data || this.parameters; // 如果没有配置，使用默认值
-        console.log(this.systemSettings)
       } catch (error) {
         console.error('Error fetching config:', error);
       }
