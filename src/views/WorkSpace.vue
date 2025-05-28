@@ -304,7 +304,6 @@
             layout="total, sizes, prev, pager, next, jumper" 
             :total="taskList.length">
           </el-pagination>
-          
           <!-- Button Row -->
           <div class="footer">
             <div class="footer-button-row">
@@ -373,6 +372,17 @@
             layout="total, sizes, prev, pager, next, jumper" 
             :total="shareList.length">
           </el-pagination>
+          <!-- Button Row -->
+          <div class="footer">
+            <div class="footer-button-row">
+              <el-button type="success" @click="Refresh">
+                Refresh
+              </el-button>
+              <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
+                Batch Delete TODO 批量删除分享
+              </el-button>
+            </div>
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -1418,7 +1428,7 @@ export default {
   margin-top: auto;
   padding: 10px;
   border-top: 1px solid #e6e6e6;
-  position: absolute;
+  /* position: absolute; */
 }
 
 .footer-button-row {
