@@ -19,7 +19,7 @@
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising" :disabled="!((type?.split(':')[0] || '') === 'denoising')">
+        <el-menu-item index="denoising" :disabled="!((thisTask.type?.split(':')[0] || '') === 'denoising')">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
@@ -54,11 +54,23 @@
             <template #header>
               <div slot="header" class="card-header">
                 <span class="page-name">{{ taskName || $t('Visualization.Example') }} {{ $t('Visualization.DataVisualization' )}}</span>
-                <el-button type="primary" style="float: right;" @click="SwitchTrueLabel" :disabled="!isUserTask||!((type?.split(':')[0] || '') === 'training')">
-                  <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;{{ $t('Visualization.Switch') }}&nbsp;
-                  <span v-if="trueLabel">{{ $t('Visualization.Pred') }}</span>
-                  <span v-else>{{ $t('Visualization.True') }}</span>
-                </el-button>
+                <div class="button-group">
+                  <el-button type="success" @click="showTrainResult('pretrain')" :loading="pretrainLoading" 
+                  v-if="isUserTask&&((thisTask.type?.split(':')[0] || '') === 'training')&&thisTask.rePretrain">
+                    <font-awesome-icon :icon="['fas', 'chart-line']" />&nbsp;{{ $t('Visualization.PretrainResult') }}
+                  </el-button>
+                  <el-button type="info" @click="showTrainResult('train')" :loading="trainLoading" 
+                  v-if="isUserTask&&((thisTask.type?.split(':')[0] || '') === 'training')">
+                    <font-awesome-icon :icon="['fas', 'chart-area']" />&nbsp;{{ $t('Visualization.TrainResult') }}
+                  </el-button>
+                  <!-- 切换真实标签 -->
+                  <el-button type="primary" @click="SwitchTrueLabel" 
+                  v-if="isUserTask&&((thisTask.type?.split(':')[0] || '') === 'training')">
+                    <font-awesome-icon :icon="['fas', 'shuffle']" />&nbsp;{{ $t('Visualization.Switch') }}&nbsp;
+                    <span v-if="trueLabel">{{ $t('Visualization.Pred') }}</span>
+                    <span v-else>{{ $t('Visualization.True') }}</span>
+                  </el-button>
+                </div>
               </div>
             </template>
             <div class="card-body">
@@ -209,6 +221,22 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog 
+      v-model="trainResultVisible" 
+      :title="trainResultTitle" 
+      :width="isMobile ? '95%' : '1000px'" 
+      align-center
+      :fullscreen="isMobile"
+      :close-on-click-modal="false">
+      <div id="trainChart" style="width: 100%; height: 500px;"></div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="trainResultVisible = false">{{ $t('Close') }}</el-button>
+          <el-button type="primary" @click="downloadTrainChart()">{{ $t('Visualization.DownloadCharts') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -257,7 +285,7 @@ export default {
       newData: '',
       newLabel: '',
       isUserTask: false, // 是否是用户的任务而不是示例
-      type: 'annotation',
+      thisTask: {},
       trueLabel: false,  // 是否真实标签
       newPieces: false,
       isMobile: false,
@@ -277,7 +305,15 @@ export default {
           showLabels: true, // Y 轴上的文字
           showGridLines: true // Y 轴网格线
         }
-      }
+      },
+      // 训练图表
+      trainResultVisible: false,
+      trainResultTitle: '',
+      pretrainLoading: false,
+      trainLoading: false,
+      trainChart: null,
+      currentTrainData: null,
+      currentTrainType: '', // 'pretrain' 或 'train'
     };
   },
   computed: {
@@ -300,6 +336,296 @@ export default {
     },
   },
   methods: {
+    async showTrainResult(type) {
+      try {
+        if (type === 'pretrain') {
+          this.pretrainLoading = true;
+          this.trainResultTitle = this.$t('Visualization.PretrainResult');
+        } else {
+          this.trainLoading = true;
+          this.trainResultTitle = this.$t('Visualization.TrainResult');
+        }
+        
+        const formData = new FormData();
+        formData.append('taskName', this.$route.query.taskName);
+        formData.append('type', type === 'pretrain' ? 'pretrainresult' : 'trainresult');
+        formData.append('userName', this.userData.userName);
+        
+        const response = await axios.post('/api/downloadTrainResult', formData);
+        
+        // 解析训练结果数据
+        const trainData = this.parseTrainResult(response.data, type);
+        this.currentTrainData = trainData;
+        this.currentTrainType = type;
+        
+        this.trainResultVisible = true;
+        
+        // 等待对话框渲染完成后初始化图表
+        this.$nextTick(() => {
+          this.initTrainChart(trainData, type);
+        });
+        
+      } catch (error) {
+        console.error('获取训练结果失败:', error);
+        this.$message.error(this.$t('Visualization.TrainResultLoadFailed'));
+      } finally {
+        if (type === 'pretrain') {
+          this.pretrainLoading = false;
+        } else {
+          this.trainLoading = false;
+        }
+      }
+    },
+    
+    parseTrainResult(data, type) {
+      const lines = data.trim().split('\n');
+      const headers = lines[0].split('\t').map(h => h.trim()); // 去除空白字符
+      const epochs = [];
+      const series = {};
+      
+      // 初始化系列数据
+      headers.forEach(header => {
+        if (header !== 'Epoch') {
+          series[header] = [];
+        }
+      });
+      
+      // 解析数据行
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line && !line.startsWith('Best') && !line.startsWith('Early')) {
+          const values = line.split('\t').map(v => v.trim()); // 去除空白字符
+          if (values.length === headers.length) {
+            epochs.push(parseInt(values[0]));
+            for (let j = 1; j < headers.length; j++) {
+              const value = parseFloat(values[j]);
+              if (!isNaN(value)) { // 确保是有效数字
+                series[headers[j]].push(value);
+              }
+            }
+          }
+        }
+      }
+      
+      return { epochs, series, headers };
+    },
+    
+    initTrainChart(trainData, type) {
+      const chartDom = document.getElementById('trainChart');
+      if (this.trainChart) {
+        this.trainChart.dispose();
+      }
+      this.trainChart = echarts.init(chartDom, this.isDarkMode ? 'dark' : null);
+      
+      const { epochs, series, headers } = trainData;
+      const seriesConfig = [];
+      const colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452'];
+      let colorIndex = 0;
+      
+      // 分类指标：损失类 vs 准确率/F1类
+      const lossMetrics = [];
+      const accuracyMetrics = [];
+      
+      // 为每个指标创建系列并分类
+      headers.forEach(header => {
+        if (header !== 'Epoch' && series[header]) {
+          const isLossMetric = header.toLowerCase().includes('loss');
+          const yAxisIndex = isLossMetric ? 0 : 1; // 损失用左轴(0)，准确率/F1用右轴(1)
+          
+          const seriesItem = {
+            name: this.getMetricDisplayName(header),
+            type: 'line',
+            yAxisIndex: yAxisIndex,
+            data: series[header],
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 6,
+            lineStyle: {
+              width: 2
+            },
+            itemStyle: {
+              color: colors[colorIndex % colors.length]
+            }
+          };
+          
+          seriesConfig.push(seriesItem);
+          
+          if (isLossMetric) {
+            lossMetrics.push(header);
+          } else {
+            accuracyMetrics.push(header);
+          }
+          
+          colorIndex++;
+        }
+      });
+      
+      // 构建Y轴配置
+      const yAxisConfig = [
+        // 左轴 - 损失
+        {
+          type: type === 'pretrain' ? 'log' : 'value', // 预训练使用对数坐标
+          name: this.$t('Visualization.Loss'),
+          nameLocation: 'middle',
+          nameGap: 50,
+          position: 'left',
+          axisLabel: {
+            color: this.isDarkMode ? '#ffffff' : '#333333',
+            formatter: type === 'pretrain' ? '{value}' : '{value}'
+          },
+          nameTextStyle: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          },
+          splitLine: {
+            show: true,
+            lineStyle: {
+              color: this.isDarkMode ? '#333333' : '#e0e0e0'
+            }
+          }
+        }
+      ];
+      
+      // 只有当存在准确率/F1指标时才添加右轴
+      if (accuracyMetrics.length > 0) {
+        yAxisConfig.push({
+          type: 'value',
+          name: this.$t('Visualization.AccuracyF1'),
+          nameLocation: 'middle',
+          nameGap: 50,
+          position: 'right',
+          min: 0,
+          max: 1,
+          axisLabel: {
+            color: this.isDarkMode ? '#ffffff' : '#333333',
+            formatter: '{value}'
+          },
+          nameTextStyle: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          },
+          splitLine: {
+            show: false // 右轴不显示网格线，避免与左轴冲突
+          }
+        });
+      }
+      
+      const option = {
+        title: {
+          text: type === 'pretrain' ? this.$t('Visualization.PretrainResult') : this.$t('Visualization.TrainResult'),
+          left: 'center',
+          textStyle: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross'
+          },
+          formatter: function(params) {
+            let result = `Epoch: ${params[0].axisValue}<br/>`;
+            params.forEach(param => {
+              const value = param.yAxisIndex === 0 ? 
+                (type === 'pretrain' ? param.value.toFixed(5) : param.value.toFixed(5)) :
+                param.value.toFixed(5);
+              result += `${param.marker}${param.seriesName}: ${value}<br/>`;
+            });
+            return result;
+          }
+        },
+        legend: {
+          data: seriesConfig.map(s => s.name),
+          bottom: 5,
+          textStyle: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          }
+        },
+        grid: {
+          left: '15%',
+          right: accuracyMetrics.length > 0 ? '15%' : '10%', // 有右轴时增加右边距
+          bottom: '20%',
+          top: '15%'
+        },
+        xAxis: {
+          type: 'category',
+          data: epochs,
+          name: 'Epoch',
+          nameLocation: 'middle',
+          nameGap: 30,
+          axisLabel: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          },
+          nameTextStyle: {
+            color: this.isDarkMode ? '#ffffff' : '#333333'
+          }
+        },
+        yAxis: yAxisConfig,
+        series: seriesConfig
+      };
+      
+      this.trainChart.setOption(option);
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', () => {
+        if (this.trainChart) {
+          this.trainChart.resize();
+        }
+      });
+    },
+    
+    getMetricDisplayName(metric) {
+      // 去除可能的空白字符并进行匹配
+      const cleanMetric = metric.trim();
+      const metricMap = {
+        'Train Loss': this.$t('Visualization.TrainLoss'),
+        'Validation Loss': this.$t('Visualization.ValidationLoss'), 
+        'Train Acc': this.$t('Visualization.TrainAccuracy'),
+        'Train F1': this.$t('Visualization.TrainF1'),
+        'Validation Acc': this.$t('Visualization.ValidationAccuracy'),
+        'Validation F1': this.$t('Visualization.ValidationF1')
+      };
+      
+      // 先尝试完全匹配
+      if (metricMap[cleanMetric]) {
+        return metricMap[cleanMetric];
+      }
+      
+      // 如果没有匹配到，尝试部分匹配
+      for (const key in metricMap) {
+        if (cleanMetric.includes(key) || key.includes(cleanMetric)) {
+          return metricMap[key];
+        }
+      }
+      
+      // 都没有匹配到，返回原始值
+      return cleanMetric;
+    },
+    
+    downloadTrainChart() {
+      if (!this.trainChart) return;
+      
+      const img = new Image();
+      img.src = this.trainChart.getDataURL({
+        type: "png",
+        pixelRatio: this.magnifyRatio,
+        backgroundColor: "#fff",
+      });
+      
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL("image/png");
+    
+        const a = document.createElement("a");
+        const event = new MouseEvent("click");
+        a.download = `train_result_${this.currentTrainType}.png`;
+        a.href = dataURL;
+        a.dispatchEvent(event);
+        a.remove();
+      }.bind(this);
+    },
     SwitchTrueLabel(){
       this.trueLabel = !this.trueLabel
       if(this.isUserTask){
@@ -460,9 +786,9 @@ export default {
         a.remove();
       }
     },
-    async findTaskType(taskName){
+    async findTask(taskName){
       const response = await axios.post('/api/findTaskByTaskName?taskName='+taskName);
-      this.type = response.data.data.type
+      this.thisTask = response.data.data
     },
     checkMobile() {
       this.isMobile = window.innerWidth < 768;
@@ -496,7 +822,7 @@ export default {
     // 如果有 taskName 参数，调用下载
     if (this.$route.query.taskName) {
       // 判断任务类型
-      this.findTaskType(this.$route.query.taskName)
+      this.findTask(this.$route.query.taskName)
       this.downloadResult(this.$route.query.taskName);
       this.isUserTask = true;
     }
@@ -506,6 +832,9 @@ export default {
     window.removeEventListener('resize', () => {
       this.myChart.resize();
     });
+    if (this.trainChart) {
+      this.trainChart.dispose();
+    }
   },
 };
 </script>
@@ -555,8 +884,18 @@ export default {
   position: absolute;
 }
 
+.button-group{
+  float: right;
+}
+
 /* Mobile-specific styles */
 @media (max-width: 768px) {
+  .button-group{
+    float: none;
+    justify-content: space-between;
+    display: flex;
+  }
+
   .card{
     margin-bottom: 200px;
   }
