@@ -46,6 +46,9 @@ const zh =  {
     AddCompany: "添加公司",
     AddUserTo: "添加用户到",
     SelectUser: "选择一个用户",
+
+    DownloadLogs: "下载日志",
+    ChooseDownloadFormat: "请选择下载格式",
   },
   modelPage:{
     SingleModality: "单模态模型",
@@ -127,6 +130,12 @@ const zh =  {
     Close: '关闭',
     Loss: '损失',
     AccuracyF1: '准确率 & F1',
+  },
+  importance: {
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "unknown": "未知"
   },
   uploadPage: {
     Annotation: "类型注释",

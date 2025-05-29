@@ -46,6 +46,9 @@ const en = {
     AddCompany: "Add Company",
     AddUserTo: "Add user to",
     SelectUser: "Select User",
+
+    DownloadLogs: "Download Logs",
+    ChooseDownloadFormat: "Choose Download Format",
   },
   modelPage:{
     SingleModality: "Single",
@@ -127,6 +130,12 @@ const en = {
     Close: 'Close',
     Loss: 'Loss',
     AccuracyF1: 'Accuracy & F1',
+  },
+  importance: {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "unknown": "Unknown"
   },
   uploadPage: {
     Annotation: "Annotation",

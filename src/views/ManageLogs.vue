@@ -14,7 +14,7 @@
           v-loading="loading"
         >
           <!-- 多选功能 -->
-          <el-table-column type="selection" width="55"></el-table-column>
+          <!-- <el-table-column type="selection" width="55"></el-table-column> -->
           <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable min-width="150">
             <template #default="{ row }">
               <div style="display: flex; align-items: center;">
@@ -70,8 +70,8 @@
         <el-button type="success" @click="fetchLogs">
           {{ $t('Refresh') }}
         </el-button>
-        <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedLogs.length === 0">
-          {{ $t('BatchDelete') }}
+        <el-button type="primary" @click="showDownloadDialog">
+          {{ $t('managePage.DownloadLogs') }}
         </el-button>
       </div>
     </div>
@@ -100,34 +100,8 @@
         </el-descriptions-item>
       </el-descriptions>
       <template #footer>
-        <div class="dialog-footer">
+        <div>
           <el-button type="primary" @click="detailDialogVisible = false">{{ $t('Confirm') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
-      <span>{{ $t('logs.DeleteConfirm') }}</span>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteLog(selectedLog.log_id)">
-            {{ $t('Confirm') }}
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 批量删除确认对话框 -->
-    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('BatchDeleteConfirmation')" width="500" align-center>
-      <span>{{ $t('logs.BatchDeleteConfirm') }}</span>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">
-            {{ $t('Confirm') }}
-          </el-button>
         </div>
       </template>
     </el-dialog>
@@ -155,13 +129,13 @@
           {{ formatDate(currentRow.timestamp) }}
         </el-descriptions-item>
       </el-descriptions>
-      <div class="operation-buttons">
+      <div>
         <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
           {{ $t('Delete') }}
         </el-button>
       </div>
       <template #footer>
-        <div class="dialog-footer">
+        <div>
           <el-button type="primary" @click="optDialogVisible = false">{{ $t('Close') }}</el-button>
         </div>
       </template>
@@ -170,6 +144,8 @@
 </template>
   
 <script>
+  import * as XLSX from 'xlsx';
+  import { saveAs } from 'file-saver';
   import MainHeader from "../components/MainHeader.vue";
   import axios from 'axios';
   import { ElMessage } from 'element-plus';
@@ -188,7 +164,6 @@
         optDialogVisible: false,
         detailDialogVisible: false,
         deleteDialogVisible: false,
-        batchDeleteDialogVisible: false,
         selectedLog: {},
         selectedLogs: [],
         currentPage: 1,
@@ -235,10 +210,6 @@
       showDeleteDialog(log) {
         this.deleteDialogVisible = true;
         this.selectedLog = log;
-      },
-      
-      showBatchDeleteDialog() {
-        this.batchDeleteDialogVisible = true;
       },
       
       handleSelectionChange(val) {
@@ -329,29 +300,6 @@
         }
       },
       
-      async confirmBatchDelete() {
-        this.batchDeleteDialogVisible = false;
-        let successCount = 0;
-        let failCount = 0;
-        
-        for (const log of this.selectedLogs) {
-          try {
-            await this.deleteLogID(log.log_id);
-            successCount++;
-          } catch (error) {
-            failCount++;
-          }
-        }
-        
-        if (failCount === 0) {
-          ElMessage.success(`成功删除${successCount}条日志`);
-        } else {
-          ElMessage.warning(`成功删除${successCount}条日志，${failCount}条删除失败`);
-        }
-        
-        this.fetchLogs();
-      },
-      
       formatDate(dateString) {
         if (!dateString) return '';
         const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
@@ -369,13 +317,161 @@
       },
       
       getImportanceLabel(importance) {
-        // 根据重要性返回不同的标签文字
         switch (Number(importance)) {
-          case 1: return '低';
-          case 2: return '中';
-          case 3: return '高';
-          default: return '未知';
+          case 1: return this.$t('importance.low');
+          case 2: return this.$t('importance.medium');
+          case 3: return this.$t('importance.high');
+          default: return this.$t('importance.unknown');
         }
+      },
+
+      downloadCSV() {
+        try {
+          // 准备CSV数据
+          const csvData = this.prepareCsvData();
+          
+          // 创建CSV内容
+          const csvContent = this.arrayToCsv(csvData);
+          
+          // 创建Blob对象
+          const blob = new Blob(['\ufeff' + csvContent], { 
+            type: 'text/csv;charset=utf-8' 
+          });
+          
+          // 生成文件名
+          const fileName = `logs_${this.formatFileDate(new Date())}.csv`;
+          
+          // 下载文件
+          saveAs(blob, fileName);
+          
+          ElMessage.success(this.$t('DownloadSuccess') || '下载成功');
+        } catch (error) {
+          console.error('CSV下载失败:', error);
+          ElMessage.error(this.$t('DownloadFailed') || '下载失败');
+        }
+      },
+
+      // Excel下载功能
+      downloadExcel() {
+        try {
+          // 准备Excel数据
+          const excelData = this.prepareExcelData();
+          
+          // 创建工作簿
+          const wb = XLSX.utils.book_new();
+          
+          // 创建工作表
+          const ws = XLSX.utils.aoa_to_sheet(excelData);
+          
+          // 设置列宽
+          const colWidths = [
+            { wch: 15 }, // 用户名
+            { wch: 30 }, // 操作
+            { wch: 10 }, // 重要性
+            { wch: 20 }  // 时间戳
+          ];
+          ws['!cols'] = colWidths;
+          
+          // 添加工作表到工作簿
+          XLSX.utils.book_append_sheet(wb, ws, 'Logs');
+          
+          // 生成文件名
+          const fileName = `logs_${this.formatFileDate(new Date())}.xlsx`;
+          
+          // 下载文件
+          XLSX.writeFile(wb, fileName);
+          
+          ElMessage.success(this.$t('DownloadSuccess') || '下载成功');
+        } catch (error) {
+          console.error('Excel下载失败:', error);
+          ElMessage.error(this.$t('DownloadFailed') || '下载失败');
+        }
+      },
+
+      // 准备CSV数据
+      prepareCsvData() {
+        const headers = [
+          this.$t('database.user.user_name') || '用户名',
+          this.$t('database.log.action') || '操作',
+          this.$t('database.log.importance') || '重要性',
+          this.$t('database.log.timestamp') || '时间戳'
+        ];
+        
+        const rows = this.logsList.map(log => [
+          log.user_name || '',
+          log.action || '',
+          this.getImportanceLabel(log.importance),
+          this.formatDate(log.timestamp)
+        ]);
+        
+        return [headers, ...rows];
+      },
+
+      // 准备Excel数据
+      prepareExcelData() {
+        const headers = [
+          this.$t('database.user.user_name') || '用户名',
+          this.$t('database.log.action') || '操作',
+          this.$t('database.log.importance') || '重要性',
+          this.$t('database.log.timestamp') || '时间戳'
+        ];
+        
+        const rows = this.logsList.map(log => [
+          log.user_name || '',
+          log.action || '',
+          this.getImportanceLabel(log.importance),
+          this.formatDate(log.timestamp)
+        ]);
+        
+        return [headers, ...rows];
+      },
+
+      // 数组转CSV格式
+      arrayToCsv(data) {
+        return data.map(row => 
+          row.map(cell => {
+            // 处理包含逗号、换行符或引号的字段
+            const cellStr = String(cell || '');
+            if (cellStr.includes(',') || cellStr.includes('\n') || cellStr.includes('"')) {
+              return `"${cellStr.replace(/"/g, '""')}"`;
+            }
+            return cellStr;
+          }).join(',')
+        ).join('\n');
+      },
+
+      // 格式化文件日期
+      formatFileDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${year}${month}${day}_${hours}${minutes}`;
+      },
+
+      // 显示下载选择对话框
+      showDownloadDialog() {
+        this.$confirm(
+          this.$t('managePage.ChooseDownloadFormat'),
+          this.$t('Download'),
+          {
+            distinguishCancelAndClose: true,
+            confirmButtonText: 'Excel',
+            cancelButtonText: 'CSV',
+            type: 'info'
+          }
+        ).then(() => {
+          // 用户选择Excel
+          this.downloadExcel();
+        }).catch((action) => {
+          if (action === 'cancel') {
+            // 用户选择CSV
+            this.downloadCSV();
+          }
+          // 如果是'close'则什么都不做
+        });
       }
     },
     mounted() {
@@ -387,18 +483,3 @@
     }
   };
 </script>
-  
-<style scoped>
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .operation-buttons {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-</style>

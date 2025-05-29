@@ -117,11 +117,11 @@
         <!-- 按钮行 -->
         <div class="footer">
           <div class="footer-button-row">
-            <el-button type="success" @click="showCreateDialog">
-              {{ $t('managePage.AddCompany') }}
-            </el-button>
             <el-button type="success" @click="fetchCompanyList">
               {{ $t('Refresh') }}
+            </el-button>
+            <el-button type="primary" @click="showCreateDialog">
+              {{ $t('managePage.AddCompany') }}
             </el-button>
             <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedCompanys.length === 0">
               {{ $t('BatchDelete') }}
