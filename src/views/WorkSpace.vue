@@ -1,12 +1,13 @@
 <template>
   <div class="dashboard-container">
     <MainHeader></MainHeader>
-    
+
     <div class="content-container">
       <!-- Left Column with 4 Cards -->
       <div class="left-column" :class="{ 'with-expanded-right': isRightColumnExpanded }">
         <!-- Card 1: Status Chart -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto'}" v-loading="loading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft"
+          :body-style="{ height: '100%', overflow: 'auto' }" v-loading="loading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.TaskStatus') }}</span>
@@ -24,7 +25,7 @@
                     <el-row><el-tag type="warning" style="width: 80px;">{{ $t('status.Pending') }}</el-tag></el-row>
                     <el-row><el-tag type="primary" style="width: 80px;">{{ $t('status.Processing') }}</el-tag></el-row>
                     <el-row><el-tag type="success" style="width: 80px;">{{ $t('status.Completed') }}</el-tag></el-row>
-                    <el-row><el-tag type="danger"  style="width: 80px;">{{ $t('status.Error') }}</el-tag></el-row>
+                    <el-row><el-tag type="danger" style="width: 80px;">{{ $t('status.Error') }}</el-tag></el-row>
                   </el-col>
                   <el-col :span="10">
                     <el-row><span class="status-count">{{ pendingCount }}</span></el-row>
@@ -45,7 +46,8 @@
                     <div class="success-task-header">
                       <font-awesome-icon :style="{ color: '#67C23A' }" :icon="['fas', 'circle']" />
                       <span class="success-task-name">{{ task.task_name }}</span>
-                      <el-button link type="success" size="small" @click="showCharts(task.task_name)" :disabled="task.status !== 2" style="margin-left: auto;">
+                      <el-button link type="success" size="small" @click="showCharts(task.task_name)"
+                        :disabled="task.status !== 2" style="margin-left: auto;">
                         {{ $t('navigateBar.Virtualization') }}
                       </el-button>
                     </div>
@@ -60,7 +62,8 @@
         </el-card>
 
         <!-- Card 2: MyShares -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft"
+          :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.MyShares') }}</span>
@@ -72,49 +75,54 @@
             </div>
             <div v-for="(data, index) in shareList" :key="index" class="success-task-item">
               <div class="success-task-header">
-                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <font-awesome-icon :style="{ color: getStatusColor(data.status) }" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <el-button link type="info" size="small" @click="" style="margin-left: auto" v-if="!isRightColumnExpanded">
+                <el-button link type="info" size="small" @click="" style="margin-left: auto"
+                  v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
                 </el-button>
                 <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
-                <el-button link type="success" size="small" @click="showCharts(data.task_name)" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                <el-button link type="success" size="small" @click="showCharts(data.task_name)"
+                  :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
                   {{ $t('navigateBar.Virtualization') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('Edit') }}
                 </el-button>
-                <el-button link type="danger" size="small" @click="showUnshareDialog(data)" v-if="!isRightColumnExpanded">
+                <el-button link type="danger" size="small" @click="showUnshareDialog(data)"
+                  v-if="!isRightColumnExpanded">
                   {{ $t('Delete') }}
                 </el-button>
               </div>
 
               <div class="success-task-details">
-                {{ formatDate(data.shared_time) }} 
-                <span v-if="!data.due_time && !isRightColumnExpanded" class="share-status-badge share-status-indefinite"> {{ $t('workSpace.Indefinite') }} </span>
-                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666; margin-left: auto;">
+                {{ formatDate(data.shared_time) }}
+                <span v-if="!data.due_time && !isRightColumnExpanded"
+                  class="share-status-badge share-status-indefinite"> {{
+                    $t('workSpace.Indefinite') }} </span>
+                <span v-if="data.due_time && !isRightColumnExpanded"
+                  style="font-size: 11px; color: #666; margin-left: auto;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired" style="margin-left: 10px"> {{ $t('workSpace.Expired') }} </span>
-                
-                <el-progress 
-                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
-                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
-                  type="line"
-                  style="margin-left: 10px; width: 80px;"
-                  :stroke-width="10"
-                  :show-text="false"
-                />
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded"
+                  class="share-status-badge share-status-expired" style="margin-left: 10px"> {{ $t('workSpace.Expired')
+                  }}
+                </span>
+
+                <el-progress v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" type="line"
+                  style="margin-left: 10px; width: 80px;" :stroke-width="10" :show-text="false" />
               </div>
             </div>
           </div>
         </el-card>
-        
+
         <!-- My Models -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="modelLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft"
+          :body-style="{ height: '100%', overflow: 'auto' }" v-loading="modelLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.MyModels') }}</span>
@@ -131,7 +139,8 @@
                 <el-tag size="small" type="info" style="margin-left: 10px;" v-if="!isRightColumnExpanded">
                   {{ getModelTypeText(model.modelType) }}
                 </el-tag>
-                <el-button link type="primary" size="small" @click="showModelDetails = true; selectedData = model" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                <el-button link type="primary" size="small" @click="showModelDetails = true; selectedData = model"
+                  style="margin-left: auto;" v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
                 </el-button>
               </div>
@@ -144,9 +153,10 @@
             </div>
           </div>
         </el-card>
-        
+
         <!-- Shares Received -->
-        <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
+        <el-card class="dashboard-card animate__animated animate__fadeInLeft"
+          :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
               <span>{{ $t('workSpace.SharesReceived') }}</span>
@@ -158,412 +168,371 @@
             </div>
             <div v-for="(data, index) in shareReceivedList" :key="index" class="success-task-item">
               <div class="success-task-header">
-                <font-awesome-icon :style="{ color: getStatusColor(data.status)}" :icon="['fas', 'circle']" />
+                <font-awesome-icon :style="{ color: getStatusColor(data.status) }" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <el-button link type="info" size="small" @click="" style="margin-left: auto;" v-if="!isRightColumnExpanded">
+                <el-button link type="info" size="small" @click="" style="margin-left: auto;"
+                  v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
                 </el-button>
                 <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
-                <el-button link type="success" size="small" @click="showCharts(data.task_name)" :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
+                <el-button link type="success" size="small" @click="showCharts(data.task_name)"
+                  :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
                   {{ $t('navigateBar.Virtualization') }}
                 </el-button>
               </div>
 
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }}
-                
-                <span v-if="!data.due_time && !isRightColumnExpanded" class="share-status-badge share-status-indefinite"> {{ $t('workSpace.Indefinite') }} </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
+
+                <span v-if="!data.due_time && !isRightColumnExpanded"
+                  class="share-status-badge share-status-indefinite"> {{
+                    $t('workSpace.Indefinite') }} </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded"
+                  class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
                 <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
-                <el-progress 
-                  v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
-                  :percentage="getShareProgress(data.shared_time, data.due_time)" 
-                  type="line"
-                  style="margin-left: 10px; width: 80px;"
-                  :stroke-width="10"
-                  :show-text="false"
-                />
+                <el-progress v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
+                  :percentage="getShareProgress(data.shared_time, data.due_time)" type="line"
+                  style="margin-left: 10px; width: 80px;" :stroke-width="10" :show-text="false" />
               </div>
             </div>
           </div>
         </el-card>
       </div>
-      
+
       <!-- Right Column with Collapsible Task List -->
-    <div class="right-column animate__animated animate__fadeInRight"
-      :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
-      <div class="column-toggle" @click="toggleRightColumn">
-      <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
-        {{ isRightColumnExpanded ? $t('workSpace.Collapse') : $t('workSpace.Expand') }}
-      </el-button>
-    </div>
-    
-    <!-- Collapsed -->
-    <div v-if="!isRightColumnExpanded" class="collapsed-task-list">
-      <el-table :data="paginatedTaskList" 
-        style="width: 100%" 
-        v-loading="loading">
-        <el-table-column prop="task_name" :label="$t('database.task.task_name')">
-          <template #default="{ row }">
-            <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-            {{ row.task_name }}
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <!-- Simplified Pagination -->
-      <el-pagination 
-        class="pagination" 
-        @current-change="handleCurrentChange"
-        :current-page="currentPage" 
-        :page-size="pageSize"
-        layout="prev, pager, next" 
-        :total="taskList.length">
-      </el-pagination>
-    </div>
-    
-    <!-- Expanded -->
-    <div v-else class="expanded-task-list">
-      <!-- 新增TAB栏 - 三列布局 -->
-      <el-tabs v-model="activeTab" type="card" class="right-column-tabs">
-        <el-tab-pane :label="$t('workSpace.Tasks')" name="tasks">
-          <!-- Original Full Table Layout -->
-          <el-table :data="paginatedTaskList" 
-            style="width: 100%"
-            @selection-change="handleSelectionChange"
-            @sort-change="handleSortChange"
-            v-loading="loading">
-            <!-- 多选框 -->
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
-              <template #default="{ row }">
-                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-                {{ row.task_name }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="type" :label="$t('database.task.type')" sortable>
-              <template #default="{ row }">
-                {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
-                   (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
-                   (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
-                {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-                   (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
-                   (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
-              </template>
-            </el-table-column>
-            <el-table-column prop="model_name" :label="$t('database.models.model_name')" sortable>
-              <template #default="{ row }">
-                {{ row.model_name ?? "Unknown" }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
-              <template #default="{ row }">
-                {{ formatDate(row.start_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
-              <template #default="{ row }">
-                {{ (row.end_time&&row.status===2) ? formatDate(row.end_time) :  $t('Notcompletedyet') }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" :label="$t('database.task.status')" sortable>
-              <template #default="{ row }">
-                <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" :label="$t('Operations')" width="300">
-              <template #default="{ row }">
-                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-                <el-button link type="info" size="small" @click="showShareDialog(row)">
-                  {{ $t('Share') }}
-                </el-button>
-                <el-button link type="primary" size="small" @click="showDetailDialog(row)">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-                  {{ $t('Delete') }}
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <!-- Full Pagination -->
-          <el-pagination 
-            class="pagination" 
-            @size-change="handleSizeChange" 
-            @current-change="handleCurrentChange"
-            :current-page="currentPage" 
-            :page-sizes="[5, 10, 20, 50]" 
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="taskList.length">
-          </el-pagination>
-          <!-- Button Row -->
-          <div class="footer">
-            <div class="footer-button-row">
-              <el-button type="success" @click="Refresh">
-                {{ $t('Refresh') }}
-              </el-button>
-              <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-                {{ $t('workSpace.BatchDelete') }}
-              </el-button>
-            </div>
-          </div>
-        </el-tab-pane>
-
-        <!-- 我的分享 TAB -->
-        <el-tab-pane :label="$t('workSpace.MyShares')" name="myShares">
-          <el-table :data="paginatedMySharesList" 
-            style="width: 100%"
-            v-loading="shareLoading">
-            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
-              <template #default="{ row }">
-                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-                {{ row.task_name }}
-              </template>
-            </el-table-column>
-            <!-- 新增：被分享者列 -->
-    <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')">
-      <template #default="{ row }">
-        {{ row.receiver_name || $t('workSpace.Public') }}
-      </template>
-    </el-table-column>
-    
-    <!-- 新增：任务类型列 -->
-    <el-table-column :label="$t('database.task.type')">
-      <template #default="{ row }">
-        {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
-           (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
-           (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
-        {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-           (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
-           (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
-      </template>
-    </el-table-column>
-    
-
-<el-table-column prop="status" :label="$t('database.task.status')">
-      <template #default="{ row }">
-        <el-tag :type="statusType(row.status)">
-          {{ statusText(row.status) }}
-        </el-tag>
-      </template>
-    </el-table-column>
-            <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
-              <template #default="{ row }">
-                {{ formatDate(row.shared_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="due_time" :label="$t('database.share.due_time')">
-              <template #default="{ row }">
-                {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" :label="$t('Status')">
-              <template #default="{ row }">
-                <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
-                  {{ $t('workSpace.Indefinite') }}
-                </span>
-                <span v-else-if="new Date() > new Date(row.due_time)" class="share-status-badge share-status-expired">
-                  {{ $t('workSpace.Expired') }}
-                </span>
-                <span v-else class="share-status-badge share-status-active">
-                  {{ $t('workSpace.Active') }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" :label="$t('Operations')" width="250">
-              <template #default="{ row }">
-                <el-button link type="info" size="small" @click="copyShareLink(row)">
-                  {{ $t('workSpace.CopyLink') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showUnshareDialog(row)">
-                  {{ $t('workSpace.Unshare') }}
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <el-pagination 
-            class="pagination" 
-            @size-change="handleMySharesSizeChange" 
-            @current-change="handleMySharesCurrentChange"
-            :current-page="mySharesCurrentPage" 
-            :page-sizes="[5, 10, 20, 50]" 
-            :page-size="mySharesPageSize"
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="shareList.length">
-          </el-pagination>
-          <!-- Button Row -->
-          <div class="footer">
-            <div class="footer-button-row">
-              <el-button type="success" @click="Refresh">
-                {{ $t('Refresh') }}
-              </el-button>
-            </div>
-          </div>
-        </el-tab-pane>
-
-        <!-- 收到的分享 TAB -->
-        <el-tab-pane :label="$t('workSpace.SharesReceived')" name="receivedShares">
-          <el-table :data="paginatedReceivedSharesList" 
-            style="width: 100%"
-            v-loading="shareLoading">
-            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
-              <template #default="{ row }">
-                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
-                {{ row.task_name }}
-              </template>
-            </el-table-column>
-                <!-- 新增：任务类型列 -->
-    <el-table-column :label="$t('database.task.type')">
-      <template #default="{ row }">
-        {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
-           (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
-           (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
-        {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-           (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
-           (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
-      </template>
-    </el-table-column>
-    
-    
-    <!-- 新增：状态列（任务状态） -->
-    <el-table-column prop="status" :label="$t('database.task.status')">
-      <template #default="{ row }">
-        <el-tag :type="statusType(row.status)">
-          {{ statusText(row.status) }}
-        </el-tag>
-      </template>
-    </el-table-column>
-            <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
-              <template #default="{ row }">
-                {{ formatDate(row.shared_time) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="due_time" :label="$t('database.share.due_time')">
-              <template #default="{ row }">
-                {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')">
-              <template #default="{ row }">
-                {{ row.user_name || $t('workSpace.Unknown') }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" :label="$t('Status')">
-              <template #default="{ row }">
-                <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
-                  {{ $t('workSpace.Indefinite') }}
-                </span>
-                <span v-else-if="new Date() > new Date(row.due_time)" class="share-status-badge share-status-expired">
-                  {{ $t('workSpace.Expired') }}
-                </span>
-                <span v-else class="share-status-badge share-status-active">
-                  {{ $t('workSpace.Active') }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" :label="$t('Operations')" width="200">
-              <template #default="{ row }">
-                <el-button link type="info" size="small" @click="copyShareLink(row)">
-                  {{ $t('workSpace.CopyLink') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <el-pagination 
-            class="pagination" 
-            @size-change="handleReceivedSharesSizeChange" 
-            @current-change="handleReceivedSharesCurrentChange"
-            :current-page="receivedSharesCurrentPage" 
-            :page-sizes="[5, 10, 20, 50]" 
-            :page-size="receivedSharesPageSize"
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="shareReceivedList.length">
-          </el-pagination>
-          <!-- Button Row -->
-          <div class="footer">
-            <div class="footer-button-row">
-              <el-button type="success" @click="Refresh">
-                {{ $t('Refresh') }}
-              </el-button>
-            </div>
-          </div>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
-  </div>
-
-  <!-- 分享对话框 -->
-  <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
-    <el-form :model="shareForm" label-width="120px">
-      <el-form-item :label="$t('workSpace.Expiration')">
-        <el-date-picker
-          v-model="shareForm.dueTime"
-          type="datetime"
-          placeholder="选择到期时间"
-          format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
-          clearable
-        />
-        <div style="color: #909399; font-size: 12px; margin-left: 5px;">
-          留空表示永久分享
+      <div class="right-column animate__animated animate__fadeInRight"
+        :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
+        <div class="column-toggle" @click="toggleRightColumn">
+          <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
+            {{ isRightColumnExpanded ? $t('workSpace.Collapse') : $t('workSpace.Expand') }}
+          </el-button>
         </div>
-      </el-form-item>
-      
-      <el-form-item :label="$t('workSpace.Recipient')">
-        <el-input 
-          v-model="shareForm.accepter" 
-          :placeholder="$t('workSpace.RecipientPlaceholder')"
-          clearable>
-        </el-input>
-      </el-form-item>
-      
-      <el-form-item :label="$t('workSpace.Company')">
-        <el-input 
-          v-model="shareForm.companyName" 
-          :placeholder="$t('workSpace.CompanyPlaceholder')"
-          clearable>
-        </el-input>
-      </el-form-item>
 
-      <el-form-item :label="$t('workSpace.Password')">
-        <el-input 
-          v-model="shareForm.password" 
-          type="password"
-          :placeholder="$t('workSpace.PasswordPlaceholder')"
-          show-password
-          clearable>
-        </el-input>
-        <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
-      </el-form-item>
-    </el-form>
-  
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
-        <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+        <!-- Collapsed -->
+        <div v-if="!isRightColumnExpanded" class="collapsed-task-list">
+          <el-table :data="paginatedTaskList" style="width: 100%" v-loading="loading">
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+              <template #default="{ row }">
+                <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
+                {{ row.task_name }}
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <!-- Simplified Pagination -->
+          <el-pagination class="pagination" @current-change="handleCurrentChange" :current-page="currentPage"
+            :page-size="pageSize" layout="prev, pager, next" :total="taskList.length">
+          </el-pagination>
+        </div>
+
+        <!-- Expanded -->
+        <div v-else class="expanded-task-list">
+          <!-- 新增TAB栏 - 三列布局 -->
+          <el-tabs v-model="activeTab" type="card" class="right-column-tabs">
+            <el-tab-pane :label="$t('workSpace.Tasks')" name="tasks">
+              <!-- Original Full Table Layout -->
+              <el-table :data="paginatedTaskList" style="width: 100%" @selection-change="handleSelectionChange"
+                @sort-change="handleSortChange" v-loading="loading">
+                <!-- 多选框 -->
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
+                  <template #default="{ row }">
+                    <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
+                    {{ row.task_name }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="type" :label="$t('database.task.type')" sortable>
+                  <template #default="{ row }">
+                    {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
+                      (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
+                        (row.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
+                    {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+                      (row.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
+                        (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown') }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="model_name" :label="$t('database.models.model_name')" sortable>
+                  <template #default="{ row }">
+                    {{ row.model_name ?? "Unknown" }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
+                  <template #default="{ row }">
+                    {{ formatDate(row.start_time) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
+                  <template #default="{ row }">
+                    {{ (row.end_time && row.status === 2) ? formatDate(row.end_time) : $t('Notcompletedyet') }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="status" :label="$t('database.task.status')" sortable>
+                  <template #default="{ row }">
+                    <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" :label="$t('Operations')" width="300">
+                  <template #default="{ row }">
+                    <el-button link type="success" size="small" @click="showCharts(row.task_name)"
+                      :disabled="row.status !== 2">
+                      {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                    <el-button link type="info" size="small" @click="showShareDialog(row)">
+                      {{ $t('Share') }}
+                    </el-button>
+                    <el-button link type="primary" size="small" @click="showDetailDialog(row)">
+                      {{ $t('Detail') }}
+                    </el-button>
+                    <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
+                      {{ $t('Delete') }}
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <!-- Full Pagination -->
+              <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper" :total="taskList.length">
+              </el-pagination>
+              <!-- Button Row -->
+              <div class="footer">
+                <div class="footer-button-row">
+                  <el-button type="success" @click="Refresh">
+                    {{ $t('Refresh') }}
+                  </el-button>
+                  <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
+                    {{ $t('BatchDelete') }}
+                  </el-button>
+                </div>
+              </div>
+            </el-tab-pane>
+
+            <!-- 我的分享 TAB -->
+            <el-tab-pane :label="$t('workSpace.MyShares')" name="myShares">
+              <el-table :data="paginatedMySharesList" style="width: 100%" v-loading="shareLoading">
+                <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+                  <template #default="{ row }">
+                    <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
+                    {{ row.task_name }}
+                  </template>
+                </el-table-column>
+                <!-- 新增：被分享者列 -->
+                <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')">
+                  <template #default="{ row }">
+                    {{ row.receiver_name || $t('workSpace.Public') }}
+                  </template>
+                </el-table-column>
+
+                <!-- 新增：任务类型列 -->
+                <el-table-column :label="$t('database.task.type')">
+                  <template #default="{ row }">
+                    {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
+                      (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
+                        (row.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
+                    {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+                      (row.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
+                        (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown')}}
+                  </template>
+                </el-table-column>
+
+
+                <el-table-column prop="status" :label="$t('database.task.status')">
+                  <template #default="{ row }">
+                    <el-tag :type="statusType(row.status)">
+                      {{ statusText(row.status) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
+                  <template #default="{ row }">
+                    {{ formatDate(row.shared_time) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="due_time" :label="$t('database.share.due_time')">
+                  <template #default="{ row }">
+                    {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="status" :label="$t('Status')">
+                  <template #default="{ row }">
+                    <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
+                      {{ $t('workSpace.Indefinite') }}
+                    </span>
+                    <span v-else-if="new Date() > new Date(row.due_time)"
+                      class="share-status-badge share-status-expired">
+                      {{ $t('workSpace.Expired') }}
+                    </span>
+                    <span v-else class="share-status-badge share-status-active">
+                      {{ $t('workSpace.Active') }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" :label="$t('Operations')" width="250">
+                  <template #default="{ row }">
+                    <el-button link type="info" size="small" @click="copyShareLink(row)">
+                      {{ $t('workSpace.CopyLink') }}
+                    </el-button>
+                    <el-button link type="success" size="small" @click="showCharts(row.task_name)"
+                      :disabled="row.status !== 2">
+                      {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                    <el-button link type="danger" size="small" @click="showUnshareDialog(row)">
+                      {{ $t('workSpace.Unshare') }}
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <el-pagination class="pagination" @size-change="handleMySharesSizeChange"
+                @current-change="handleMySharesCurrentChange" :current-page="mySharesCurrentPage"
+                :page-sizes="[5, 10, 20, 50]" :page-size="mySharesPageSize"
+                layout="total, sizes, prev, pager, next, jumper" :total="shareList.length">
+              </el-pagination>
+              <!-- Button Row -->
+              <div class="footer">
+                <div class="footer-button-row">
+                  <el-button type="success" @click="Refresh">
+                    {{ $t('Refresh') }}
+                  </el-button>
+                </div>
+              </div>
+            </el-tab-pane>
+
+            <!-- 收到的分享 TAB -->
+            <el-tab-pane :label="$t('workSpace.SharesReceived')" name="receivedShares">
+              <el-table :data="paginatedReceivedSharesList" style="width: 100%" v-loading="shareLoading">
+                <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+                  <template #default="{ row }">
+                    <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
+                    {{ row.task_name }}
+                  </template>
+                </el-table-column>
+                <!-- 新增：任务类型列 -->
+                <el-table-column :label="$t('database.task.type')">
+                  <template #default="{ row }">
+                    {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
+                      (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
+                        (row.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
+                    {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+                      (row.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
+                        (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown')}}
+                  </template>
+                </el-table-column>
+
+
+                <!-- 新增：状态列（任务状态） -->
+                <el-table-column prop="status" :label="$t('database.task.status')">
+                  <template #default="{ row }">
+                    <el-tag :type="statusType(row.status)">
+                      {{ statusText(row.status) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
+                  <template #default="{ row }">
+                    {{ formatDate(row.shared_time) }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="due_time" :label="$t('database.share.due_time')">
+                  <template #default="{ row }">
+                    {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')">
+                  <template #default="{ row }">
+                    {{ row.user_name || $t('workSpace.Unknown') }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="status" :label="$t('Status')">
+                  <template #default="{ row }">
+                    <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
+                      {{ $t('workSpace.Indefinite') }}
+                    </span>
+                    <span v-else-if="new Date() > new Date(row.due_time)"
+                      class="share-status-badge share-status-expired">
+                      {{ $t('workSpace.Expired') }}
+                    </span>
+                    <span v-else class="share-status-badge share-status-active">
+                      {{ $t('workSpace.Active') }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" :label="$t('Operations')" width="200">
+                  <template #default="{ row }">
+                    <el-button link type="info" size="small" @click="copyShareLink(row)">
+                      {{ $t('workSpace.CopyLink') }}
+                    </el-button>
+                    <el-button link type="success" size="small" @click="showCharts(row.task_name)"
+                      :disabled="row.status !== 2">
+                      {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+              <el-pagination class="pagination" @size-change="handleReceivedSharesSizeChange"
+                @current-change="handleReceivedSharesCurrentChange" :current-page="receivedSharesCurrentPage"
+                :page-sizes="[5, 10, 20, 50]" :page-size="receivedSharesPageSize"
+                layout="total, sizes, prev, pager, next, jumper" :total="shareReceivedList.length">
+              </el-pagination>
+              <!-- Button Row -->
+              <div class="footer">
+                <div class="footer-button-row">
+                  <el-button type="success" @click="Refresh">
+                    {{ $t('Refresh') }}
+                  </el-button>
+                </div>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
       </div>
-    </template>
-  </el-dialog>
+
+      <!-- 分享对话框 -->
+      <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
+        <el-form :model="shareForm" label-width="120px">
+          <el-form-item :label="$t('workSpace.Expiration')">
+            <el-date-picker v-model="shareForm.dueTime" type="datetime" placeholder="选择到期时间"
+              format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" clearable />
+            <div style="color: #909399; font-size: 12px; margin-left: 5px;">
+              留空表示永久分享
+            </div>
+          </el-form-item>
+
+          <el-form-item :label="$t('workSpace.Recipient')">
+            <el-input v-model="shareForm.accepter" :placeholder="$t('workSpace.RecipientPlaceholder')" clearable>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item :label="$t('workSpace.Company')">
+            <el-input v-model="shareForm.companyName" :placeholder="$t('workSpace.CompanyPlaceholder')" clearable>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item :label="$t('workSpace.Password')">
+            <el-input v-model="shareForm.password" type="password" :placeholder="$t('workSpace.PasswordPlaceholder')"
+              show-password clearable>
+            </el-input>
+            <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
+            <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+          </div>
+        </template>
+      </el-dialog>
 
       <!-- 编辑分享对话框 -->
-    <!-- <el-dialog
+      <!-- <el-dialog
       v-model="editDialogVisible" 
       :title="`编辑分享设置`" 
       :width="isMobile ? '95%' : '600px'"
@@ -599,7 +568,7 @@
       </template>
     </el-dialog> -->
     </div>
-    
+
     <el-dialog v-model="batchDeleteDialogVisible" :title="$t('Warning')" width="500">
       <span>{{ $t('workSpace.BatchDeleteConfirm') }}</span>
       <template #footer>
@@ -611,7 +580,8 @@
     </el-dialog>
 
     <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
-      <span>{{ $t('workSpace.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedTask?.task_name }}</strong></span>
+      <span>{{ $t('workSpace.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedTask?.task_name
+          }}</strong></span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -634,15 +604,16 @@
         </el-descriptions-item>
 
         <el-descriptions-item :label="$t('database.task.type')">
-          {{ (selectedTask.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
-             (selectedTask.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
-             (selectedTask.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+          {{ (selectedTask.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
+            (selectedTask.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
+              (selectedTask.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
           {{ (selectedTask.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-             (selectedTask.type?.split(':')[0] || "") === "training"  ? $t('taskType.Training')  :
-             (selectedTask.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+            (selectedTask.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
+              (selectedTask.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown') }}
         </el-descriptions-item>
-        
-        <el-descriptions-item :label="$t('database.task.re_pretrain')" v-if="(selectedTask.type?.split(':')[0] || '') === 'training'">
+
+        <el-descriptions-item :label="$t('database.task.re_pretrain')"
+          v-if="(selectedTask.type?.split(':')[0] || '') === 'training'">
           <el-tag :type="selectedTask.re_pretrain == true ? 'success' : 'warning'">
             {{ selectedTask.re_pretrain == true ? $t('Yes') : $t('No') }}
           </el-tag>
@@ -654,7 +625,9 @@
 
         <el-descriptions-item :label="$t('database.task.parameters')">
           <el-scrollbar max-height="150px">
-            <el-row v-for="(param, index) in (selectedTask.parameters || selectedTask.default_parameters || '').split(',')" :key="index">
+            <el-row
+              v-for="(param, index) in (selectedTask.parameters || selectedTask.default_parameters || '').split(',')"
+              :key="index">
               <el-col :span="24">
                 <el-tag type="info" class="param-tag">
                   {{ param.trim() }}
@@ -674,19 +647,11 @@
   </div>
 
   <div class="mobile-task-drawer">
-    <el-drawer
-      v-model="mobileTaskDrawerVisible"
-      :title="$t('workSpace.Tasks')"
-      direction="btt"
-      size="80%"
-    >
-      <el-table 
-        :data="paginatedTaskList" 
-        style="width: 100%" 
-        v-loading="loading">
+    <el-drawer v-model="mobileTaskDrawerVisible" :title="$t('workSpace.Tasks')" direction="btt" size="80%">
+      <el-table :data="paginatedTaskList" style="width: 100%" v-loading="loading">
         <el-table-column prop="task_name" :label="$t('database.task.task_name')">
           <template #default="{ row }">
-            <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+            <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
             {{ row.task_name }}
           </template>
         </el-table-column>
@@ -698,29 +663,22 @@
         <el-table-column fixed="right" :label="$t('Operations')" width="60">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMobileActionSheet(row)">
-              <el-icon><MoreFilled /></el-icon>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
-      <el-pagination 
-        class="pagination" 
-        @current-change="handleCurrentChange"
-        :current-page="currentPage" 
-        :page-size="pageSize"
-        layout="prev, pager, next" 
-        :total="taskList.length">
+
+      <el-pagination class="pagination" @current-change="handleCurrentChange" :current-page="currentPage"
+        :page-size="pageSize" layout="prev, pager, next" :total="taskList.length">
       </el-pagination>
     </el-drawer>
 
     <!-- Mobile Action Sheet -->
-    <el-dialog
-      v-model="mobileActionSheetVisible"
-      :title="selectedTask?.task_name"
-      width="95%"
-      class="mobile-action-dialog"
-    >
+    <el-dialog v-model="mobileActionSheetVisible" :title="selectedTask?.task_name" width="95%"
+      class="mobile-action-dialog">
       <div class="mobile-task-details">
         <div class="detail-item">
           <span class="detail-label">{{ $t('Status') }}:</span>
@@ -740,11 +698,13 @@
         </div>
         <div class="detail-item">
           <span class="detail-label">{{ $t('database.task.end_time') }}:</span>
-          <span>{{ (selectedTask?.end_time && selectedTask?.status === 2) ? formatDate(selectedTask?.end_time) : $t('Notcompletedyet') }}</span>
+          <span>{{ (selectedTask?.end_time && selectedTask?.status === 2) ? formatDate(selectedTask?.end_time) :
+            $t('Notcompletedyet') }}</span>
         </div>
       </div>
       <div class="mobile-action-buttons">
-        <el-button type="success" @click="showCharts(selectedTask?.task_name)" :disabled="selectedTask?.status !== 2" block>
+        <el-button type="success" @click="showCharts(selectedTask?.task_name)" :disabled="selectedTask?.status !== 2"
+          block>
           {{ $t('navigateBar.Virtualization') }}
         </el-button>
         <el-button type="primary" @click="showDetailDialog(selectedTask)" block>
@@ -759,7 +719,9 @@
 
   <div class="mobile-task-button" v-if="isMobileView">
     <el-button type="primary" circle @click="mobileTaskDrawerVisible = true">
-      <el-icon><List /></el-icon>
+      <el-icon>
+        <List />
+      </el-icon>
     </el-button>
   </div>
 
@@ -767,10 +729,14 @@
   <el-dialog v-model="showModelDetails" :title="selectedData?.modelName" width="550px" align-center>
     <div class="model-details-info" style="width: 100%;">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedData.modelType) }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedData.companyName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedData.createdTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('modelPage.ModelType')">{{ getModelTypeLabel(selectedData.modelType)
+          }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName
+          }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.company_name')">{{ selectedData.companyName
+          }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('database.models.created_time')">{{ selectedData.createdTime
+          }}</el-descriptions-item>
         <el-descriptions-item :label="$t('modelPage.Remark')">{{ selectedData.remark }}</el-descriptions-item>
         <el-descriptions-item :label="$t('modelPage.DefaultParameters')">
           <el-scrollbar max-height="150px">
@@ -788,10 +754,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="showModelDetails = false">{{ $t('Close') }}</el-button>
-        <el-button 
-          type="warning" 
-          @click="editModel(selectedData)" 
-          :disabled="!isUserModel(selectedData)" 
+        <el-button type="warning" @click="editModel(selectedData)" :disabled="!isUserModel(selectedData)"
           v-if="isUserModel(selectedData)">
           {{ $t('modelPage.Edit') }}
         </el-button>
@@ -824,7 +787,8 @@
 
   <!-- 删除确认对话框 -->
   <el-dialog v-model="showDeleteModelDialog" :title="$t('Warning')" width="500" align-center>
-    <span>{{ $t('modelPage.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong></span>
+    <span>{{ $t('modelPage.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedData.modelName
+        }}</strong></span>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="showDeleteModelDialog = false">{{ $t('Cancel') }}</el-button>
@@ -891,7 +855,7 @@ export default {
         password: '',
       },
       timeError: '',
-      
+
       // 新增分页变量
       mySharesCurrentPage: 1,
       mySharesPageSize: 10,
@@ -916,7 +880,7 @@ export default {
     receivedShareCount() {
       return this.shareReceivedList.length;
     },
-    shareCount(){
+    shareCount() {
       return this.shareList.length;
     },
     // 获取错误任务列表
@@ -933,16 +897,16 @@ export default {
     sortedRecentModels() {
       return [...this.modelList]
         .sort((a, b) => new Date(b.create_time || b.createdAt) - new Date(a.create_time || a.createdAt))
-        // .slice(0, 5); // 只显示最近5个
+      // .slice(0, 5); // 只显示最近5个
     },
-    
+
     // 新增计算属性
     paginatedMySharesList() {
       const start = (this.mySharesCurrentPage - 1) * this.mySharesPageSize;
       const end = start + this.mySharesPageSize;
       return this.shareList.slice(start, end);
     },
-    
+
     paginatedReceivedSharesList() {
       const start = (this.receivedSharesCurrentPage - 1) * this.receivedSharesPageSize;
       const end = start + this.receivedSharesPageSize;
@@ -964,16 +928,16 @@ export default {
       try {
         let userId = null;
         let companyId = null;
-        
+
         // 验证接收者
         if (this.shareForm.accepter) {
           if (this.shareForm.accepter === this.userData.userName) {
             ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
             return;
           }
-          
+
           const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.shareForm.accepter}`);
-          const userData = userResponse.data.data; 
+          const userData = userResponse.data.data;
           if (userData.state === 0) {
             ElMessage.error(this.$t('workSpace.UserNotExist'));
             return;
@@ -982,7 +946,7 @@ export default {
           userId = userData.userId;
           console.log(userId);
         }
-        
+
         // 验证公司
         if (this.shareForm.companyName) {
           const companyResponse = await axios.post(`/api/findCompanyByCompanyName?companyName=${this.shareForm.companyName}`);
@@ -995,11 +959,11 @@ export default {
           companyId = companyData.userGroup.companyId;
           console.log(companyId);
         }
-        
+
         // 计算分享时间
         const shareTime = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss');
         const dueTime = this.shareForm.dueTime;
-        
+
         // 创建分享
         const shareData = {
           taskId: this.selectedTask.task_id,
@@ -1010,24 +974,24 @@ export default {
           companyId: companyId ?? -2,
           password: this.shareForm.password,
         };
-        
+
         // 发送请求
         const response = await axios.post('/api/share/insertShare', [shareData]);
-        
+
         if (response.data.code === 200) {
           ElMessage.success(this.$t('workSpace.ShareSuccess'));
           this.fetchShareList();
         } else {
           ElMessage.error(response.data.msg);
         }
-        
+
         this.shareDialogVisible = false;
       } catch (error) {
         console.error('Failed to share task:', error);
         ElMessage.error(this.$t('workSpace.ShareFailed'));
       }
     },
-    
+
     copyShareLink(share) {
       const link = `${window.location.origin}/shared/${share.share_id}`;
       navigator.clipboard.writeText(link).then(() => {
@@ -1036,7 +1000,7 @@ export default {
         ElMessage.error(this.$t('workSpace.CopyFailed'));
       });
     },
-    
+
     async showUnshareDialog(share) {
       try {
         await this.$confirm(this.$t('workSpace.ConfirmUnshare'), this.$t('Warning'), {
@@ -1044,8 +1008,8 @@ export default {
           cancelButtonText: this.$t('Cancel'),
           type: 'warning'
         });
-        
-        const response = await axios.post(`/api/share/deleteShareByShareId`,{shareId: share.share_id});
+
+        const response = await axios.post(`/api/share/deleteShareByShareId`, { shareId: share.share_id });
         if (response.data.code === 200) {
           ElMessage.success(this.$t('workSpace.UnshareSuccess'));
           this.fetchShareList(); // 刷新分享列表
@@ -1059,7 +1023,7 @@ export default {
         }
       }
     },
-    
+
     async fetchModelList() {
       try {
         this.modelLoading = true;
@@ -1091,13 +1055,13 @@ export default {
     },
     getModelTypeLabel(type) {
       switch (type) {
-        case 'single': 
+        case 'single':
           return this.$t('modelPage.SingleModality');
-        case 'multi': 
+        case 'multi':
           return this.$t('modelPage.MultiModality');
-        case 'deno': 
+        case 'deno':
           return this.$t('modelPage.Denoising');
-        default: 
+        default:
           return type;
       }
     },
@@ -1141,13 +1105,13 @@ export default {
     // 获取模型类型显示文本
     getModelTypeText(type) {
       if (!type) return this.$t('taskType.Unknown');
-      
+
       const typeMap = {
         'single': this.$t('taskType.Singleomic'),
         'multi': this.$t('taskType.Multiomics'),
         'deno': this.$t('taskType.Denoising'),
       };
-      
+
       return typeMap[type.split(':')[0]] || type;
     },
 
@@ -1213,10 +1177,10 @@ export default {
         if (this.statusChart) {
           this.statusChart.dispose();
         }
-        
+
         // 创建新的图表实例
         this.statusChart = echarts.init(this.$refs.statusChart);
-        
+
         // 设置图表选项
         const option = {
           tooltip: {
@@ -1257,7 +1221,7 @@ export default {
             }
           ]
         };
-        
+
         // 使用配置项设置图表
         this.statusChart.setOption(option);
       }
@@ -1276,8 +1240,8 @@ export default {
       this.deleteDialogVisible = true;
       this.selectedTask = task;
     },
-    showCharts(taskName) {  
-      this.$router.push({ name: "Virtualization", query: { taskName } });  
+    showCharts(taskName) {
+      this.$router.push({ name: "Virtualization", query: { taskName } });
     },
     showDetailDialog(task) {
       this.detailDialogVisible = true;
@@ -1292,7 +1256,7 @@ export default {
     },
     async deleteTask() {
       try {
-        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.task_name);
+        await axios.get("/api/deleteTaskByTaskName?userName=" + this.userData.userName + "&taskName=" + this.selectedTask.task_name);
         ElMessage.success(this.$t('workSpace.DeleteSuccess'));
         this.Refresh();
       } catch (error) {
@@ -1310,7 +1274,7 @@ export default {
     },
     async deleteTaskByTaskName(taskName) {
       try {
-        await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + taskName);
+        await axios.get("/api/deleteTaskByTaskName?userName=" + this.userData.userName + "&taskName=" + taskName);
       } catch (error) {
         console.error("Delete failed:", error);
       }
@@ -1413,24 +1377,24 @@ export default {
         this.isRightColumnExpanded = false;
       }
     },
-    
+
     showMobileActionSheet(task) {
       this.selectedTask = task;
       this.mobileActionSheetVisible = true;
     },
-    
+
     getTaskType(row) {
       if (!row) return '';
-      
+
       let typeText = '';
-      
+
       if (row.type?.split(':')[1]) {
         typeText += (row.type.split(':')[1] === "single" ? this.$t('taskType.Singleomic') :
-                    row.type.split(':')[1] === "multi" ? this.$t('taskType.Multiomics') :
-                    row.type.split(':')[1] === "deno" ? this.$t('taskType.Denoising') : 
-                    this.$t('taskType.Unknown'));
+          row.type.split(':')[1] === "multi" ? this.$t('taskType.Multiomics') :
+            row.type.split(':')[1] === "deno" ? this.$t('taskType.Denoising') :
+              this.$t('taskType.Unknown'));
       }
-      
+
       if (row.type?.split(':')[0]) {
         if (row.type.split(':')[0] === "annotation") {
           typeText += ' ' + this.$t('taskType.Annotation');
@@ -1438,23 +1402,23 @@ export default {
           typeText += ' ' + this.$t('taskType.Training');
         }
       }
-      
+
       return typeText || this.$t('taskType.Unknown');
     },
-    
+
     // 新增分页处理方法
     handleMySharesSizeChange(val) {
       this.mySharesPageSize = val;
     },
-    
+
     handleMySharesCurrentChange(val) {
       this.mySharesCurrentPage = val;
     },
-    
+
     handleReceivedSharesSizeChange(val) {
       this.receivedSharesPageSize = val;
     },
-    
+
     handleReceivedSharesCurrentChange(val) {
       this.receivedSharesCurrentPage = val;
     },
@@ -1481,6 +1445,7 @@ export default {
 .el-row {
   margin-bottom: 20px;
 }
+
 .el-row:last-child {
   margin-bottom: 0;
 }
@@ -1495,13 +1460,16 @@ export default {
   display: flex;
   flex: 1;
   overflow: hidden;
-  margin-top: 60px; /* Add top margin to accommodate the fixed header */
-  height: calc(100vh - 60px); /* Adjust height to account for header */
+  margin-top: 60px;
+  /* Add top margin to accommodate the fixed header */
+  height: calc(100vh - 60px);
+  /* Adjust height to account for header */
 }
 
 /* Left Column Styles */
 .left-column {
-  width: 88%; /* Default width when right column is collapsed */
+  width: 88%;
+  /* Default width when right column is collapsed */
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1512,7 +1480,8 @@ export default {
 }
 
 .left-column.with-expanded-right {
-  width: 25%; /* Width when right column is expanded */
+  width: 25%;
+  /* Width when right column is expanded */
 }
 
 .dashboard-card {
@@ -1553,9 +1522,12 @@ export default {
 .status-count {
   font-size: 18px;
   font-weight: bold;
-  display: block; /* 让 span 变为块级元素 */
-  text-align: right; /* 文字右对齐 */
-  width: 100%; /* 确保占满父容器 */
+  display: block;
+  /* 让 span 变为块级元素 */
+  text-align: right;
+  /* 文字右对齐 */
+  width: 100%;
+  /* 确保占满父容器 */
 }
 
 .success-tasks-list {
@@ -1569,7 +1541,7 @@ export default {
   background-color: #302E2C;
 }
 
-.right-section{
+.right-section {
   max-height: 100%;
 }
 
@@ -1652,11 +1624,13 @@ export default {
 }
 
 .right-column.collapsed {
-  width: 12%; /* Collapsed width */
+  width: 12%;
+  /* Collapsed width */
 }
 
 .right-column.expanded {
-  width: 100%; /* Expanded width */
+  width: 100%;
+  /* Expanded width */
 }
 
 .column-toggle {
@@ -1666,10 +1640,11 @@ export default {
   z-index: 10;
 }
 
-.collapsed-task-list, 
+.collapsed-task-list,
 .expanded-task-list {
   padding: 15px;
-  padding-top: 60px; /* Space for the toggle button */
+  padding-top: 60px;
+  /* Space for the toggle button */
   height: 100%;
   overflow-y: auto;
   display: flex;
@@ -1697,7 +1672,8 @@ export default {
 
 /* TAB栏三列等分样式 */
 .right-column-tabs :deep(.el-tabs__item) {
-  width: 33.3%; /* 三列等宽 */
+  width: 33.3%;
+  /* 三列等宽 */
   text-align: center;
 }
 
@@ -1741,7 +1717,7 @@ export default {
     height: auto;
     overflow-y: auto;
   }
-  
+
   .left-column {
     width: 95% !important;
     grid-template-columns: 1fr;
@@ -1749,11 +1725,11 @@ export default {
     padding: 10px;
     margin-top: 20px;
   }
-  
+
   .right-column {
     display: none;
   }
-  
+
   .dashboard-card {
     height: auto;
     min-height: 350px;
@@ -1775,13 +1751,14 @@ export default {
   height: 50px;
 }
 
-.mobile-task-button .el-button{
+.mobile-task-button .el-button {
   width: 50px;
   height: 50px;
 }
 
-.mobile-action-buttons .el-button + .el-button {
-  margin-left: 0;        /* 去除横向间距 */
+.mobile-action-buttons .el-button+.el-button {
+  margin-left: 0;
+  /* 去除横向间距 */
 }
 
 .mobile-task-details {
@@ -1815,19 +1792,21 @@ export default {
 .left-section {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 保证上下空间拉满并底部对齐 */
+  justify-content: space-between;
+  /* 保证上下空间拉满并底部对齐 */
   height: 100%;
 }
+
 /* Adjust card for smaller screens */
 @media (max-width: 1150px) {
   .card-header {
     padding: 10px;
   }
-  
+
   .status-count {
     font-size: 14px;
   }
-  
+
   .status-chart {
     height: 120px;
   }
@@ -1842,7 +1821,7 @@ export default {
   margin: 2px 0;
 }
 
-.el-scrollbar__view .el-row{
+.el-scrollbar__view .el-row {
   margin-bottom: 0;
 }
 </style>
