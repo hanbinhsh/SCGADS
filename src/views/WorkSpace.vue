@@ -373,7 +373,7 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column fixed="right" :label="$t('Operations')" width="250">
+                <el-table-column fixed="right" :label="$t('Operations')" width="300">
                   <template #default="{ row }">
                     <el-button link type="info" size="small" @click="copyShareLink(row)">
                       {{ $t('workSpace.CopyLink') }}
@@ -381,6 +381,9 @@
                     <el-button link type="success" size="small" @click="showCharts(row.task_name)"
                       :disabled="row.status !== 2">
                       {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                    <el-button link type="warning" size="small" @click="showEditShareDialog(row)">
+                      {{ $t('Edit') }}
                     </el-button>
                     <el-button link type="danger" size="small" @click="showUnshareDialog(row)">
                       {{ $t('workSpace.Unshare') }}
@@ -399,6 +402,9 @@
                 <div class="footer-button-row">
                   <el-button type="success" @click="Refresh">
                     {{ $t('Refresh') }}
+                  </el-button>
+                  <el-button type="danger" @click="" :disabled="selectedTasks.length === 0">
+                    {{ $t('TODO BatchDelete') }}
                   </el-button>
                 </div>
               </div>
@@ -493,49 +499,51 @@
           </el-tabs>
         </div>
       </div>
+    </div>
 
-      <!-- 分享对话框 -->
-      <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
-        <el-form :model="shareForm" label-width="120px">
-          <el-form-item :label="$t('workSpace.Expiration')">
-            <el-date-picker v-model="shareForm.dueTime" type="datetime" placeholder="选择到期时间"
-              format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" clearable />
-            <div style="color: #909399; font-size: 12px; margin-left: 5px;">
-              留空表示永久分享
-            </div>
-          </el-form-item>
-
-          <el-form-item :label="$t('workSpace.Recipient')">
-            <el-input v-model="shareForm.accepter" :placeholder="$t('workSpace.RecipientPlaceholder')" clearable>
-            </el-input>
-          </el-form-item>
-
-          <el-form-item :label="$t('workSpace.Company')">
-            <el-input v-model="shareForm.companyName" :placeholder="$t('workSpace.CompanyPlaceholder')" clearable>
-            </el-input>
-          </el-form-item>
-
-          <el-form-item :label="$t('workSpace.Password')">
-            <el-input v-model="shareForm.password" type="password" :placeholder="$t('workSpace.PasswordPlaceholder')"
-              show-password clearable>
-            </el-input>
-            <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
-          </el-form-item>
-        </el-form>
-
-        <template #footer>
-          <div class="dialog-footer">
-            <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
-            <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+    <!-- 分享对话框 -->
+    <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px" align-center>
+      <el-form :model="shareForm" label-width="120px">
+        <el-form-item :label="$t('workSpace.Expiration')">
+          <el-date-picker v-model="shareForm.dueTime" type="datetime" placeholder="选择到期时间"
+            format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" clearable />
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
+            留空表示永久分享
           </div>
-        </template>
-      </el-dialog>
+        </el-form-item>
 
-      <!-- 编辑分享对话框 -->
-      <!-- <el-dialog
+        <el-form-item :label="$t('workSpace.Recipient')">
+          <el-input v-model="shareForm.accepter" :placeholder="$t('workSpace.RecipientPlaceholder')" clearable>
+          </el-input>
+        </el-form-item>
+
+        <el-form-item :label="$t('workSpace.Company')">
+          <el-input v-model="shareForm.companyName" :placeholder="$t('workSpace.CompanyPlaceholder')" clearable>
+          </el-input>
+        </el-form-item>
+
+        <el-form-item :label="$t('workSpace.Password')">
+          <el-input v-model="shareForm.password" type="password" :placeholder="$t('workSpace.PasswordPlaceholder')"
+            show-password clearable>
+          </el-input>
+          <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑分享对话框 -->
+    <el-dialog
       v-model="editDialogVisible" 
       :title="`编辑分享设置`" 
-      :width="isMobile ? '95%' : '600px'"
+      align-center
+      width="500px"
     >
       <el-form :model="editForm" label-width="120px">
         <el-form-item label="密码设置">
@@ -555,7 +563,7 @@
             value-format="YYYY-MM-DD HH:mm:ss"
             clearable
           />
-          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
             留空表示永久分享
           </div>
         </el-form-item>
@@ -566,8 +574,7 @@
           <el-button type="primary" @click="saveEdit">保存</el-button>
         </div>
       </template>
-    </el-dialog> -->
-    </div>
+    </el-dialog>
 
     <el-dialog v-model="batchDeleteDialogVisible" :title="$t('Warning')" width="500">
       <span>{{ $t('workSpace.BatchDeleteConfirm') }}</span>
@@ -825,6 +832,7 @@ export default {
       deleteDialogVisible: false,
       batchDeleteDialogVisible: false,
       detailDialogVisible: false,
+      editDialogVisible: false,
       selectedTask: null,
       selectedTasks: [], // 存储多选选中的任务
       currentPage: 1, // 当前页
@@ -861,6 +869,12 @@ export default {
       mySharesPageSize: 10,
       receivedSharesCurrentPage: 1,
       receivedSharesPageSize: 10,
+
+      editForm: {
+        shareId: null,
+        password: '',
+        dueTime: null
+      }
     };
   },
   computed: {
@@ -914,6 +928,39 @@ export default {
     },
   },
   methods: {
+    cancelEdit() {
+      this.editDialogVisible = false;
+      this.editForm = {
+        shareId: null,
+        password: '',
+        dueTime: null
+      };
+    },
+    async saveEdit() {
+      try {
+        const response = await axios.put('/api/share/updateShare', this.editForm);
+        
+        if (response.data.code === 200) {
+          ElMessage.success('分享设置更新成功');
+          this.Refresh();
+          this.editDialogVisible = false;
+        } else {
+          ElMessage.error(response.data.msg);
+        }
+      } catch (error) {
+        console.error('Failed to update share:', error);
+        ElMessage.error('更新分享设置失败');
+      }
+    },
+    showEditShareDialog(share) {
+      this.selectedShare = share;
+      this.editForm = {
+        shareId: share.share_id,
+        password: share.password || '',
+        dueTime: share.due_time || null
+      };
+      this.editDialogVisible = true;
+    },
     showShareDialog(task) {
       this.selectedTask = task;
       this.shareForm = {
@@ -1151,8 +1198,20 @@ export default {
         const response = await axios.get("/api/share/findSharesByUserId?userID=" + this.userData.userId);
         const responseReceived = await axios.get("/api/share/findSharesReceivedByUserId?userID=" + this.userData.userId);
         if (response.data.code === 200 && responseReceived.data.code === 200) {
-          this.shareList = response.data.data;
-          this.shareReceivedList = responseReceived.data.data;
+          this.shareList = Object.values(response.data.data).map(item => {
+            return {
+              ...item,
+              due_time: item.due_time ? dayjs(item.due_time).format('YYYY-MM-DD HH:mm:ss') : null,
+              shared_time: item.shared_time ? dayjs(item.shared_time).format('YYYY-MM-DD HH:mm:ss') : null
+            };
+          });
+          this.shareReceivedList = Object.values(responseReceived.data.data).map(item => {
+            return {
+              ...item,
+              due_time: item.due_time ? dayjs(item.due_time).format('YYYY-MM-DD HH:mm:ss') : null,
+              shared_time: item.shared_time ? dayjs(item.shared_time).format('YYYY-MM-DD HH:mm:ss') : null
+            };
+          });
           console.log("Share List:", this.shareList);
           console.log("Share Received List:", this.shareReceivedList);
         } else {

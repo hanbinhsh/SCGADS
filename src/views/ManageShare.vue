@@ -100,8 +100,9 @@
     <!-- 编辑分享对话框 -->
     <el-dialog
       v-model="editDialogVisible" 
-      :title="`编辑分享设置`" 
-      :width="isMobile ? '95%' : '600px'"
+      :title="`编辑分享设置`"
+      align-center
+      width="500px"
     >
       <el-form :model="editForm" label-width="120px">
         <el-form-item label="密码设置">
