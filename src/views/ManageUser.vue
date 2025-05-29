@@ -5,7 +5,7 @@
       <h1 class="page-name">{{ $t('navigateBar.ManageUsers') }}</h1>
       <el-divider />
 
-      <!-- 桌面端显示的表格 -->
+      <!-- 表格 -->
       <div class="desktop-view">
         <el-table :data="paginatedUserList"
           style="width: 100%;"
@@ -42,7 +42,7 @@
           </el-table-column>
 
           <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="120">
+          <el-table-column fixed="right" :label="$t('Operations')" width="130">
             <template #default="{ row }">
               <!-- 未审核用户显示通过和不通过按钮 -->
               <template v-if="!row.isVerified">
@@ -93,54 +93,6 @@
       </div>
     </el-main>
 
-    <!-- 移动端详情对话框 -->
-    <el-dialog v-model="detailDialogVisible" title="User Details" width="90%" align-center>
-      <el-form :model="selectedUser" label-width="100px" label-position="left" :disabled="!isEditing">
-        <el-form-item label="User Name" class="form-item">
-          <el-input v-model="selectedUser.userName" class="form-input"></el-input>
-        </el-form-item>
-        <el-form-item label="Password" class="form-item" v-if="isEditing">
-          <el-input v-model="selectedUser.psw" type="password" show-password placeholder="Enter new password"
-            class="form-input"></el-input>
-        </el-form-item>
-        <el-form-item label="Email" class="form-item">
-          <el-input v-model="selectedUser.email" class="form-input"></el-input>
-        </el-form-item>
-        <el-form-item label="Phone" class="form-item">
-          <el-input v-model="selectedUser.phone" class="form-input"></el-input>
-        </el-form-item>
-        <el-form-item label="Admin" class="form-item">
-          <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
-            :disabled="selectedUser.userId === this.userData.userId || !isEditing"></el-switch>
-        </el-form-item>
-        <el-form-item label="Verified" class="form-item">
-          <el-switch v-model="selectedUser.isVerified" :active-value="1" :inactive-value="0" :disabled="!isEditing"></el-switch>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <div>
-            <el-button v-if="isEditing" @click="detailDialogVisible = false">Cancel</el-button>
-            <el-button type="primary" v-if="isEditing" @click="confirmEdit">Save</el-button>
-          </div>
-          <div class="action-buttons" v-if="!isEditing">
-            <el-button type="primary" @click="enableEditing">Edit</el-button>
-            <!-- 未验证用户显示通过和拒绝按钮 -->
-            <template v-if="selectedUser && !selectedUser.isVerified">
-              <el-button type="success" @click="approveUser(selectedUser)">Approve</el-button>
-              <el-button type="danger" @click="rejectUser(selectedUser)">Reject</el-button>
-            </template>
-            <!-- 已验证用户显示删除按钮 -->
-            <template v-else>
-              <el-button v-if="selectedUser && selectedUser.userId === this.userData.userId" 
-                type="danger" disabled>Delete</el-button>
-              <el-button v-else type="danger" @click="showDeleteDialog(selectedUser)">Delete</el-button>
-            </template>
-          </div>
-        </div>
-      </template>
-    </el-dialog>
-
     <!-- 桌面端编辑对话框 -->
     <el-dialog v-model="editDialogVisible" title="Edit User" width="500" align-center>
       <el-form :model="selectedUser" label-width="100px" label-position="left">
@@ -160,9 +112,6 @@
         <el-form-item label="Admin" class="form-item">
           <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
             :disabled="selectedUser.userId === this.userData.userId"></el-switch>
-        </el-form-item>
-        <el-form-item label="Verified" class="form-item">
-          <el-switch v-model="selectedUser.isVerified" :active-value="1" :inactive-value="0"></el-switch>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -259,27 +208,10 @@ export default {
     },
   },
   methods: {
-    // 显示详情对话框（移动端）
-    showDetailDialog(user) {
-      this.detailDialogVisible = true;
-      this.selectedUser = { ...user, psw: '' }; // 创建用户数据的副本，且密码初始为空
-      this.isEditing = false; // 初始状态为查看模式
-    },
-    // 启用编辑模式（移动端）
-    enableEditing() {
-      this.isEditing = true;
-    },
     // 显示编辑对话框（桌面端）
     showEditDialog(user) {
-      if (this.isMobile) {
-        // 移动端使用详情对话框
-        this.showDetailDialog(user);
-        this.enableEditing();
-      } else {
-        // 桌面端使用原来的编辑对话框
-        this.editDialogVisible = true;
-        this.selectedUser = { ...user, psw: '' };
-      }
+      this.editDialogVisible = true;
+      this.selectedUser = { ...user, psw: '' };
     },
     // 显示删除对话框
     showDeleteDialog(user) {

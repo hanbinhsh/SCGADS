@@ -22,6 +22,8 @@ const en = {
   Create: 'CreateCompany',
   Add: 'Add',
   Close: "Close",
+  Approve: "Approve",
+  Reject: "Reject",
 
   modelPage:{
     SingleModality: "Single",

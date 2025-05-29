@@ -22,6 +22,8 @@ const zh =  {
   Create: '新建公司',
   Add: '添加',
   Close: "关闭",
+  Approve: "批准",
+  Reject: "拒绝",
 
   modelPage:{
     SingleModality: "单模态模型",
