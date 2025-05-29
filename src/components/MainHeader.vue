@@ -55,6 +55,10 @@
                     v-if="userData.userName && userData.isAdmin">
                     <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
                 </el-menu-item>
+                <el-menu-item index="ManageShare" :class="{ 'is-active': activeIndex === 'ManageShare' }"
+                    v-if="userData.userName && userData.isAdmin">
+                    <font-awesome-icon :icon="['fas', 'share-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageShare') }}
+                </el-menu-item>
                 <el-menu-item index="SystemSettings" :class="{ 'is-active': activeIndex === 'SystemSettings' }"
                     v-if="userData.userName && userData.isAdmin">
                     <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}

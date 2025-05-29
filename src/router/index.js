@@ -98,6 +98,12 @@ const routes = [
     meta: { title: 'ManageModel', requiresAuth:true, requiresLogin:true }
   },
   {
+    path: '/ManageShare',
+    name: 'ManageShare',
+    component: () => import('../views/ManageShare.vue'),
+    meta: { title: 'ManageShare', requiresAuth:true, requiresLogin:true }
+  },
+  {
     path: '/SystemSettings',
     name: 'SystemSettings',
     component: () => import('../views/SystemSettings.vue'),
