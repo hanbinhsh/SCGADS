@@ -240,3 +240,125 @@
   margin-left: 64px;
   width: calc(100% - 64px);
 }
+
+.pagination {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* 移动端分页样式优化 */
+@media (max-width: 768px) {
+  .pagination {
+    margin: 15px 0;
+    padding: 0 10px;
+  }
+  
+  /* 小屏幕分页器样式调整 */
+  .pagination :deep(.el-pagination) {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .pagination :deep(.el-pagination__total) {
+    margin-right: 10px;
+    font-size: 13px;
+  }
+  
+  .pagination :deep(.el-pager li) {
+    min-width: 28px;
+    height: 28px;
+    line-height: 28px;
+    font-size: 13px;
+  }
+  
+  .pagination :deep(.btn-prev),
+  .pagination :deep(.btn-next) {
+    min-width: 28px;
+    height: 28px;
+    line-height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination {
+    margin: 10px 0;
+    padding: 0 5px;
+  }
+  
+  /* 超小屏幕进一步简化 */
+  .pagination :deep(.el-pager li) {
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 12px;
+  }
+  
+  .pagination :deep(.btn-prev),
+  .pagination :deep(.btn-next) {
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+  }
+  
+  /* 隐藏过多的页码，只显示关键页码 */
+  .pagination :deep(.el-pager) {
+    flex-wrap: wrap;
+  }
+}
+
+/* 其他原有样式保持不变 */
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-footer-desktop {
+  text-align: right;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.form-item {
+  margin-bottom: 15px;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.footer {
+  margin-top: 20px;
+}
+
+.footer-button-row {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .el-dialog {
+    width: 95% !important;
+    margin: 0 auto;
+  }
+  
+  .dialog-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .dialog-footer > div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .el-table {
+    font-size: 14px;
+  }
+}

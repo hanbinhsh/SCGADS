@@ -172,9 +172,17 @@
         </el-dialog>
   
         <!-- 分页组件 -->
-        <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper" :total="companyList.length">
+        <el-pagination 
+          class="pagination" 
+          @size-change="handleSizeChange" 
+          @current-change="handleCurrentChange"
+          :current-page="currentPage" 
+          :page-sizes="[5, 10, 20, 50]" 
+          :page-size="pageSize"
+          :layout="paginationLayout"
+          :total="companyList.length"
+          :small="isMobile"
+          :hide-on-single-page="false">
         </el-pagination>
   
         <!-- 按钮行 -->
@@ -302,7 +310,19 @@
     computed: {
       isMobile() {
         return this.windowWidth <= 768;
-      }
+      },
+      paginationLayout() {
+        if (this.windowWidth <= 480) {
+          // 小屏手机：只显示基本的分页器
+          return "prev, pager, next";
+        } else if (this.windowWidth <= 768) {
+          // 平板/大屏手机：显示总数和基本分页
+          return "total, prev, pager, next";
+        } else {
+          // 桌面端：显示完整功能
+          return "total, sizes, prev, pager, next, jumper";
+        }
+      },
     },
     methods: {      
       // 显示编辑对话框
@@ -634,9 +654,6 @@
   padding: 15px;
 }
 
-
-
-
 @media (max-width: 768px) {
   .mobile-view {
     display: block;
@@ -644,10 +661,6 @@
 
   .desktop-view {
     display: none;
-  }
-
-  .pagination {
-    justify-content: left;
   }
 }
 
@@ -665,7 +678,6 @@
   .pagination {
     display: flex;
     flex-wrap: wrap;
-    justify-content: left;
     margin-bottom: 20px;
   }
 }

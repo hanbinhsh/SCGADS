@@ -90,9 +90,18 @@
         </div>
         
         <!-- 分页组件 -->
-        <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-          :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper" :total="logsList.length"></el-pagination>
+        <el-pagination 
+          class="pagination" 
+          @size-change="handleSizeChange" 
+          @current-change="handleCurrentChange"
+          :current-page="currentPage" 
+          :page-sizes="[5, 10, 20, 50]" 
+          :page-size="pageSize"
+          :layout="paginationLayout"
+          :total="logsList.length"
+          :small="isMobile"
+          :hide-on-single-page="false">
+        </el-pagination>
       </el-main>
   
       <!-- 按钮行 -->
@@ -229,12 +238,30 @@
         sortOrder: '',
         loading: false,
         defaultAvatar: logo,
-        isMobile: false,
+        windowWidth: window.innerWidth,
       };
     },
+    computed: {
+      isMobile() {
+        return this.windowWidth <= 768;
+      },
+      paginationLayout() {
+        if (this.windowWidth <= 480) {
+          // 小屏手机：只显示基本的分页器
+          return "prev, pager, next";
+        } else if (this.windowWidth <= 768) {
+          // 平板/大屏手机：显示总数和基本分页
+          return "total, prev, pager, next";
+        } else {
+          // 桌面端：显示完整功能
+          return "total, sizes, prev, pager, next, jumper";
+        }
+      },
+    },
     methods: {
-      checkMobile() {
-        this.isMobile = window.innerWidth <= 768;
+      // 监听窗口大小变化
+      handleResize() {
+        this.windowWidth = window.innerWidth;
       },
       showOptDialog(row) {
         this.currentRow = row;
@@ -305,7 +332,6 @@
           const response = await axios.get('/api/findAllLogs');
           if (response.data.code === 200) {
             const dataObject = response.data.data;
-            console.log(dataObject);
             this.logsList = Object.values(dataObject);
             this.applySorting();
           } else {
@@ -395,11 +421,10 @@
     },
     mounted() {
       this.fetchLogs();
-      this.checkMobile(); // 初始检查
-      window.addEventListener('resize', this.checkMobile);
+      window.addEventListener('resize', this.handleResize);
     },
     beforeUnmount() {
-      window.removeEventListener('resize', this.checkMobile); // 移除事件监听器
+      window.removeEventListener('resize', this.handleResize);
     }
   };
   </script>
@@ -458,7 +483,6 @@
     .pagination {
       display: flex;
       flex-wrap: wrap;
-      justify-content: left;
       margin-bottom: 20px;
     }
   }

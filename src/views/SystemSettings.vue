@@ -135,8 +135,8 @@ export default {
 }
 
 .el-form-item {
-    width:400px;
-  }
+  width:400px;
+}
 
 @media screen and (max-width: 767px) {
   .settings-container {
@@ -154,6 +154,10 @@ export default {
   
   .el-alert p {
     font-size: 13px;
+  }
+
+  .el-col-xs-22{
+    max-width: 100%;
   }
 }
 </style>

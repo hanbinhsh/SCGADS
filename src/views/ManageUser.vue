@@ -8,15 +8,15 @@
       <!-- 桌面端显示的表格 -->
       <div class="desktop-view">
         <el-table :data="paginatedUserList"
-          style="width: 100%"
+          style="width: 100%;"
           @selection-change="handleSelectionChange"
           @sort-change="handleSortChange"
           v-loading="loading">
           <!-- 多选功能 -->
           <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="userName" :label="$t('database.user.user_name')" sortable>
+          <el-table-column prop="userName" :label="$t('database.user.user_name')" sortable min-width="150" show-overflow-tooltip>
             <template #default="{ row }">
-              <div style="display: flex; align-items: center;">
+              <div style="display: flex; align-items: center; white-space: nowrap;">
                 <el-avatar :size="24"
                   :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
                 </el-avatar>
@@ -24,16 +24,16 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable>
+          <el-table-column prop="email" :label="$t('database.user.email')" sortable min-width="180" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="120" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isAdmin ? 'success' : 'warning'">
                 {{ row.isAdmin ? '是' : '否' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable>
+          <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isVerified ? 'success' : 'warning'">
                 {{ row.isVerified ? '已通过' : '未通过' }}
@@ -42,7 +42,7 @@
           </el-table-column>
 
           <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="220">
+          <el-table-column fixed="right" :label="$t('Operations')" width="120">
             <template #default="{ row }">
               <!-- 未审核用户显示通过和不通过按钮 -->
               <template v-if="!row.isVerified">
@@ -66,47 +66,18 @@
         </el-table>
       </div>
 
-      <!-- 移动端显示的表格 -->
-      <div class="mobile-view">
-        <el-table :data="paginatedUserList"
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @sort-change="handleSortChange"
-          v-loading="loading">
-          <!-- 多选功能 -->
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column prop="userName" :label="$t('database.user.user_name')" sortable>
-            <template #default="{ row }">
-              <div style="display: flex; align-items: center;">
-                <el-avatar :size="24"
-                  :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-                </el-avatar>
-                <span style="margin-left: 8px;">{{ row.userName }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-          <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable>
-            <template #default="{ row }">
-              <el-tag :type="row.isVerified ? 'success' : 'warning'">
-                {{ row.isVerified ? '已通过' : '未通过' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-
-          <!-- 操作列 -->
-          <el-table-column fixed="right" :label="$t('Operations')" width="70">
-            <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="showDetailDialog(row)">Detail</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-
       <!-- 分页组件 -->
-      <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper" :total="userList.length">
+      <el-pagination 
+        class="pagination" 
+        @size-change="handleSizeChange" 
+        @current-change="handleCurrentChange"
+        :current-page="currentPage" 
+        :page-sizes="[5, 10, 20, 50]" 
+        :page-size="pageSize"
+        :layout="paginationLayout"
+        :total="userList.length"
+        :small="isMobile"
+        :hide-on-single-page="false">
       </el-pagination>
 
       <!-- 按钮行 -->
@@ -273,7 +244,19 @@ export default {
   computed: {
     isMobile() {
       return this.windowWidth <= 768;
-    }
+    },
+    paginationLayout() {
+      if (this.windowWidth <= 480) {
+        // 小屏手机：只显示基本的分页器
+        return "prev, pager, next";
+      } else if (this.windowWidth <= 768) {
+        // 平板/大屏手机：显示总数和基本分页
+        return "total, prev, pager, next";
+      } else {
+        // 桌面端：显示完整功能
+        return "total, sizes, prev, pager, next, jumper";
+      }
+    },
   },
   methods: {
     // 显示详情对话框（移动端）
@@ -496,14 +479,6 @@ export default {
 </script>
 
 <style scoped>
-.desktop-view {
-  display: block;
-}
-
-.mobile-view {
-  display: none;
-}
-
 .dialog-footer {
   display: flex;
   justify-content: space-between;
@@ -536,19 +511,7 @@ export default {
   gap: 10px;
 }
 
-.pagination {
-  margin-bottom: 20px;
-}
-
 @media (max-width: 768px) {
-  .desktop-view {
-    display: none;
-  }
-
-  .mobile-view {
-    display: block;
-  }
-
   .el-dialog {
     width: 95% !important;
     margin: 0 auto;
@@ -568,13 +531,6 @@ export default {
   
   .el-table {
     font-size: 14px;
-  }
-  
-  .pagination {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: left;
-    margin-bottom: 20px;
   }
 }
 </style>
