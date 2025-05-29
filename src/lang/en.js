@@ -182,7 +182,11 @@ const en = {
     ShareSuccess: "Share successful",
     ShareFailed: "Share failed",
     Cancel: "Cancel",
-    Confirm: "Confirm"
+    Confirm: "Confirm",
+     Tasks: "Tasks",
+    Shares: "Shares",
+    Active: "Active", 
+    Unshare: "Unshare",
   },
   taskManage: {
     Auto: "Auto",

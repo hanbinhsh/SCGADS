@@ -183,6 +183,10 @@ const zh =  {
     ShareFailed: "分享失败",
     Cancel: "取消",
     Confirm: "确认",
+    Tasks: "任务",
+    Shares: "分享", 
+    Active: "活跃",
+    Unshare: "取消分享",
   },
   taskManage: {
     Auto: "自动处理",
