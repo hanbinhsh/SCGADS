@@ -13,7 +13,7 @@
         v-loading="loading">
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable min-width="150">
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -24,107 +24,60 @@
           </template>
         </el-table-column>
         <!-- 显示任务名 -->
-        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
+        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable min-width="180"></el-table-column>
         <!-- 显示上传者的电子邮件 -->
-        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable min-width="180"></el-table-column>
         <!-- 显示上传者的电话 -->
-        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="160"></el-table-column>
         <!-- 显示任务开始时间 -->
-        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
+        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable width="150">
           <template #default="{ row }">
             {{ formatDate(row.start_time) }}
           </template>
         </el-table-column>
         <!-- 显示任务结束时间 -->
-        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
+        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable width="150">
           <template #default="{ row }">
             {{ row.end_time ? formatDate(row.end_time) : $t('Notcompletedyet') }}
           </template>
         </el-table-column>
         <!-- 显示任务状态 -->
-        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
+        <el-table-column prop="status" :label="$t('database.task.status')" sortable width="120">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
 
         <!-- 显示操作列 -->
-        <el-table-column fixed="right" :label="$t('Operations')" :width="systemSettings['Auto Progress'] ? 380 : 320" class-name="operations-column">
+        <el-table-column fixed="right" :label="$t('Operations')" :width="systemSettings['Auto Progress'] ? 380 : 320" class-name="operations-column" v-if="!isMobile">
           <template #default="{ row }">
             <!-- Desktop view - show all buttons -->
-                <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)" v-if="systemSettings['Auto Progress']">
-                  {{ $t('taskManage.Auto') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
-                  {{ $t('Download') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showDetailDialog(row)">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
-                  {{ $t('navigateBar.Virtualization') }}
-                </el-button>
-                <el-button link type="warning" size="small" @click="showEditDialog(row)">
-                  {{ $t('Edit') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
-                  {{ $t('Delete') }}
-                </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      </div>
-      
-      <div class="mobile-view">
-        <el-table :data="paginatedTaskList" 
-        style="width: 100%" 
-        @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange"
-        v-loading="loading">
-        <!-- 多选功能 -->
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
-          <template #default="{ row }">
-            <div style="display: flex; align-items: center;">
-              <el-avatar :size="24"
-                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-              </el-avatar>
-              <span style="margin-left: 8px;">{{ row.user_name }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <!-- 显示任务名 -->
-        <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable></el-table-column>
-        <!-- 显示上传者的电子邮件 -->
-        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-        <!-- 显示上传者的电话 -->
-        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-        <!-- 显示任务开始时间 -->
-        <el-table-column prop="start_time" :label="$t('database.task.start_time')" sortable>
-          <template #default="{ row }">
-            {{ formatDate(row.start_time) }}
-          </template>
-        </el-table-column>
-        <!-- 显示任务结束时间 -->
-        <el-table-column prop="end_time" :label="$t('database.task.end_time')" sortable>
-          <template #default="{ row }">
-            {{ row.end_time ? formatDate(row.end_time) : $t('Notcompletedyet') }}
-          </template>
-        </el-table-column>
-        <!-- 显示任务状态 -->
-        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
-          <template #default="{ row }">
-            <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
+            <el-button link type="primary" size="small" @click="showAutoProgressDialog(row)" v-if="systemSettings['Auto Progress']">
+              {{ $t('taskManage.Auto') }}
+            </el-button>
+            <el-button link type="success" size="small" @click="showDownloadFileDialog(row)">
+              {{ $t('Download') }}
+            </el-button>
+            <el-button link type="" size="small" @click="showDetailDialog(row)">
+              {{ $t('Detail') }}
+            </el-button>
+            <el-button link type="" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
+              {{ $t('navigateBar.Virtualization') }}
+            </el-button>
+            <el-button link type="warning" size="small" @click="showEditDialog(row)">
+              {{ $t('Edit') }}
+            </el-button>
+            <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
+              {{ $t('Delete') }}
+            </el-button>
           </template>
         </el-table-column>
 
-        <!--显示操作列-->
-        
-        <el-table-column fixed="right" :label="$t('Operations')" width="100">
-            <template #default="{ row }">
-              <el-button link type="primary" size="small" @click="showOptDialog(row)">Detail</el-button>
-            </template>
-          </el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="100" v-if="isMobile">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showOptDialog(row)">Detail</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       </div>
 
@@ -363,9 +316,6 @@
               • label_pred_umap.js<br>
               • output.npy
             </div>
-            <!-- <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
-              {{ file.name }}
-            </div> -->
           </template>
         </el-upload>
       </el-form>
@@ -916,25 +866,6 @@ export default {
 <style scoped>
 .param-tag {
   margin: 2px 0;
-}
-
-.desktop-view {
-  display: flex;
-  gap: 8px;
-}
-
-.mobile-view {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .desktop-view {
-    display: none;
-  }
-  
-  .mobile-view {
-    display: block;
-  }
 }
 </style>
 
