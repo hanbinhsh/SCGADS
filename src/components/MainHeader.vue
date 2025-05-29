@@ -182,6 +182,9 @@
                             <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageModel' }" @click="navigateTo('ManageModel')">
                                 <font-awesome-icon :icon="['fas', 'hexagon-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageModel') }}
                             </div>
+                            <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'ManageShare' }" @click="navigateTo('ManageShare')">
+                                <font-awesome-icon :icon="['fas', 'share-nodes']" />&nbsp;&nbsp;{{ $t('navigateBar.ManageShare') }}
+                            </div>
                             <div class="mobile-menu-item grid-item" :class="{ active: activeIndex === 'SystemSettings' }" @click="navigateTo('SystemSettings')">
                                 <font-awesome-icon :icon="['fas', 'gear']" />&nbsp;&nbsp;{{ $t('navigateBar.SystemSettings') }}
                             </div>
