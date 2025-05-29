@@ -24,8 +24,8 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="email" :label="$t('database.user.email')" sortable min-width="180" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="160" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="email"   :label="$t('database.user.email')"    sortable min-width="180" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="phone"   :label="$t('database.user.phone')"    sortable min-width="160" show-overflow-tooltip></el-table-column>
           <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isAdmin ? 'success' : 'warning'">

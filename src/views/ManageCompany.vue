@@ -5,7 +5,7 @@
         <h1 class="page-name">{{ $t('navigateBar.ManageCompanys') }}</h1>
         <el-divider />
   
-        <!-- 桌面端显示的表格 -->
+        <!-- 表格 -->
         <div class="desktop-view">
           <el-table :data="paginatedCompanyList"
             style="width: 100%"
@@ -19,13 +19,13 @@
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column type="expand">
               <template #default="props">
-                <div style="padding: 0 100px 20px 100px;">
-                  <div v-if="loadingCompanyUsers && currentExpandedCompany === props.row.companyId" class="loading-users">
+                <div style="padding: 0 30px 20px 30px;">
+                  <div v-if="loadingCompanyUsers && currentExpandedCompany === props.row.companyId" style="text-align: center;">
                     <el-icon class="is-loading"><loading /></el-icon> loading...
                   </div>
                   <div v-else-if="companyUsersMap[props.row.companyId] && companyUsersMap[props.row.companyId].length > 0">
                     <el-table :data="companyUsersMap[props.row.companyId]" style="width: 100%">
-                      <el-table-column prop="username" label="用户">
+                      <el-table-column prop="username" label="用户" sortable min-width="150">
                         <template #default="{ row }">
                           <div style="display: flex; align-items: center;">
                             <el-avatar :size="20" :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar"></el-avatar>
@@ -33,9 +33,9 @@
                           </div>
                         </template>
                       </el-table-column>
-                      <el-table-column prop="email" :label="$t('Email')"></el-table-column>
-                      <el-table-column prop="phone" :label="$t('Phone')"></el-table-column>
-                      <el-table-column :label="$t('Operations')" width="120">
+                      <el-table-column prop="email" :label="$t('Email')" sortable min-width="180"></el-table-column>
+                      <el-table-column prop="phone" :label="$t('Phone')" sortable min-width="160"></el-table-column>
+                      <el-table-column :label="$t('Operations')" width="120" fixed="right">
                         <template #default="{ row }">
                           <el-button link type="danger" size="small" @click="removeUserFromCompany(row.userId, props.row.companyId)">
                             {{ $t('Delete') }}
@@ -44,8 +44,8 @@
                       </el-table-column>
                     </el-table>
                   </div>
-                  <div v-else class="no-users">
-                    NULL
+                  <div v-else style="text-align: center;">
+                    Empty
                   </div>
                 </div>
               </template>
@@ -69,77 +69,6 @@
                 <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
                   {{ $t('Delete') }}
                 </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-
-        
-        <!--移动端显示的表格-->
-        <div class="mobile-view">
-          <el-table :data="paginatedCompanyList"
-            style="width: 100%"
-            @selection-change="handleSelectionChange"
-            @sort-change="handleSortChange"
-            v-loading="loading"
-            row-key="companyId"
-            :expand-row-keys="expandedRows"
-            @expand-change="handleExpandChange">
-            <!-- 多选功能 -->
-            <el-table-column type="selection" width="30"></el-table-column>
-            <el-table-column type="expand">
-              <template #default="props">
-                <div style="padding: 0 50px 20px 0px;">
-                  <div v-if="loadingCompanyUsers && currentExpandedCompany === props.row.companyId" class="loading-users">
-                    <el-icon class="is-loading"><loading /></el-icon> loading...
-                  </div>
-                  <div v-else-if="companyUsersMap[props.row.companyId] && companyUsersMap[props.row.companyId].length > 0">
-                    <el-table :data="companyUsersMap[props.row.companyId]" style="width: 100%">
-                      <el-table-column prop="username" label="用户">
-                        <template #default="{ row }">
-                          <div style="display: flex; align-items: center;">
-                            <!-- <el-avatar :size="20" :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar"></el-avatar> -->
-                            <span style="margin-left: 8px;">{{ row.userName }}</span>
-                          </div>
-                        </template>
-                      </el-table-column>
-                      <el-table-column prop="email" :label="$t('Email')"></el-table-column>
-                      <el-table-column prop="phone" :label="$t('Phone')"></el-table-column>
-                      <el-table-column :label="$t('Operations')" width="120">
-                        <template #default="{ row }">
-                          <el-button link type="danger" size="small" @click="removeUserFromCompany(row.userId, props.row.companyId)">
-                            {{ $t('Delete') }}
-                          </el-button>
-                        </template>
-                      </el-table-column>
-                    </el-table>
-                  </div>
-                  <div v-else class="no-users">
-                    NULL
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="companyName" :label="$t('database.company.company_name')" sortable>
-              <template #default="{ row }">
-                <div style="display: flex; align-items: center;">
-                  <!-- <el-avatar :size="24"
-                    :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-                  </el-avatar> -->
-                  <span style="margin-left: 8px;">{{ row.companyName }}</span>
-                </div>
-              </template>
-            </el-table-column>
-    
-            <!-- 操作列 -->
-            <el-table-column fixed="right" :label="$t('Operations')" width="120">
-              <template #default="{ row }">
-                <div style="display: grid;">
-                  <el-button link type="primary" size="small" @click="showAddUserDialog(row)">{{ $t('Add') }}</el-button>
-                  <!-- <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button> -->
-                  <el-button link type="danger" size="small" @click="showDeleteDialog(row)" style="margin: 0;">{{ $t('Delete') }}</el-button>
-                </div>
-                
               </template>
             </el-table-column>
           </el-table>
@@ -217,7 +146,7 @@
       </el-dialog>
   
       
-      <!-- 桌面端编辑对话框 -->
+      <!-- 编辑对话框 -->
       <el-dialog v-model="editDialogVisible" title="Edit Company" width="500" align-center>
         <el-form :model="selectedCompany" label-width="100px" label-position="left">
           <el-form-item label="Name" class="form-item">
@@ -327,15 +256,8 @@
     methods: {      
       // 显示编辑对话框
       showEditDialog(company) {
-        if (this.isMobile) {
-          // 移动端使用编辑对话框
-          this.editDialogVisible = true;
-          this.selectedCompany = { ...company};
-        } else {
-          // 桌面端使用原来的编辑对话框
-          this.editDialogVisible = true;
-          this.selectedCompany = { ...company};
-        }
+        this.editDialogVisible = true;
+        this.selectedCompany = { ...company};
       },
       // 显示删除对话框
       showDeleteDialog(company) {
@@ -633,10 +555,6 @@
   </script>
 
 <style scoped>
-.mobile-view {
-  display: none;
-}
-
 .pagination {
   display: flex;
   justify-content: center;
@@ -655,26 +573,6 @@
 }
 
 @media (max-width: 768px) {
-  .mobile-view {
-    display: block;
-  }
-
-  .desktop-view {
-    display: none;
-  }
-}
-
-
-@media (max-width: 768px) {
-
-  .desktop-view {
-    display: none;
-  }
-  
-  .mobile-view {
-    display: block;
-  }
-
   .pagination {
     display: flex;
     flex-wrap: wrap;
