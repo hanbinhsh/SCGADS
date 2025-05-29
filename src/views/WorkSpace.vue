@@ -251,7 +251,7 @@
                    (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
                    (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
                 {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-                   (row.type?.split(':')[0] || "") === "training"  ? $t('taskType.Training')  :
+                   (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
                    (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
               </template>
             </el-table-column>

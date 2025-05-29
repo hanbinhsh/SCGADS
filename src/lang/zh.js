@@ -19,7 +19,6 @@ const zh =  {
   Notcompletedyet: '未完成',
   Confirm: '确认',
   Reset: '重置',
-  Create: '新建公司',
   Add: '添加',
   Close: "关闭",
   Approve: "批准",
@@ -28,6 +27,9 @@ const zh =  {
   No: "否",
   Warning: "警告",
   BatchDeleteConfirmation: "批量删除确认",
+  Loading: "加载中",
+  Empty: "空",
+  Share: "分享",
 
   managePage:{
     EditUser: "编辑用户",
@@ -40,6 +42,10 @@ const zh =  {
     Aruser2: "的注册申请吗？",
 
     Company: "公司",
+    CompanyName: "公司名称",
+    AddCompany: "添加公司",
+    AddUserTo: "添加用户到",
+    SelectUser: "选择一个用户",
   },
   modelPage:{
     SingleModality: "单模态模型",

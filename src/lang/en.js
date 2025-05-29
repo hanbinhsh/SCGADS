@@ -19,7 +19,6 @@ const en = {
   Notcompletedyet: 'Not completed yet',
   Confirm: 'Confirm',
   Reset: 'Reset',
-  Create: 'CreateCompany',
   Add: 'Add',
   Close: "Close",
   Approve: "Approve",
@@ -28,6 +27,9 @@ const en = {
   No: "No",
   Warning: "Warning",
   BatchDeleteConfirmation: "Batch Delete Confirmation",
+  Loading: "Loading",
+  Empty: "Empty",
+  Share: "Share",
 
   managePage:{
     EditUser: "Edit User",
@@ -40,6 +42,10 @@ const en = {
     Aruser2: "\'s application for registration?",
 
     Company: "Company",
+    CompanyName: "Company Name",
+    AddCompany: "Add Company",
+    AddUserTo: "Add user to",
+    SelectUser: "Select User",
   },
   modelPage:{
     SingleModality: "Single",

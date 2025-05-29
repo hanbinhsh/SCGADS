@@ -21,7 +21,7 @@
               <template #default="props">
                 <div style="padding: 0 30px 20px 30px;">
                   <div v-if="loadingCompanyUsers && currentExpandedCompany === props.row.companyId" style="text-align: center;">
-                    <el-icon class="is-loading"><loading /></el-icon> loading...
+                    <el-icon class="is-loading"><loading /></el-icon> {{ $t('Loading') }}...
                   </div>
                   <div v-else-if="companyUsersMap[props.row.companyId] && companyUsersMap[props.row.companyId].length > 0">
                     <el-table :data="companyUsersMap[props.row.companyId]" style="width: 100%">
@@ -45,7 +45,7 @@
                     </el-table>
                   </div>
                   <div v-else style="text-align: center;">
-                    Empty
+                    {{ $t('Empty') }}
                   </div>
                 </div>
               </template>
@@ -75,10 +75,10 @@
         </div>
 
         <!-- 添加用户到公司对话框 -->
-        <el-dialog v-model="addUserDialogVisible" :title="`添加用户到 ${selectedCompany ? selectedCompany.companyName : '公司'}`" width="500" align-center>
+        <el-dialog v-model="addUserDialogVisible" :title="$t('managePage.AddUserTo') + ' ' + `${selectedCompany ? selectedCompany.companyName : $t('managePage.Company')}`" width="500" align-center>
           <el-form :model="addUserForm" label-width="100px" label-position="left">
-            <el-form-item label="用户" class="form-item">
-              <el-select v-model="addUserForm.userId" filterable placeholder="选择一个用户" class="form-input">
+            <el-form-item :label="$t('managePage.User')" class="form-item">
+              <el-select v-model="addUserForm.userId" filterable :placeholder="$t('managePage.SelectUser')" class="form-input">
                 <el-option 
                   v-for="user in availableUsers" 
                   :key="user.userId" 
@@ -94,8 +94,8 @@
           </el-form>
           <template #footer>
             <div class="dialog-footer-desktop">
-             <el-button @click="addUserDialogVisible = false">取消</el-button>
-             <el-button type="primary" @click="confirmAddUserToCompany">确认</el-button>
+             <el-button @click="addUserDialogVisible = false">{{ $t('Cancel') }}</el-button>
+             <el-button type="primary" @click="confirmAddUserToCompany">{{ $t('Confirm') }}</el-button>
             </div>
           </template>
         </el-dialog>
@@ -118,7 +118,7 @@
         <div class="footer">
           <div class="footer-button-row">
             <el-button type="success" @click="showCreateDialog">
-              {{ $t('Create') }}
+              {{ $t('managePage.AddCompany') }}
             </el-button>
             <el-button type="success" @click="fetchCompanyList">
               {{ $t('Refresh') }}
@@ -131,9 +131,9 @@
       </el-main>
 
       <!-- 创建公司对话框 -->
-      <el-dialog v-model="createDialogVisible" title="Create Company" width="500" align-center>
-        <el-form :model="companyForm" label-width="100px" label-position="left">
-          <el-form-item label="Name" class="form-item">
+      <el-dialog v-model="createDialogVisible" :title="$t('managePage.AddCompany')" width="500" align-center>
+        <el-form :model="companyForm" label-width="150px" label-position="left">
+          <el-form-item :label="$t('managePage.CompanyName')" class="form-item">
             <el-input v-model="companyForm.companyName" class="form-input"></el-input>
           </el-form-item>
         </el-form>
@@ -147,7 +147,7 @@
   
       
       <!-- 编辑对话框 -->
-      <el-dialog v-model="editDialogVisible" title="Edit Company" width="500" align-center>
+      <!-- <el-dialog v-model="editDialogVisible" title="Edit Company" width="500" align-center>
         <el-form :model="selectedCompany" label-width="100px" label-position="left">
           <el-form-item label="Name" class="form-item">
             <el-input v-model="selectedCompany.companyName" class="form-input"></el-input>
@@ -159,7 +159,7 @@
             <el-button type="primary" @click="confirmEdit">{{ $t('Save') }}</el-button>
           </div>
         </template>
-      </el-dialog>
+      </el-dialog> -->
   
       <!-- 删除确认对话框 -->
       <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" :width="isMobile ? '90%' : '500'" align-center>
