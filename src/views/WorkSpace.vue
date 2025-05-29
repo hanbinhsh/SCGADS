@@ -808,6 +808,27 @@ export default {
   },
   methods: {
     // 新增方法
+    validateTime(type) {
+    if (type === 'day') {
+      if (this.shareForm.day < 0) {
+        this.timeError = this.$t('workSpace.DaysPositive');
+      } else {
+        this.timeError = '';
+      }
+    } else if (type === 'hour') {
+      if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
+        this.timeError = this.$t('workSpace.HoursRange');
+      } else {
+        this.timeError = '';
+      }
+    } else if (type === 'minute') {
+      if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
+        this.timeError = this.$t('workSpace.MinutesRange');
+      } else {
+        this.timeError = '';
+      }
+    }
+  },
     showShareDialog(task) {
       this.selectedTask = task;
       this.shareForm = {
@@ -845,17 +866,17 @@ export default {
         }
         
         const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.shareForm.accepter}`);
-        const userData = userResponse.data.data;
+        const userData = userResponse.data.data; 
         if (userData.state === 0) {
           ElMessage.error(this.$t('workSpace.UserNotExist'));
           return;
         }
         userId = userData.userId;
       }
-      
+      console.log("1");
       // 验证公司
       if (this.shareForm.companyName) {
-        const companyResponse = await axios.post(`/api/findCompanyByName?name=${this.shareForm.companyName}`);
+        const companyResponse = await axios.post(`/api/findCompanyByName?companyName=${this.shareForm.companyName}`);
         const companyData = companyResponse.data.data;
         if (companyData.state === 0) {
           ElMessage.error(this.$t('workSpace.CompanyNotExist'));
@@ -863,7 +884,7 @@ export default {
         }
         companyId = companyData.companyId;
       }
-      
+      console.log("2");
       // 计算分享时间
       const shareTime = new Date();
       const dueTime = new Date(
@@ -872,25 +893,28 @@ export default {
         (this.shareForm.hour || 0) * 60 * 60 * 1000 + 
         (this.shareForm.minute || 0) * 60 * 1000
       );
-      
+      console.log("3");
       // 创建分享
-      const response = await axios.post('/api/share/create', {
-        task_id: this.selectedTask.task_id,
-        share_time: shareTime,
-        due_time: dueTime,
-        accepter_id: userId ?? -2,
-        company_id: companyId ?? -2,
-        user_id: this.userData.userId,
-        password: this.shareForm.password,
-      });
-      
+      const shareData = {
+                    taskId: this.selectedTask.task_id,
+                    sharerId: this.userData.userId,
+                    sharedTime: shareTime,
+                    dueTime: dueTime,
+                    receiverId: userId ?? -2,
+                    companyId: companyId ?? -2,
+                    password: this.shareForm.password,
+                };
+      console.log("4");
+      // 发送请求
+      const response = await axios.post('/api/share/insertShare', [shareData]);
+      console.log("5");
       if (response.data.code === 200) {
         ElMessage.success(this.$t('workSpace.ShareSuccess'));
         this.fetchShareList();
       } else {
         ElMessage.error(response.data.msg);
       }
-      
+      console.log("6");
       this.shareDialogVisible = false;
     } catch (error) {
       console.error('Failed to share task:', error);
