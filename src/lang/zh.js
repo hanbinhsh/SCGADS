@@ -19,12 +19,37 @@ const zh =  {
   Notcompletedyet: '未完成',
   Confirm: '确认',
   Reset: '重置',
-  Create: '新建公司',
   Add: '添加',
   Close: "关闭",
   Approve: "批准",
   Reject: "拒绝",
+  Yes: "是",
+  No: "否",
+  Warning: "警告",
+  BatchDeleteConfirmation: "批量删除确认",
+  Loading: "加载中",
+  Empty: "空",
+  Share: "分享",
 
+  managePage:{
+    EditUser: "编辑用户",
+    Enternewpassword: "输入新密码",
+    User: "用户",
+    willbedeleted: "将会被删除",
+    Adusers: "确认要删除选中的所有用户吗？",
+    RejectConfirmation: "拒绝确认",
+    Aruser1: "确认要拒绝用户",
+    Aruser2: "的注册申请吗？",
+
+    Company: "公司",
+    CompanyName: "公司名称",
+    AddCompany: "添加公司",
+    AddUserTo: "添加用户到",
+    SelectUser: "选择一个用户",
+
+    DownloadLogs: "下载日志",
+    ChooseDownloadFormat: "请选择下载格式",
+  },
   modelPage:{
     SingleModality: "单模态模型",
     MultiModality: "多模态模型",
@@ -105,6 +130,12 @@ const zh =  {
     Close: '关闭',
     Loss: '损失',
     AccuracyF1: '准确率 & F1',
+  },
+  importance: {
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "unknown": "未知"
   },
   uploadPage: {
     Annotation: "类型注释",
@@ -303,15 +334,15 @@ const zh =  {
   },
   homeView: {
     title: 'SCGADS: 基于人工智能的高精度人类基因组数据分析平台',
-    p21title: '什么是单细胞类型注释?',
+    p21title: '什么是单细胞类型注释？',
     p21text: '单细胞类型注释是生物信息学中的一个关键过程，旨在对异质性细胞群中的不同细胞类型进行分类和识别。\
               该过程对于解析组织、器官乃至整个生物体的复杂细胞组成至关重要。\
               随着高通量单细胞测序技术的兴起，研究人员如今能够解析成千上万乃至数百万个细胞的转录组和表观基因组特征，从而深入揭示细胞多样性、分化路径及疾病机制。',
-    p22title: '什么是scRNA-seq?',
+    p22title: '什么是scRNA-seq？',
     p22text: '单细胞RNA测序（scRNA-seq）是一种强大的技术，可用于测量单个细胞的基因表达水平。\
               通过捕获并测序单细胞的信使RNA（mRNA），scRNA-seq能够构建详尽的细胞图谱，揭示不同细胞类型的身份及其状态。\
               这一技术彻底革新了我们对细胞分化、发育及疾病分子机制的认知。scRNA-seq不仅有助于发现新型细胞类型，还能解析细胞间的异质性，并表征那些在整体RNA测序方法中可能被掩盖的稀有或瞬时细胞群。',
-    p23title: '什么是scATAC-seq?',
+    p23title: '什么是scATAC-seq？',
     p23text: '单细胞转座酶可及染色质测序（scATAC-seq）是一种用于解析单细胞表观遗传景观的技术，通过绘制开放染色质区域图谱来揭示染色质可及性。\
               与专注于基因表达的 scRNA-seq 不同，scATAC-seq 提供了DNA潜在调控区域（如增强子和启动子）的可及性信息。\
               通过解析基因组中哪些区域是开放的，scATAC-seq 能够揭示控制基因表达的调控机制，为细胞类型特异性功能、基因调控网络以及发育或疾病进程中染色质状态的动态变化提供深刻见解。',

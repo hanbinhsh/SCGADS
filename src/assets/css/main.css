@@ -309,7 +309,6 @@
 
 /* 其他原有样式保持不变 */
 .dialog-footer {
-  display: flex;
   justify-content: space-between;
   align-items: center;
 }

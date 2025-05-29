@@ -19,12 +19,37 @@ const en = {
   Notcompletedyet: 'Not completed yet',
   Confirm: 'Confirm',
   Reset: 'Reset',
-  Create: 'CreateCompany',
   Add: 'Add',
   Close: "Close",
   Approve: "Approve",
   Reject: "Reject",
+  Yes: "Yes",
+  No: "No",
+  Warning: "Warning",
+  BatchDeleteConfirmation: "Batch Delete Confirmation",
+  Loading: "Loading",
+  Empty: "Empty",
+  Share: "Share",
 
+  managePage:{
+    EditUser: "Edit User",
+    Enternewpassword: "Enter new password",
+    User: "User",
+    willbedeleted: "will be deleted",
+    Adusers: "Are you sure you want to delete the selected users?",
+    RejectConfirmation: "Reject Confirmation",
+    Aruser1: "Are you sure you want to reject",
+    Aruser2: "\'s application for registration?",
+
+    Company: "Company",
+    CompanyName: "Company Name",
+    AddCompany: "Add Company",
+    AddUserTo: "Add user to",
+    SelectUser: "Select User",
+
+    DownloadLogs: "Download Logs",
+    ChooseDownloadFormat: "Choose Download Format",
+  },
   modelPage:{
     SingleModality: "Single",
     MultiModality: "Multi",
@@ -106,6 +131,12 @@ const en = {
     Loss: 'Loss',
     AccuracyF1: 'Accuracy & F1',
   },
+  importance: {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "unknown": "Unknown"
+  },
   uploadPage: {
     Annotation: "Annotation",
     Training: "Training",
@@ -186,7 +217,7 @@ const en = {
     ShareFailed: "Share failed",
     Cancel: "Cancel",
     Confirm: "Confirm",
-     Tasks: "Tasks",
+    Tasks: "Tasks",
     Shares: "Shares",
     Active: "Active", 
     Unshare: "Unshare",
@@ -221,10 +252,10 @@ const en = {
     user: {
       user_id: "User ID",
       user_name: "Username",
-      psw: "User Password",
+      psw: "Password",
       email: "Email",
       is_admin: "Is Admin",
-      phone: "Phone Number",
+      phone: "Phone",
       avatar: "User Avatar",
       is_verified: "Is Verified"
     },

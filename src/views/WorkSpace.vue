@@ -194,9 +194,9 @@
       </div>
       
       <!-- Right Column with Collapsible Task List -->
-      <div class="right-column animate__animated animate__fadeInRight"
-    :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
-    <div class="column-toggle" @click="toggleRightColumn">
+    <div class="right-column animate__animated animate__fadeInRight"
+      :class="{ 'expanded': isRightColumnExpanded, 'collapsed': !isRightColumnExpanded }">
+      <div class="column-toggle" @click="toggleRightColumn">
       <el-button type="primary" :icon="isRightColumnExpanded ? 'arrow-right' : 'arrow-left'">
         {{ isRightColumnExpanded ? $t('workSpace.Collapse') : $t('workSpace.Expand') }}
       </el-button>
@@ -251,7 +251,7 @@
                    (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
                    (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
                 {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-                   (row.type?.split(':')[0] || "") === "training"  ? $t('taskType.Training')  :
+                   (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
                    (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
               </template>
             </el-table-column>
@@ -275,7 +275,7 @@
                 <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column fixed="right" :label="$t('Operations')" width="350">
+            <el-table-column fixed="right" :label="$t('Operations')" width="300">
               <template #default="{ row }">
                 <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
                   {{ $t('navigateBar.Virtualization') }}

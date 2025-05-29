@@ -75,7 +75,7 @@
 
         <el-table-column fixed="right" :label="$t('Operations')" width="100" v-if="isMobile">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="showOptDialog(row)">Detail</el-button>
+            <el-button link type="primary" size="small" @click="showOptDialog(row)">{{ $t('Detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
