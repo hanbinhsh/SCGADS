@@ -325,7 +325,9 @@
                 <!-- 新增：被分享者列 -->
                 <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')">
                   <template #default="{ row }">
-                    {{ row.receiver_name || $t('workSpace.Public') }}
+                    <span v-if="row.receiver_name">{{ row.receiver_name }}</span>
+                    <span v-else-if="row.company_name" style="color: #409EFF;">{{ row.company_name }} (公司)</span>
+                    <span v-else style="color: #67C23A;">公开分享</span>
                   </template>
                 </el-table-column>
 
