@@ -109,18 +109,19 @@
           </el-empty>
         </div>
 
-        <!-- Pagination -->
-        <div class="pagination-container" v-if="filteredModels.length > 0">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[8, 12, 24, 36]"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="totalModels"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
+        <!-- 分页组件 -->
+        <el-pagination 
+          class="pagination" 
+          @size-change="handleSizeChange" 
+          @current-change="handleCurrentChange"
+          :current-page="currentPage" 
+          :page-sizes="[4, 8, 12, 16]" 
+          :page-size="pageSize"
+          :layout="paginationLayout"
+          :total="totalModels"
+          :small="isMobile"
+          :hide-on-single-page="false">
+        </el-pagination>
       </div>
 
       <!-- Footer -->
@@ -244,6 +245,7 @@
 import MainHeader from "../components/MainHeader.vue";
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { UploadFilled, Search, Upload, View, Edit, Document, Files, Filter, User, ArrowLeft } from "@element-plus/icons-vue";
 
 export default {
   name: "ModelManagementPage",
@@ -256,6 +258,10 @@ export default {
     if (savedState !== null) {
       this.isCollapsed = savedState === 'true';
     }
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   },
   data() {
     return {
@@ -263,7 +269,6 @@ export default {
       open: false,
       loading: false,
       isCollapsed: false,
-      isMobile: false,
       
       // Model data
       models: [],
@@ -301,10 +306,33 @@ export default {
       },
       
       // Preview image
-      previewImage: ''
+      previewImage: '',
+
+      windowWidth: window.innerWidth,
     };
   },
+  computed: {
+    isMobile() {
+      return this.windowWidth <= 768;
+    },
+    paginationLayout() {
+      if (this.windowWidth <= 480) {
+        // 小屏手机：只显示基本的分页器
+        return "prev, pager, next";
+      } else if (this.windowWidth <= 768) {
+        // 平板/大屏手机：显示总数和基本分页
+        return "total, prev, pager, next";
+      } else {
+        // 桌面端：显示完整功能
+        return "total, sizes, prev, pager, next, jumper";
+      }
+    },
+  },
   methods: {
+    // 监听窗口大小变化
+    handleResize() {
+      this.windowWidth = window.innerWidth;
+    },
     // 模型修改
     editModel(model) {
       if (!this.isUserModel(model)) {
@@ -513,38 +541,14 @@ export default {
 };
 </script>
 
-<script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { UploadFilled, Search, Upload, View, Edit, Document, Files, Filter, User, ArrowLeft } from "@element-plus/icons-vue";
-
-const open = ref(false);
-const isMobile = ref(false);
-
-const checkMobile = () => {
-  isMobile.value = window.innerWidth < 768;
-};
-
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);
-});
-</script>
-
 <style scoped>
-/* Sidebar */
-.sidebar {
-  position: relative;
-}
-
 /* Model container */
 .model-container {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  margin-left: 150px;
+  padding-bottom: 20px;
 }
 
 /* Page header */
@@ -668,14 +672,6 @@ onUnmounted(() => {
   padding: 48px 0;
 }
 
-/* Pagination */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
-
 .model-details-image {
   flex: 0 0 40%;
   max-width: 550px;
@@ -751,6 +747,10 @@ onUnmounted(() => {
   .fullscreen-section{
     margin-top: 0px;
     margin-bottom: 20px;
+  }
+
+  .model-container{
+     margin-left: 0px;
   }
 }
 
