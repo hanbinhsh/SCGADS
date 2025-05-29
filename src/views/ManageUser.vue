@@ -441,27 +441,4 @@ export default {
   display: flex;
   gap: 10px;
 }
-
-@media (max-width: 768px) {
-  .el-dialog {
-    width: 95% !important;
-    margin: 0 auto;
-  }
-  
-  .dialog-footer {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .dialog-footer > div {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .el-table {
-    font-size: 14px;
-  }
-}
 </style>

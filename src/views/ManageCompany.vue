@@ -571,14 +571,5 @@
 .mobile-edit-form {
   padding: 15px;
 }
-
-@media (max-width: 768px) {
-  .pagination {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-}
-
 </style>
   

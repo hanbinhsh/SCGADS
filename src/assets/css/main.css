@@ -361,4 +361,8 @@
   .el-table {
     font-size: 14px;
   }
+
+  .fullscreen-section{
+    padding-bottom:70px;
+  }
 }
