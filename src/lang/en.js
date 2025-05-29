@@ -274,6 +274,19 @@ const en = {
       model_id: "Model ID",
       re_pretrain: "Re-Pretrain",
     },
+    "share": {
+      "share_id": "Share ID",
+      "task_id": "Task ID",
+      "sharer_id": "Sharer ID",
+      "receiver_id": "Receiver ID",
+      "company_id": "Receiving Company ID",
+      "password": "Password",
+      "shared_time": "Shared Time",
+      "due_time": "Due Time",
+      sharer_name: "Sharer",
+      task_name: "Task Name",
+      receiver_name: "Receiver",
+    },
     files: {
       file_id: "File ID",
       scRNA_seq_file: "scRNA-seq File Name",
@@ -315,6 +328,7 @@ const en = {
     ManageTasks: 'Task Management',
     ManageFeedbacks: 'Feedback Management',
     ManageModel: 'Model Management',
+    ManageShare: "Share Management",
     SystemSettings: 'System Settings',
     
     Applications: 'Applications',

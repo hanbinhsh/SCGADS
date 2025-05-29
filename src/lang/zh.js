@@ -274,6 +274,19 @@ const zh =  {
       model_id: "模型ID",
       re_pretrain: "重新预训练",
     },
+    "share": {
+      "share_id": "分享ID",
+      "task_id": "任务ID",
+      "sharer_id": "分享者ID",
+      "receiver_id": "接收者ID",
+      "company_id": "接收公司ID",
+      "password": "密码",
+      "shared_time": "分享时间",
+      "due_time": "到期时间",
+      sharer_name: "分享者",
+      task_name: "任务名",
+      receiver_name: "接收者",
+    },
     files: {
       file_id: "文件ID",
       scRNA_seq_file: "scRNA-seq文件名",
@@ -315,6 +328,7 @@ const zh =  {
     ManageTasks: '任务管理',
     ManageFeedbacks: '反馈管理',
     ManageModel: '模型管理',
+    ManageShare: "分享管理",
     SystemSettings: '系统设置',
     
     Applications: '应用',
