@@ -27,12 +27,19 @@ const en = {
   Yes: "Yes",
   No: "No",
   Warning: "Warning",
+  BatchDeleteConfirmation: "Batch Delete Confirmation",
 
   managePage:{
     EditUser: "Edit User",
     Enternewpassword: "Enter new password",
     User: "User",
     willbedeleted: "will be deleted",
+    Adusers: "Are you sure you want to delete the selected users?",
+    RejectConfirmation: "Reject Confirmation",
+    Aruser1: "Are you sure you want to reject",
+    Aruser2: "\'s application for registration?",
+
+    Company: "Company",
   },
   modelPage:{
     SingleModality: "Single",
@@ -192,7 +199,7 @@ const en = {
     ShareFailed: "Share failed",
     Cancel: "Cancel",
     Confirm: "Confirm",
-     Tasks: "Tasks",
+    Tasks: "Tasks",
     Shares: "Shares",
     Active: "Active", 
     Unshare: "Unshare",

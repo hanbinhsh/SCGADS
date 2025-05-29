@@ -139,8 +139,8 @@
         </el-form>
         <template #footer>
           <div class="dialog-footer-desktop">
-            <el-button @click="createDialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="insertCompany">Confirm</el-button>
+            <el-button @click="createDialogVisible = false">{{ $t('Cancel') }}</el-button>
+            <el-button type="primary" @click="insertCompany">{{ $t('Confirm') }}</el-button>
           </div>
         </template>
       </el-dialog>
@@ -155,19 +155,19 @@
         </el-form>
         <template #footer>
           <div class="dialog-footer-desktop">
-            <el-button @click="editDialogVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="confirmEdit">Save</el-button>
+            <el-button @click="editDialogVisible = false">{{ $t('Cancel') }}</el-button>
+            <el-button type="primary" @click="confirmEdit">{{ $t('Save') }}</el-button>
           </div>
         </template>
       </el-dialog>
   
       <!-- 删除确认对话框 -->
-      <el-dialog v-model="deleteDialogVisible" title="Warning" :width="isMobile ? '90%' : '500'" align-center>
-        <span>Company <strong style="color: #e74c3c;">{{ selectedCompany ? selectedCompany.companyName : '' }}</strong> will be deleted</span>
+      <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" :width="isMobile ? '90%' : '500'" align-center>
+        <span>{{ $t('managePage.Company') }} <strong style="color: #e74c3c;">{{ selectedCompany ? selectedCompany.companyName : '' }}</strong> {{ $t('managePage.willbedeleted') }}</span>
         <template #footer>
           <div class="dialog-footer-desktop">
-            <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-            <el-button type="danger" @click="confirmDelete">Confirm</el-button>
+            <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+            <el-button type="danger" @click="confirmDelete">{{ $t('Confirm') }}</el-button>
           </div>
         </template>
       </el-dialog>
@@ -177,8 +177,8 @@
         <span>Are you sure you want to delete the selected users?</span>
         <template #footer>
           <div class="dialog-footer-desktop">
-            <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
-            <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
+            <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+            <el-button type="danger" @click="confirmBatchDelete">{{ $t('Confirm') }}</el-button>
           </div>
         </template>
       </el-dialog>

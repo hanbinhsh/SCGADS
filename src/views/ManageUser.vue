@@ -134,23 +134,23 @@
     </el-dialog>
 
     <!-- 拒绝用户确认对话框 -->
-    <el-dialog v-model="rejectDialogVisible" title="拒绝确认" :width="isMobile ? '90%' : '500'" align-center>
-      <span>确定要拒绝用户 <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> 的注册申请吗？</span>
+    <el-dialog v-model="rejectDialogVisible" :title="$t('managePage.RejectConfirmation')" :width="isMobile ? '90%' : '500'" align-center>
+      <span>{{ $t('managePage.Aruser1') }} <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> {{ $t('managePage.Aruser2') }}</span>
       <template #footer>
         <div class="dialog-footer-desktop">
-          <el-button @click="rejectDialogVisible = false">取消</el-button>
-          <el-button type="danger" @click="confirmReject">确认拒绝</el-button>
+          <el-button @click="rejectDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="confirmReject">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 批量删除确认对话框 -->
-    <el-dialog v-model="batchDeleteDialogVisible" title="Batch Delete Confirmation" :width="isMobile ? '90%' : '500'" align-center>
-      <span>Are you sure you want to delete the selected users?</span>
+    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('BatchDeleteConfirmation')" :width="isMobile ? '90%' : '500'" align-center>
+      <span>{{ $t('managePage.Adusers') }}</span>
       <template #footer>
         <div class="dialog-footer-desktop">
-          <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
+          <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="confirmBatchDelete">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
