@@ -97,42 +97,42 @@
       </div>
     </div>
 
-<!-- 编辑分享对话框 -->
-<el-dialog
-    v-model="editDialogVisible" 
-    :title="`编辑分享设置`" 
-    :width="isMobile ? '95%' : '600px'"
-  >
-    <el-form :model="editForm" label-width="120px">
-      <el-form-item label="密码设置">
-        <el-input
-          v-model="editForm.password"
-          placeholder="留空表示无密码保护"
-          show-password
-          clearable
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="到期时间">
-        <el-date-picker
-          v-model="editForm.dueTime"
-          type="datetime"
-          placeholder="选择到期时间"
-          format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
-          clearable
-        />
-        <div style="color: #909399; font-size: 12px; margin-top: 5px;">
-          留空表示永久分享
+    <!-- 编辑分享对话框 -->
+    <el-dialog
+      v-model="editDialogVisible" 
+      :title="`编辑分享设置`" 
+      :width="isMobile ? '95%' : '600px'"
+    >
+      <el-form :model="editForm" label-width="120px">
+        <el-form-item label="密码设置">
+          <el-input
+            v-model="editForm.password"
+            placeholder="留空表示无密码保护"
+            show-password
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="到期时间">
+          <el-date-picker
+            v-model="editForm.dueTime"
+            type="datetime"
+            placeholder="选择到期时间"
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            clearable
+          />
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            留空表示永久分享
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="cancelEdit">取消</el-button>
+          <el-button type="primary" @click="saveEdit">保存</el-button>
         </div>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="cancelEdit">取消</el-button>
-        <el-button type="primary" @click="saveEdit">保存</el-button>
-      </div>
-    </template>
-  </el-dialog>
+      </template>
+    </el-dialog>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="警告" width="500" align-center>
@@ -376,7 +376,7 @@ export default {
     },
     async deleteShare(shareId) {
       try {
-        const response = await axios.delete(`/api/share/deleteShareByShareId?shareId=${shareId}`);
+        const response = await axios.post(`/api/share/deleteShareByShareId`,{shareId: shareId});
         if (response.data.code === 200) {
           ElMessage.success('分享记录删除成功');
           this.fetchShares();

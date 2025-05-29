@@ -461,75 +461,94 @@
   </div>
 
   <!-- 分享对话框 -->
- <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
-  <el-form :model="shareForm" label-width="120px">
-    <el-form-item :label="$t('workSpace.Expiration')">
-      <div class="time-input-group">
+  <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
+    <el-form :model="shareForm" label-width="120px">
+      <el-form-item :label="$t('workSpace.Expiration')">
+        <el-date-picker
+          v-model="shareForm.dueTime"
+          type="datetime"
+          placeholder="选择到期时间"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          clearable
+        />
+        <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+          留空表示永久分享
+        </div>
+      </el-form-item>
+      
+      <el-form-item :label="$t('workSpace.Recipient')">
         <el-input 
-          v-model.number="shareForm.day" 
-          :placeholder="$t('workSpace.Days')" 
-          type="number" 
-          min="0"
-          class="time-input"
-          @input="validateTime('day')">
+          v-model="shareForm.accepter" 
+          :placeholder="$t('workSpace.RecipientPlaceholder')"
+          clearable>
         </el-input>
+      </el-form-item>
+      
+      <el-form-item :label="$t('workSpace.Company')">
         <el-input 
-          v-model.number="shareForm.hour" 
-          :placeholder="$t('workSpace.Hours')" 
-          type="number" 
-          min="0" 
-          max="23"
-          class="time-input"
-          @input="validateTime('hour')">
+          v-model="shareForm.companyName" 
+          :placeholder="$t('workSpace.CompanyPlaceholder')"
+          clearable>
         </el-input>
-        <el-input 
-          v-model.number="shareForm.minute" 
-          :placeholder="$t('workSpace.Minutes')" 
-          type="number" 
-          min="0" 
-          max="59"
-          class="time-input"
-          @input="validateTime('minute')">
-        </el-input>
-      </div>
-      <div v-if="timeError" class="time-error">{{ timeError }}</div>
-    </el-form-item>
-    
-    <el-form-item :label="$t('workSpace.Recipient')">
-      <el-input 
-        v-model="shareForm.accepter" 
-        :placeholder="$t('workSpace.RecipientPlaceholder')"
-        clearable>
-      </el-input>
-    </el-form-item>
-    
-    <el-form-item :label="$t('workSpace.Company')">
-      <el-input 
-        v-model="shareForm.companyName" 
-        :placeholder="$t('workSpace.CompanyPlaceholder')"
-        clearable>
-      </el-input>
-    </el-form-item>
+      </el-form-item>
 
-    <el-form-item :label="$t('workSpace.Password')">
-      <el-input 
-        v-model="shareForm.password" 
-        type="password"
-        :placeholder="$t('workSpace.PasswordPlaceholder')"
-        show-password
-        clearable>
-      </el-input>
-      <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
-    </el-form-item>
-  </el-form>
+      <el-form-item :label="$t('workSpace.Password')">
+        <el-input 
+          v-model="shareForm.password" 
+          type="password"
+          :placeholder="$t('workSpace.PasswordPlaceholder')"
+          show-password
+          clearable>
+        </el-input>
+        <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
+      </el-form-item>
+    </el-form>
   
-  <template #footer>
-    <div class="dialog-footer">
-      <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
-      <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
-    </div>
-  </template>
-</el-dialog>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="shareDialogVisible = false">{{ $t('Cancel') }}</el-button>
+        <el-button type="primary" @click="confirmShare">{{ $t('Confirm') }}</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+      <!-- 编辑分享对话框 -->
+    <!-- <el-dialog
+      v-model="editDialogVisible" 
+      :title="`编辑分享设置`" 
+      :width="isMobile ? '95%' : '600px'"
+    >
+      <el-form :model="editForm" label-width="120px">
+        <el-form-item label="密码设置">
+          <el-input
+            v-model="editForm.password"
+            placeholder="留空表示无密码保护"
+            show-password
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="到期时间">
+          <el-date-picker
+            v-model="editForm.dueTime"
+            type="datetime"
+            placeholder="选择到期时间"
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            clearable
+          />
+          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+            留空表示永久分享
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="cancelEdit">取消</el-button>
+          <el-button type="primary" @click="saveEdit">保存</el-button>
+        </div>
+      </template>
+    </el-dialog> -->
     </div>
     
     <el-dialog v-model="batchDeleteDialogVisible" :title="$t('Warning')" width="500">
@@ -774,6 +793,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 import * as echarts from 'echarts';  // Import echarts
 import { List, MoreFilled } from '@element-plus/icons-vue';
+import dayjs from 'dayjs';
 
 export default {
   name: "WorkSpace",
@@ -816,9 +836,7 @@ export default {
       activeTab: 'tasks', // 当前激活的TAB
       shareDialogVisible: false, // 分享对话框可见性
       shareForm: {
-        day: 0,
-        hour: 0,
-        minute: 0,
+        dueTime: null,
         accepter: '',
         companyName: '', //  companyName
         password: '',
@@ -883,33 +901,10 @@ export default {
     },
   },
   methods: {
-    validateTime(type) {
-      if (type === 'day') {
-        if (this.shareForm.day < 0) {
-          this.timeError = this.$t('workSpace.DaysPositive');
-        } else {
-          this.timeError = '';
-        }
-      } else if (type === 'hour') {
-        if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
-          this.timeError = this.$t('workSpace.HoursRange');
-        } else {
-          this.timeError = '';
-        }
-      } else if (type === 'minute') {
-        if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
-          this.timeError = this.$t('workSpace.MinutesRange');
-        } else {
-          this.timeError = '';
-        }
-      }
-    },
     showShareDialog(task) {
       this.selectedTask = task;
       this.shareForm = {
-        day: 0,
-        hour: 0,
-        minute: 0,
+        dueTime: null,
         accepter: '',
         companyName: '',
         password: ''
@@ -917,22 +912,6 @@ export default {
       this.shareDialogVisible = true;
     },
     async confirmShare() {
-      // 验证输入
-      if (this.shareForm.day < 0) {
-        this.timeError = this.$t('workSpace.DaysPositive');
-        return;
-      }
-      
-      if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
-        this.timeError = this.$t('workSpace.HoursRange');
-        return;
-      }
-      
-      if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
-        this.timeError = this.$t('workSpace.MinutesRange');
-        return;
-      }
-      
       try {
         let userId = null;
         let companyId = null;
@@ -969,13 +948,8 @@ export default {
         }
         
         // 计算分享时间
-        const shareTime = new Date();
-        const dueTime = new Date(
-          shareTime.getTime() + 
-          (this.shareForm.day || 0) * 24 * 60 * 60 * 1000 + 
-          (this.shareForm.hour || 0) * 60 * 60 * 1000 + 
-          (this.shareForm.minute || 0) * 60 * 1000
-        );
+        const shareTime = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        const dueTime = this.shareForm.dueTime;
         
         // 创建分享
         const shareData = {
