@@ -24,7 +24,16 @@ const zh =  {
   Close: "关闭",
   Approve: "批准",
   Reject: "拒绝",
+  Yes: "是",
+  No: "否",
+    Warning: "警告",
 
+  managePage:{
+    EditUser: "编辑用户",
+    Enternewpassword: "输入新密码",
+    User: "用户",
+    willbedeleted: "将会被删除",
+  },
   modelPage:{
     SingleModality: "单模态模型",
     MultiModality: "多模态模型",

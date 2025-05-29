@@ -24,7 +24,16 @@ const en = {
   Close: "Close",
   Approve: "Approve",
   Reject: "Reject",
+  Yes: "Yes",
+  No: "No",
+  Warning: "Warning",
 
+  managePage:{
+    EditUser: "Edit User",
+    Enternewpassword: "Enter new password",
+    User: "User",
+    willbedeleted: "will be deleted",
+  },
   modelPage:{
     SingleModality: "Single",
     MultiModality: "Multi",
@@ -214,10 +223,10 @@ const en = {
     user: {
       user_id: "User ID",
       user_name: "Username",
-      psw: "User Password",
+      psw: "Password",
       email: "Email",
       is_admin: "Is Admin",
-      phone: "Phone Number",
+      phone: "Phone",
       avatar: "User Avatar",
       is_verified: "Is Verified"
     },

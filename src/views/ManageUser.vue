@@ -29,14 +29,14 @@
           <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isAdmin ? 'success' : 'warning'">
-                {{ row.isAdmin ? '是' : '否' }}
+                {{ row.isAdmin ? $t('Yes') : $t('No') }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="isVerified" :label="$t('database.user.is_verified')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isVerified ? 'success' : 'warning'">
-                {{ row.isVerified ? '已通过' : '未通过' }}
+                {{ row.isVerified ? $t('Yes') : $t('No') }}
               </el-tag>
             </template>
           </el-table-column>
@@ -94,41 +94,41 @@
     </el-main>
 
     <!-- 桌面端编辑对话框 -->
-    <el-dialog v-model="editDialogVisible" title="Edit User" width="500" align-center>
+    <el-dialog v-model="editDialogVisible" :title="$t('managePage.EditUser')" width="500" align-center>
       <el-form :model="selectedUser" label-width="100px" label-position="left">
-        <el-form-item label="User Name" class="form-item">
+        <el-form-item :label="$t('database.user.user_name')" class="form-item">
           <el-input v-model="selectedUser.userName" class="form-input"></el-input>
         </el-form-item>
-        <el-form-item label="Password" class="form-item">
-          <el-input v-model="selectedUser.psw" type="password" show-password placeholder="Enter new password"
+        <el-form-item :label="$t('database.user.psw')" class="form-item">
+          <el-input v-model="selectedUser.psw" type="password" show-password :placeholder="$t('managePage.Enternewpassword')"
             class="form-input"></el-input>
         </el-form-item>
-        <el-form-item label="Email" class="form-item">
+        <el-form-item :label="$t('database.user.email')" class="form-item">
           <el-input v-model="selectedUser.email" class="form-input"></el-input>
         </el-form-item>
-        <el-form-item label="Phone" class="form-item">
+        <el-form-item :label="$t('database.user.phone')" class="form-item">
           <el-input v-model="selectedUser.phone" class="form-input"></el-input>
         </el-form-item>
-        <el-form-item label="Admin" class="form-item">
+        <el-form-item :label="$t('database.user.is_admin')" class="form-item">
           <el-switch v-model="selectedUser.isAdmin" :active-value="1" :inactive-value="0"
             :disabled="selectedUser.userId === this.userData.userId"></el-switch>
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer-desktop">
-          <el-button @click="editDialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="confirmEdit">Save</el-button>
+          <el-button @click="editDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="primary" @click="confirmEdit">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" title="Warning" :width="isMobile ? '90%' : '500'" align-center>
-      <span>User <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> will be deleted</span>
+    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" :width="isMobile ? '90%' : '500'" align-center>
+      <span>{{ $t('managePage.User') }} <strong style="color: #e74c3c;">{{ selectedUser ? selectedUser.userName : '' }}</strong> {{ $t('managePage.willbedeleted') }}</span>
       <template #footer>
         <div class="dialog-footer-desktop">
-          <el-button @click="deleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="confirmDelete">Confirm</el-button>
+          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="confirmDelete">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
