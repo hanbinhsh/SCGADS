@@ -329,6 +329,33 @@
                 {{ row.task_name }}
               </template>
             </el-table-column>
+            <!-- 新增：被分享者列 -->
+    <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')">
+      <template #default="{ row }">
+        {{ row.receiver_name || $t('workSpace.Public') }}
+      </template>
+    </el-table-column>
+    
+    <!-- 新增：任务类型列 -->
+    <el-table-column :label="$t('database.task.type')">
+      <template #default="{ row }">
+        {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+           (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+           (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+        {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+           (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
+           (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+      </template>
+    </el-table-column>
+    
+
+<el-table-column prop="status" :label="$t('database.task.status')">
+      <template #default="{ row }">
+        <el-tag :type="statusType(row.status)">
+          {{ statusText(row.status) }}
+        </el-tag>
+      </template>
+    </el-table-column>
             <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
               <template #default="{ row }">
                 {{ formatDate(row.shared_time) }}
@@ -398,6 +425,27 @@
                 {{ row.task_name }}
               </template>
             </el-table-column>
+                <!-- 新增：任务类型列 -->
+    <el-table-column :label="$t('database.task.type')">
+      <template #default="{ row }">
+        {{ (row.type?.split(':')[1] || "") === "single"     ? $t('taskType.Singleomic') :
+           (row.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
+           (row.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
+        {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+           (row.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')   :
+           (row.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
+      </template>
+    </el-table-column>
+    
+    
+    <!-- 新增：状态列（任务状态） -->
+    <el-table-column prop="status" :label="$t('database.task.status')">
+      <template #default="{ row }">
+        <el-tag :type="statusType(row.status)">
+          {{ statusText(row.status) }}
+        </el-tag>
+      </template>
+    </el-table-column>
             <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
               <template #default="{ row }">
                 {{ formatDate(row.shared_time) }}
@@ -410,7 +458,7 @@
             </el-table-column>
             <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')">
               <template #default="{ row }">
-                {{ row.sharer_name || $t('workSpace.Unknown') }}
+                {{ row.user_name || $t('workSpace.Unknown') }}
               </template>
             </el-table-column>
             <el-table-column prop="status" :label="$t('Status')">
@@ -1141,6 +1189,8 @@ export default {
         if (response.data.code === 200 && responseReceived.data.code === 200) {
           this.shareList = response.data.data;
           this.shareReceivedList = responseReceived.data.data;
+          console.log("Share List:", this.shareList);
+          console.log("Share Received List:", this.shareReceivedList);
         } else {
           console.error("Failed to fetch share list:", response.data.msg + responseReceived.data.msg);
         }
