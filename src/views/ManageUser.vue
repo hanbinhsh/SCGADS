@@ -25,7 +25,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="email" :label="$t('database.user.email')" sortable min-width="180" show-overflow-tooltip></el-table-column>
-          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="120" show-overflow-tooltip></el-table-column>
+          <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="160" show-overflow-tooltip></el-table-column>
           <el-table-column prop="isAdmin" :label="$t('database.user.is_admin')" sortable width="150">
             <template #default="{ row }">
               <el-tag :type="row.isAdmin ? 'success' : 'warning'">
@@ -309,7 +309,6 @@ export default {
         const response = await axios.get("/api/findUsers");
         if (response.data.code === 200) {
           this.userList = response.data.data;
-          console.log('后端返回的用户数据:', response.data.data);
           this.applySorting(); // 调用排序函数
         } else {
           console.error("Failed to fetch user list:", response.data.msg);
