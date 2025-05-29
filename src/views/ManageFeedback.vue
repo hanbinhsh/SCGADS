@@ -4,7 +4,8 @@
     <el-main class="fullscreen-section">
       <h1 class="page-name">{{ $t('navigateBar.ManageFeedbacks') }}</h1>
       <el-divider />
-      <div class="desktop-view">
+
+      <div>
         <el-table 
         :data="paginatedFeedbackList" 
         style="width: 100%"
@@ -14,7 +15,7 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
+        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable min-width="150">
           <template #default="{ row }">
             <div style="display: flex; align-items: center;">
               <el-avatar :size="24"
@@ -24,16 +25,16 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable></el-table-column>
-        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="180" sortable>
+        <el-table-column prop="email" :label="$t('database.user.email')" sortable min-width="180"></el-table-column>
+        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable min-width="160"></el-table-column>
+        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable min-width="170px"></el-table-column>
+        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="160" sortable>
           <template #default="{ row }">
             {{ formatDate(row.created_time) }}
           </template>
         </el-table-column>
         
-          <el-table-column fixed="right" :label="$t('Operations')" width="220">
+        <el-table-column fixed="right" :label="$t('Operations')" width="220" v-if="!isMobile">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showMessageDialog(row)">
               {{ $t('feedback.Message') }}
@@ -41,40 +42,8 @@
             <el-button link type="success" size="small" @click="showReplyDialog(row)">{{ $t('feedback.AdminReply') }}</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
           </template>
-        </el-table-column> 
-      </el-table>
-      </div>
-
-      <div class="mobile-view">
-        <el-table 
-        :data="paginatedFeedbackList" 
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-        @sort-change="handleSortChange"
-        v-loading="loading"
-      >
-        <!-- 多选功能 -->
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user_name" :label="$t('database.user.user_name')" sortable>
-          <template #default="{ row }">
-            <div style="display: flex; align-items: center;">
-              <el-avatar :size="24"
-                :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-              </el-avatar>
-              <span style="margin-left: 8px;">{{ row.user_name }}</span>
-            </div>
-          </template>
         </el-table-column>
-        <el-table-column prop="email" :label="$t('database.user.email')" sortable></el-table-column>
-        <el-table-column prop="phone" :label="$t('database.user.phone')" sortable></el-table-column>
-        <el-table-column prop="subject" :label="$t('database.feedback.subject')" sortable></el-table-column>
-        <el-table-column prop="created_time" :label="$t('database.feedback.created_time')" width="180" sortable>
-          <template #default="{ row }">
-            {{ formatDate(row.created_time) }}
-          </template>
-        </el-table-column>
-       
-          <el-table-column fixed="right" :label="$t('Operations')" width="120">
+        <el-table-column fixed="right" :label="$t('Operations')" width="120" v-if="isMobile">
           <template #default="{ row }">
             <el-button link type="primary" size="small" @click="showOptDialog(row)">
               {{ $t('Detail') }}
@@ -83,8 +52,7 @@
         </el-table-column> 
       </el-table>
       </div>
-      
-      
+
       <!-- 分页组件 -->
       <el-pagination 
         class="pagination" 
@@ -169,17 +137,17 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="optDialogVisible" title="User Details" width="90%" align-center :label="$t('Operations')">
+    <el-dialog v-model="optDialogVisible" title="Feedback Details" width="90%" align-center :label="$t('Operations')">
       <div class="operation-buttons">
-                <el-button link type="primary" size="small" @click="showMessageDialog(currentRow)">
-                  {{ $t('Message') }}
-                </el-button>
-                <el-button link type="success" size="small" @click="showReplyDialog(currentRow)">
-                  {{ $t('Reply') }}
-                </el-button>
-                <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
-                  {{ $t('Delete') }}
-                </el-button>
+        <el-button link type="primary" size="small" @click="showMessageDialog(currentRow)">
+          {{ $t('Message') }}
+        </el-button>
+        <el-button link type="success" size="small" @click="showReplyDialog(currentRow)">
+          {{ $t('Reply') }}
+        </el-button>
+        <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
+          {{ $t('Delete') }}
+        </el-button>
       </div>
     </el-dialog>
 
@@ -400,18 +368,6 @@ export default {
 </script>
 
 <style scoped>
-/* 批量操作按钮样式 */
-.batch-actions {
-  margin-bottom: 15px;
-}
-
-/* 分页组件样式 */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
 .el-textarea {
   margin-bottom: 20px;
 }
@@ -422,27 +378,8 @@ export default {
   gap: 10px;
 }
 
-.desktop-view {
-  display: flex;
-  gap: 8px;
-}
-
-.mobile-view {
-  display: none;
-}
-
 .replyDialog {
   width: 600px;
   max-width: 80%;
-}
-
-@media (max-width: 768px) {
-  .desktop-view {
-    display: none;
-  }
-  
-  .mobile-view {
-    display: block;
-  }
 }
 </style>
