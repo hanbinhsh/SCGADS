@@ -124,14 +124,14 @@
           :disabled="taskName===undefined">
           {{ $t('Visualization.DownloadData') }}
         </el-button>
-        <el-button type="warning" class="footer-action-button" @click="download()" 
+        <el-button type="success" class="footer-action-button" @click="download()" 
           :disabled="taskName===undefined">
           {{ $t('Visualization.DownloadCharts') }}
         </el-button>
-        <el-button type="success" class="footer-action-button" @click=""
+        <!-- <el-button type="success" class="footer-action-button" @click=""
          :disabled="taskName===undefined">
          {{ $t('Visualization.DownloadReport') }}
-        </el-button>
+        </el-button> -->
       </div>
     </div>
 
