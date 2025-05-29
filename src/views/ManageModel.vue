@@ -4,6 +4,7 @@
     <el-main class="fullscreen-section">
       <h1 class="page-name">{{ $t('navigateBar.ManageModel') }}</h1>
       <el-divider />
+      
       <el-table 
         :data="paginatedListData" 
         style="width: 100%"
@@ -13,22 +14,31 @@
       >
         <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable></el-table-column>
-        <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable></el-table-column>
-        <el-table-column :label="$t('database.models.base_model')" sortable>
+        <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable min-width="140"></el-table-column>
+        <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable width="130"></el-table-column>
+        <el-table-column :label="$t('database.models.base_model')" sortable min-width="140">
           <template #default="{ row }">
             {{ row.baseModel == 0 ? 'None' : listData[row.baseModel-1]?.modelName || 'None' }}
           </template>
         </el-table-column>
-        <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable></el-table-column>
-        <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable></el-table-column>
-        <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable></el-table-column>
-        <el-table-column prop="remark" :label="$t('database.models.remark')" sortable></el-table-column>
-        <el-table-column fixed="right" :label="$t('Operations')" :width="isMobile ? '100px' : '180px'">
+        <el-table-column prop="userName" :label="$t('database.models.user_name')" sortable min-width="160"></el-table-column>
+        <el-table-column prop="companyName" :label="$t('database.models.company_name')" sortable min-width="160"></el-table-column>
+        <el-table-column prop="createdTime" :label="$t('database.models.created_time')" sortable min-width="150">
+          <template #default="{ row }">
+            {{ formatDate(row.createdTime) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" :label="$t('database.models.remark')" sortable min-width="120"></el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="180px"  v-if="!isMobile">
           <template #default="{ row }">
             <el-button link type="info" size="small" @click="showDetailsDialog(row)">{{ $t('Detail') }}</el-button>
             <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" :label="$t('Operations')" width="100px" v-if="isMobile">
+          <template #default="{ row }">
+            <el-button link type="primary" size="small" @click="showOptDialog(row)">{{ $t('Detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -62,6 +72,15 @@
         </el-button>
       </div>
     </div>
+
+    <!-- 移动端详情对话框 -->
+    <el-dialog v-model="optDialogVisible" title="Model Details" width="90%" align-center :label="$t('Operations')">
+      <div class="operation-buttons">
+        <el-button link type="info" size="small" @click="showDetailsDialog(currentRow)">{{ $t('Detail') }}</el-button>
+        <el-button link type="primary" size="small" @click="showEditDialog(currentRow)">{{ $t('Edit') }}</el-button>
+        <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">{{ $t('Delete') }}</el-button>
+      </div>
+    </el-dialog>
 
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
@@ -418,6 +437,9 @@ export default {
         pretrainModel: false,
         pretrainModelPath: "",
       },
+
+      currentRow: {},
+      optDialogVisible: false,
     };
   },
   computed: {
@@ -438,6 +460,10 @@ export default {
     },
   },
   methods: {
+    showOptDialog(row) {
+      this.currentRow = row;
+      this.optDialogVisible = true;
+    },
     // 监听窗口大小变化
     handleResize() {
       this.windowWidth = window.innerWidth;
@@ -730,11 +756,6 @@ export default {
 </script>
 
 <style scoped>
-/* 批量操作按钮样式 */
-.batch-actions {
-  margin-bottom: 15px;
-}
-
 .path-item {
   word-break: break-all;
   font-family: monospace;
@@ -745,23 +766,5 @@ export default {
 
 .dark-mode .path-item {
   background-color: #333333;
-}
-
-/* 分页组件样式 */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-
-@media (max-width: 768px) {
-  .desktop-view {
-    display: none;
-  }
-  
-  .mobile-view {
-    display: block;
-  }
 }
 </style>
