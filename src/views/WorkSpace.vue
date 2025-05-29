@@ -347,7 +347,7 @@
                 <span v-else-if="new Date() > new Date(row.due_time)" class="share-status-badge share-status-expired">
                   {{ $t('workSpace.Expired') }}
                 </span>
-                <span v-else>
+                <span v-else class="share-status-badge share-status-active">
                   {{ $t('workSpace.Active') }}
                 </span>
               </template>
@@ -421,7 +421,7 @@
                 <span v-else-if="new Date() > new Date(row.due_time)" class="share-status-badge share-status-expired">
                   {{ $t('workSpace.Expired') }}
                 </span>
-                <span v-else>
+                <span v-else class="share-status-badge share-status-active">
                   {{ $t('workSpace.Active') }}
                 </span>
               </template>
@@ -1670,6 +1670,12 @@ export default {
   background: #fff2f0;
   color: #ff4d4f;
   border: 1px solid #ffccc7;
+}
+
+.share-status-active {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
 }
 
 .password-hint {

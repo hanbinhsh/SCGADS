@@ -30,6 +30,7 @@ const zh =  {
   Loading: "加载中",
   Empty: "空",
   Share: "分享",
+  Status: "状态",
 
   managePage:{
     EditUser: "编辑用户",
@@ -71,6 +72,7 @@ const zh =  {
     SearchModels: "查找模型",
     Edit: "编辑",
     Pretrain: "预训练",
+    EditModel: "模型修改",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
@@ -207,9 +209,6 @@ const zh =  {
     Password: "密码",
     PasswordPlaceholder: "设置访问密码(可选)",
     PasswordHint: "如果设置密码，接收者需要输入密码才能访问",
-    HoursRange: "小时必须在0-23之间",
-    MinutesRange: "分钟必须在0-59之间",
-    DaysPositive: "天数不能为负数",
     CannotShareToSelf: "不能分享给自己",
     UserNotExist: "用户不存在",
     CompanyNotExist: "公司不存在",
@@ -221,6 +220,8 @@ const zh =  {
     Shares: "分享", 
     Active: "活跃",
     Unshare: "取消分享",
+    Unknown: "未知",
+    TaskDetail: "任务详情",
   },
   taskManage: {
     Auto: "自动处理",

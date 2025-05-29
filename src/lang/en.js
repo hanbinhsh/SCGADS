@@ -30,6 +30,7 @@ const en = {
   Loading: "Loading",
   Empty: "Empty",
   Share: "Share",
+  Status: "Status",
 
   managePage:{
     EditUser: "Edit User",
@@ -71,6 +72,7 @@ const en = {
     SearchModels: "Search Models",
     Edit: "Edit",
     Pretrain: "Pretrain",
+    EditModel: "Edit Model",
   },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",
@@ -207,9 +209,6 @@ const en = {
     Password: "Password",
     PasswordPlaceholder: "Set access password (optional)",
     PasswordHint: "If set, recipients need to enter password to access",
-    HoursRange: "Hours must be between 0-23",
-    MinutesRange: "Minutes must be between 0-59",
-    DaysPositive: "Days cannot be negative",
     CannotShareToSelf: "Cannot share to yourself",
     UserNotExist: "User does not exist",
     CompanyNotExist: "Company does not exist",
@@ -221,6 +220,8 @@ const en = {
     Shares: "Shares",
     Active: "Active", 
     Unshare: "Unshare",
+    Unknown: "Unknown",
+    TaskDetail: "Task Detail",
   },
   taskManage: {
     Auto: "Auto",
