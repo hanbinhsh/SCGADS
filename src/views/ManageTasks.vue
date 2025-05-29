@@ -268,7 +268,7 @@
              (selectedTask.type?.split(':')[1] || "") === "multi"      ? $t('taskType.Multiomics') :
              (selectedTask.type?.split(':')[1] || "") === "deno"       ? $t('taskType.Denoising')  : $t('taskType.Unknown')}}
           {{ (selectedTask.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-             (selectedTask.type?.split(':')[0] || "") === "training"  ? $t('taskType.Training')  :
+             (selectedTask.type?.split(':')[0] || "") === "training"   ? $t('taskType.Training')  :
              (selectedTask.type?.split(':')[0] || "") === "denoising"  ? "" : $t('taskType.Unknown')}}
         </el-descriptions-item>
 
@@ -337,7 +337,7 @@
       <el-form>
         <!-- 文件上传组件 -->
         <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" multiple
-        :auto-upload="false" :accept="'.js'">
+        :auto-upload="false" :accept="'.js,.npy'">
           <el-icon class="el-icon--upload">
             <UploadFilled />
           </el-icon>
@@ -347,12 +347,17 @@
           <template #tip>
             <div class="el-upload__tip">
               Required files pattern: <br>
-              • (data|config)_(tsne|umap).js<br>
-              • label[_pred]_(tsne|umap).js
+              • data_tsne.js<br>
+              • data_umap.js<br>
+              • config_tsne.js<br>
+              • config_umap.js<br>
+              • label_pred_tsne.js<br>
+              • label_pred_umap.js<br>
+              • output.npy
             </div>
-            <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
+            <!-- <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
               {{ file.name }}
-            </div>
+            </div> -->
           </template>
         </el-upload>
       </el-form>
@@ -453,85 +458,114 @@ export default {
           tsne: { data: null, label: [], config: [] },
           umap: { data: null, label: [], config: [] }
         };
+        let outputFile = null;
         const errors = [];
-        // 解析所有文件
+
         const allFiles = this.uploadedFiles;
-        // 文件分类处理
+
         allFiles.forEach(file => {
           const fileName = file.name.toLowerCase();
           const rawFile = file.raw || file;
-          // 使用正则表达式匹配文件名
+          
           const dataMatch = fileName.match(/^data_(tsne|umap)\.js$/);
-          const labelMatch = fileName.match(/^label(_pred)?_(tsne|umap)\.js$/);
-          const configMatch = fileName.match(/^config(_pred)?_(tsne|umap)\.js$/);
+          const labelMatch = fileName.match(/^label_pred_(tsne|umap)\.js$/);
+          const configMatch = fileName.match(/^config_(tsne|umap)\.js$/);
+          const outputMatch = fileName.match(/^output\.npy$/);
+          
           if (dataMatch) {
             const algo = dataMatch[1];
             if (fileGroups[algo].data) {
-              errors.push(`Duplicate data files: ${fileName}`);
+              errors.push(`Duplicate data file for ${algo}: ${fileName}`);
             }
             fileGroups[algo].data = rawFile;
           } else if (labelMatch) {
-            const algo = labelMatch[2];
+            const algo = labelMatch[1];
             fileGroups[algo].label.push({
               file: rawFile,
-              isPred: !!labelMatch[1]
+              isPred: true
             });
           } else if (configMatch) {
-            const algo = configMatch[2];
+            const algo = configMatch[1];
             fileGroups[algo].config.push({
               file: rawFile,
-              isPred: !!configMatch[1]
+              isPred: false
             });
+          } else if (outputMatch) {
+            if (outputFile) {
+              errors.push(`Duplicate output.npy file`);
+            }
+            outputFile = rawFile;
           } else {
             errors.push(`Invalid file name: ${fileName}`);
           }
         });
 
-        // 验证必需文件
-        // 1. 检查至少有一个data文件（tsne或umap）
-        const hasData = fileGroups.tsne.data !== null || fileGroups.umap.data !== null;
-        if (!hasData) {
-          errors.push("At least one data file needs to be uploaded (data_tsne.js or data_umap.js)");
+        // 校验完整性 - 检查所有必需的7个文件
+        if (!fileGroups.tsne.data) {
+          errors.push("Missing required file: data_tsne.js");
         }
-        // 2. 检查至少有一个label文件（tsne或umap）
-        const hasLabel = fileGroups.tsne.label.length > 0 || fileGroups.umap.label.length > 0;
-        if (!hasLabel) {
-          errors.push("At least one tag file needs to be uploaded (label[_pred]_tsne.js or label[_pred]_umap.js)");
+        
+        if (!fileGroups.umap.data) {
+          errors.push("Missing required file: data_umap.js");
         }
-        // 3. 检查至少有一个config文件（tsne或umap）
-        const hasConfig = fileGroups.tsne.config.length > 0 || fileGroups.umap.config.length > 0;
-        if (!hasConfig) {
-          errors.push("At least one configuration file needs to be uploaded (config[_pred]_tsne.js or config[_pred]_umap.js)");
+
+        if (fileGroups.tsne.label.length !== 1) {
+          errors.push("Missing required file: label_pred_tsne.js");
         }
-        // 4. 最终验证结果
+
+        if (fileGroups.umap.label.length !== 1) {
+          errors.push("Missing required file: label_pred_umap.js");
+        }
+
+        if (fileGroups.tsne.config.length !== 1) {
+          errors.push("Missing required file: config_tsne.js");
+        }
+
+        if (fileGroups.umap.config.length !== 1) {
+          errors.push("Missing required file: config_umap.js");
+        }
+
+        if (!outputFile) {
+          errors.push("Missing required file: output.npy");
+        }
+
         if (errors.length > 0) {
-          ElMessage.error(`File validation failed: \n${errors.join('\n')}`);
+          ElMessage.error(`File validation failed:\n${errors.join('\n')}`);
           return false;
         }
+
+        // 加入 output 文件
+        fileGroups.output = outputFile;
+
         // 执行上传
         await this.UploadFiles(fileGroups);
-        
+
         this.updateTaskStatus(this.selectedTask.task_id, 2);
         this.uploadDialogVisible = false;
         this.editDialogVisible = false;
-        
+
         ElMessage.success('The file was uploaded successfully');
         window.location.reload();
       } catch (error) {
         ElMessage.error(`Upload failed: ${error.message}`);
       }
     },
-    
+
     async UploadFiles(fileGroups) {
       try {
         const uploadTasks = [];
         const allFiles = [];
+        
         // 遍历每个算法组
         Object.entries(fileGroups).forEach(([algo, group]) => {
+          // 跳过output文件，单独处理
+          if (algo === 'output') return;
+          
           // 上传data文件（如果存在）
           if (group.data) {
             allFiles.push({ file: group.data, type: 'data', algo });
           }
+          
           // 处理label文件
           group.label.forEach(labelFile => {
             allFiles.push({ 
@@ -540,6 +574,7 @@ export default {
               algo 
             });
           });
+          
           // 处理config文件
           group.config.forEach(configFile => {
             allFiles.push({ 
@@ -549,12 +584,24 @@ export default {
             });
           });
         });
+        
+        // 处理 output 文件
+        if (fileGroups.output) {
+          allFiles.push({
+            file: fileGroups.output,
+            type: 'output',
+            algo: null // output文件不需要算法标识
+          });
+        }
+        
         // 创建上传任务
         allFiles.forEach(({ file, type, algo }) => {
-          console.log(file, type, algo)
+          console.log(file, type, algo);
           uploadTasks.push(this.uploadFile(file, type, algo));
         });
+        
         await Promise.all(uploadTasks);
+        
         // 清空文件列表
         this.uploadedFiles = [];
         
@@ -563,12 +610,13 @@ export default {
       }
       this.showTaskNameDialog = false; // 成功上传后关闭对话框
     },
+
     async uploadFile(file, typePrefix, algorithm) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('taskName', this.selectedTask.task_name);
       formData.append('userName', this.selectedTask.user_name);
-      formData.append('fileType', `${typePrefix}_${algorithm}`);
+      // 移除 fileType 参数，不再传递给后端
       
       const response = await axios.post('/api/uploadResult', formData);
       console.log(response.data);

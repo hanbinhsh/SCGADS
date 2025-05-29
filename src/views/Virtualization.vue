@@ -40,7 +40,7 @@
           <font-awesome-icon :icon="['fas', 'chart-column']" style="margin-left: 5px;margin-right: 10px;" />
           <span>UMAP</span>
         </el-menu-item>
-        <el-menu-item index="denoising" :disabled="!((type?.split(':')[0] || '') === 'denoising')">
+        <el-menu-item index="denoising" :disabled="!((thisTask.type?.split(':')[0] || '') === 'denoising')">
           <font-awesome-icon :icon="['fas', 'chart-area']" style="margin-left: 5px;margin-right: 10px;" />
           <span>{{ $t('Visualization.Denoising') }}</span>
         </el-menu-item>
@@ -650,6 +650,10 @@ export default {
       localStorage.setItem('sidebarCollapsed', this.isCollapsed);
     },
     handleDarkModeChange(newValue){
+      if (this.myChart) {
+        this.myChart.dispose();
+        this.myChart = null;
+      }
       this.myChart = initializeChart(newValue, this.newChart, this.axisSettings, this.newData, this.newPieces, this.newLabel, this.isMobile);
       setTimeout(() => {
         if (this.myChart) {this.myChart.resize()};
@@ -658,6 +662,10 @@ export default {
     },
     conformSettings(){
       this.settingVisible = false
+      if (this.myChart) {
+        this.myChart.dispose();
+        this.myChart = null;
+      }
       this.myChart = initializeChart(this.isDarkMode, this.newChart, this.axisSettings, this.newData, this.newPieces, this.newLabel, this.isMobile);
       setTimeout(() => {
         if (this.myChart) {this.myChart.resize()};
@@ -717,11 +725,14 @@ export default {
         }));
 
         this.applySorting();
-
         this.newData = newData;
         this.newPieces = newPieces;
         this.newLabel = newLabel;
         this.newChart = true;
+        if (this.myChart) {
+          this.myChart.dispose();
+          this.myChart = null;
+        }
         this.myChart = initializeChart(this.isDarkMode, true, this.axisSettings, newData, newPieces, newLabel, this.isMobile);
         setTimeout(() => {
           if (this.myChart) {this.myChart.resize()};
@@ -804,7 +815,21 @@ export default {
     },
     checkMobile() {
       this.isMobile = window.innerWidth < 768;
-      this.myChart = initializeChart(this.isDarkMode, false, this.axisSettings, '', '', '', this.isMobile);
+      // 先进行销毁
+      if (this.myChart) {
+        this.myChart.dispose();
+        this.myChart = null;
+      }
+      // 使用当前的数据状态重新初始化图表
+      this.myChart = initializeChart(
+        this.isDarkMode, 
+        this.newChart || false,  // 保持当前图表状态
+        this.axisSettings, 
+        this.newData || '',      // 保持当前数据
+        this.newPieces || '',    // 保持当前配置
+        this.newLabel || '',     // 保持当前标签
+        this.isMobile
+      );
       setTimeout(() => {
         if (this.myChart) {this.myChart.resize()};
       }, 10);
@@ -816,7 +841,10 @@ export default {
 
     this.applySorting();
     this.isDarkMode = JSON.parse(localStorage.getItem('isDarkMode')) || false;
-
+    if (this.myChart) {
+      this.myChart.dispose();
+      this.myChart = null;
+    }
     // 初始化图表
     this.myChart = initializeChart(this.isDarkMode, false, this.axisSettings, '', '', '', this.isMobile);
     setTimeout(() => {

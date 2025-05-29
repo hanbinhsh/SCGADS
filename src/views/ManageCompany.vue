@@ -53,9 +53,9 @@
             <el-table-column prop="companyName" :label="$t('database.company.company_name')" sortable>
               <template #default="{ row }">
                 <div style="display: flex; align-items: center;">
-                  <el-avatar :size="24"
+                  <!-- <el-avatar :size="24"
                     :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-                  </el-avatar>
+                  </el-avatar> -->
                   <span style="margin-left: 8px;">{{ row.companyName }}</span>
                 </div>
               </template>
@@ -65,7 +65,7 @@
             <el-table-column fixed="right" :label="$t('Operations')" width="150">
               <template #default="{ row }">
                 <el-button link type="primary" size="small" @click="showAddUserDialog(row)">{{ $t('Add') }}</el-button>
-                <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
+                <!-- <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button> -->
                 <el-button link type="danger" size="small" @click="showDeleteDialog(row)">
                   {{ $t('Delete') }}
                 </el-button>
@@ -105,7 +105,7 @@
                       </el-table-column>
                       <el-table-column prop="email" :label="$t('Email')"></el-table-column>
                       <el-table-column prop="phone" :label="$t('Phone')"></el-table-column>
-                      <el-table-column :label="$t('Operations')" width="100">
+                      <el-table-column :label="$t('Operations')" width="120">
                         <template #default="{ row }">
                           <el-button link type="danger" size="small" @click="removeUserFromCompany(row.userId, props.row.companyId)">
                             {{ $t('Delete') }}
@@ -123,27 +123,28 @@
             <el-table-column prop="companyName" :label="$t('database.company.company_name')" sortable>
               <template #default="{ row }">
                 <div style="display: flex; align-items: center;">
-                  <el-avatar :size="24"
+                  <!-- <el-avatar :size="24"
                     :src="row.avatarBase64 ? 'data:image/jpeg;base64,' + row.avatarBase64 : defaultAvatar">
-                  </el-avatar>
+                  </el-avatar> -->
                   <span style="margin-left: 8px;">{{ row.companyName }}</span>
                 </div>
               </template>
             </el-table-column>
     
             <!-- 操作列 -->
-            <el-table-column fixed="right" :label="$t('Operations')" width="80">
+            <el-table-column fixed="right" :label="$t('Operations')" width="120">
               <template #default="{ row }">
                 <div style="display: grid;">
                   <el-button link type="primary" size="small" @click="showAddUserDialog(row)">{{ $t('Add') }}</el-button>
-                  <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
-                  <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
+                  <!-- <el-button link type="primary" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button> -->
+                  <el-button link type="danger" size="small" @click="showDeleteDialog(row)" style="margin: 0;">{{ $t('Delete') }}</el-button>
                 </div>
                 
               </template>
             </el-table-column>
           </el-table>
         </div>
+
         <!-- 添加用户到公司对话框 -->
         <el-dialog v-model="addUserDialogVisible" :title="`添加用户到 ${selectedCompany ? selectedCompany.companyName : '公司'}`" width="500" align-center>
           <el-form :model="addUserForm" label-width="100px" label-position="left">
