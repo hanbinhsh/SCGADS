@@ -87,7 +87,7 @@
                 <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
                   {{ $t('Edit') }}
                 </el-button>
-                <el-button link type="danger" size="small" @click="" v-if="!isRightColumnExpanded">
+                <el-button link type="danger" size="small" @click="showUnshareDialog(data)" v-if="!isRightColumnExpanded">
                   {{ $t('Delete') }}
                 </el-button>
               </div>
@@ -148,7 +148,7 @@
         <el-card class="dashboard-card animate__animated animate__fadeInLeft" :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
             <div class="card-header">
-              <span>{{ $t('workSpace.ShareReceived') }}</span>
+              <span>{{ $t('workSpace.SharesReceived') }}</span>
             </div>
           </template>
           <div class="success-tasks-list">
@@ -228,7 +228,7 @@
     
     <!-- Expanded -->
     <div v-else class="expanded-task-list">
-      <!-- 新增TAB栏 -->
+      <!-- 新增TAB栏 - 三列布局 -->
       <el-tabs v-model="activeTab" type="card" class="right-column-tabs">
         <el-tab-pane :label="$t('workSpace.Tasks')" name="tasks">
           <!-- Original Full Table Layout -->
@@ -308,17 +308,18 @@
           <div class="footer">
             <div class="footer-button-row">
               <el-button type="success" @click="Refresh">
-                Refresh
+                {{ $t('Refresh') }}
               </el-button>
               <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-                Batch Delete
+                {{ $t('workSpace.BatchDelete') }}
               </el-button>
             </div>
           </div>
         </el-tab-pane>
 
-        <el-tab-pane :label="$t('workSpace.Shares')" name="shares">
-          <el-table :data="paginatedShareList" 
+        <!-- 我的分享 TAB -->
+        <el-tab-pane :label="$t('workSpace.MyShares')" name="myShares">
+          <el-table :data="paginatedMySharesList" 
             style="width: 100%"
             v-loading="shareLoading">
             <el-table-column prop="task_name" :label="$t('database.task.task_name')">
@@ -355,6 +356,9 @@
                 <el-button link type="info" size="small" @click="copyShareLink(row)">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
+                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
                 <el-button link type="danger" size="small" @click="showUnshareDialog(row)">
                   {{ $t('workSpace.Unshare') }}
                 </el-button>
@@ -364,11 +368,11 @@
 
           <el-pagination 
             class="pagination" 
-            @size-change="handleShareSizeChange" 
-            @current-change="handleShareCurrentChange"
-            :current-page="shareCurrentPage" 
+            @size-change="handleMySharesSizeChange" 
+            @current-change="handleMySharesCurrentChange"
+            :current-page="mySharesCurrentPage" 
             :page-sizes="[5, 10, 20, 50]" 
-            :page-size="sharePageSize"
+            :page-size="mySharesPageSize"
             layout="total, sizes, prev, pager, next, jumper" 
             :total="shareList.length">
           </el-pagination>
@@ -376,10 +380,78 @@
           <div class="footer">
             <div class="footer-button-row">
               <el-button type="success" @click="Refresh">
-                Refresh
+                {{ $t('Refresh') }}
               </el-button>
-              <el-button type="danger" @click="showBatchDeleteDialog" :disabled="selectedTasks.length === 0">
-                Batch Delete TODO 批量删除分享
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <!-- 收到的分享 TAB -->
+        <el-tab-pane :label="$t('workSpace.SharesReceived')" name="receivedShares">
+          <el-table :data="paginatedReceivedSharesList" 
+            style="width: 100%"
+            v-loading="shareLoading">
+            <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+              <template #default="{ row }">
+                <font-awesome-icon :style="{ color: getStatusColor(row.status)}" :icon="['fas', 'circle']" />
+                {{ row.task_name }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
+              <template #default="{ row }">
+                {{ formatDate(row.shared_time) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="due_time" :label="$t('database.share.due_time')">
+              <template #default="{ row }">
+                {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')">
+              <template #default="{ row }">
+                {{ row.sharer_name || $t('workSpace.Unknown') }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" :label="$t('Status')">
+              <template #default="{ row }">
+                <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
+                  {{ $t('workSpace.Indefinite') }}
+                </span>
+                <span v-else-if="new Date() > new Date(row.due_time)" class="share-status-badge share-status-expired">
+                  {{ $t('workSpace.Expired') }}
+                </span>
+                <span v-else>
+                  {{ $t('workSpace.Active') }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" :label="$t('Operations')" width="200">
+              <template #default="{ row }">
+                <el-button link type="info" size="small" @click="copyShareLink(row)">
+                  {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="success" size="small" @click="showCharts(row.task_name)" :disabled="row.status !== 2">
+                  {{ $t('navigateBar.Virtualization') }}
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <el-pagination 
+            class="pagination" 
+            @size-change="handleReceivedSharesSizeChange" 
+            @current-change="handleReceivedSharesCurrentChange"
+            :current-page="receivedSharesCurrentPage" 
+            :page-sizes="[5, 10, 20, 50]" 
+            :page-size="receivedSharesPageSize"
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="shareReceivedList.length">
+          </el-pagination>
+          <!-- Button Row -->
+          <div class="footer">
+            <div class="footer-button-row">
+              <el-button type="success" @click="Refresh">
+                {{ $t('Refresh') }}
               </el-button>
             </div>
           </div>
@@ -388,7 +460,7 @@
     </div>
   </div>
 
-  <!-- 新增分享对话框 -->
+  <!-- 分享对话框 -->
  <el-dialog v-model="shareDialogVisible" :title="$t('workSpace.ShareTask')" width="500px">
   <el-form :model="shareForm" label-width="120px">
     <el-form-item :label="$t('workSpace.Expiration')">
@@ -460,30 +532,30 @@
 </el-dialog>
     </div>
     
-    <el-dialog v-model="batchDeleteDialogVisible" title="Warning" width="500">
-      <span>The selected tasks will be deleted. Are you sure?</span>
+    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('Warning')" width="500">
+      <span>{{ $t('workSpace.BatchDeleteConfirm') }}</span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="batchDeleteDialogVisible = false">Cancel</el-button>
-          <el-button type="danger" @click="confirmBatchDelete">Confirm</el-button>
+          <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="confirmBatchDelete">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
-    <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask?.task_name }}</strong> will be deleted</span>
+    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
+      <span>{{ $t('workSpace.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedTask?.task_name }}</strong></span>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">Cancel</el-button>
+          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
           <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">
-            Confirm
+            {{ $t('Confirm') }}
           </el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 任务详细信息对话框 -->
-    <el-dialog v-model="detailDialogVisible" title="Task Detail" width="550px" align-center>
+    <el-dialog v-model="detailDialogVisible" :title="$t('workSpace.TaskDetail')" width="550px" align-center>
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('database.task.task_name')">
           {{ selectedTask.task_name }}
@@ -504,7 +576,7 @@
         
         <el-descriptions-item :label="$t('database.task.re_pretrain')" v-if="(selectedTask.type?.split(':')[0] || '') === 'training'">
           <el-tag :type="selectedTask.re_pretrain == true ? 'success' : 'warning'">
-            {{ selectedTask.re_pretrain == true ? 'Yes' : 'No' }}
+            {{ selectedTask.re_pretrain == true ? $t('Yes') : $t('No') }}
           </el-tag>
         </el-descriptions-item>
 
@@ -536,13 +608,13 @@
   <div class="mobile-task-drawer">
     <el-drawer
       v-model="mobileTaskDrawerVisible"
-      title="Tasks"
+      :title="$t('workSpace.Tasks')"
       direction="btt"
       size="80%"
     >
       <el-table 
         :data="paginatedTaskList" 
-        style="width: 100%"
+        style="width: 100%" 
         v-loading="loading">
         <el-table-column prop="task_name" :label="$t('database.task.task_name')">
           <template #default="{ row }">
@@ -583,23 +655,23 @@
     >
       <div class="mobile-task-details">
         <div class="detail-item">
-          <span class="detail-label">Status:</span>
+          <span class="detail-label">{{ $t('Status') }}:</span>
           <el-tag :type="statusType(selectedTask?.status)">{{ statusText(selectedTask?.status) }}</el-tag>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Type:</span>
+          <span class="detail-label">{{ $t('database.task.type') }}:</span>
           <span>{{ getTaskType(selectedTask) }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Model:</span>
-          <span>{{ selectedTask?.model_name ?? "Unknown" }}</span>
+          <span class="detail-label">{{ $t('database.models.model_name') }}:</span>
+          <span>{{ selectedTask?.model_name ?? $t('workSpace.Unknown') }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Start Time:</span>
+          <span class="detail-label">{{ $t('database.task.start_time') }}:</span>
           <span>{{ formatDate(selectedTask?.start_time) }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">End Time:</span>
+          <span class="detail-label">{{ $t('database.task.end_time') }}:</span>
           <span>{{ (selectedTask?.end_time && selectedTask?.status === 2) ? formatDate(selectedTask?.end_time) : $t('Notcompletedyet') }}</span>
         </div>
       </div>
@@ -660,16 +732,14 @@
   </el-dialog>
 
   <!-- 修改对话框 -->
-  <el-dialog v-model="showEditDialog" title="Edit Model" width="500px" align-center>
-    <!-- 添加提示信息 -->
+  <el-dialog v-model="showEditDialog" :title="$t('modelPage.EditModel')" width="500px" align-center>
     <el-form :model="selectedData" label-width="120px" label-position="left">
       <div style="display: flex; gap: 20px;">
-        <!-- 左侧：现有输入框 -->
         <div style="flex: 1;">
-          <el-form-item label="Model Name">
+          <el-form-item :label="$t('modelPage.ModelName')">
             <el-input v-model="selectedData.modelName" disabled></el-input>
           </el-form-item>
-          <el-form-item label="Remark">
+          <el-form-item :label="$t('modelPage.Remark')">
             <el-input v-model="selectedData.remark"></el-input>
           </el-form-item>
         </div>
@@ -685,13 +755,13 @@
   </el-dialog>
 
   <!-- 删除确认对话框 -->
-  <el-dialog v-model="showDeleteModelDialog" title="Warning" width="500" align-center>
-    <span>Model <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong> will be deleted</span>
+  <el-dialog v-model="showDeleteModelDialog" :title="$t('Warning')" width="500" align-center>
+    <span>{{ $t('modelPage.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong></span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="showDeleteModelDialog = false">Cancel</el-button>
+        <el-button @click="showDeleteModelDialog = false">{{ $t('Cancel') }}</el-button>
         <el-button type="danger" @click="showDeleteModelDialog = false; deleteData(selectedData.modelId)">
-          Confirm
+          {{ $t('Confirm') }}
         </el-button>
       </div>
     </template>
@@ -746,30 +816,23 @@ export default {
       activeTab: 'tasks', // 当前激活的TAB
       shareDialogVisible: false, // 分享对话框可见性
       shareForm: {
-        due_time: '', // 过期时间
-        permission: 'read' // 权限
+        day: 0,
+        hour: 0,
+        minute: 0,
+        accepter: '',
+        companyName: '', //  companyName
+        password: '',
       },
-      shareCurrentPage: 1, // 分享列表当前页
-      sharePageSize: 10, // 分享列表每页大小
-
       timeError: '',
-      shareForm: {
-      day: 0,
-      hour: 0,
-      minute: 0,
-      accepter: '',
-      companyName: '', //  companyName
-      password: '',
-    },
+      
+      // 新增分页变量
+      mySharesCurrentPage: 1,
+      mySharesPageSize: 10,
+      receivedSharesCurrentPage: 1,
+      receivedSharesPageSize: 10,
     };
   },
   computed: {
-    // 新增计算属性
-    paginatedShareList() {
-      const start = (this.shareCurrentPage - 1) * this.sharePageSize;
-      const end = start + this.sharePageSize;
-      return this.shareList.slice(start, end);
-    },
     // 计算各状态任务数量
     pendingCount() {
       return this.taskList.filter(task => task.status === 0).length;
@@ -805,125 +868,141 @@ export default {
         .sort((a, b) => new Date(b.create_time || b.createdAt) - new Date(a.create_time || a.createdAt))
         // .slice(0, 5); // 只显示最近5个
     },
+    
+    // 新增计算属性
+    paginatedMySharesList() {
+      const start = (this.mySharesCurrentPage - 1) * this.mySharesPageSize;
+      const end = start + this.mySharesPageSize;
+      return this.shareList.slice(start, end);
+    },
+    
+    paginatedReceivedSharesList() {
+      const start = (this.receivedSharesCurrentPage - 1) * this.receivedSharesPageSize;
+      const end = start + this.receivedSharesPageSize;
+      return this.shareReceivedList.slice(start, end);
+    },
   },
   methods: {
-    // 新增方法
     validateTime(type) {
-    if (type === 'day') {
-      if (this.shareForm.day < 0) {
-        this.timeError = this.$t('workSpace.DaysPositive');
-      } else {
-        this.timeError = '';
+      if (type === 'day') {
+        if (this.shareForm.day < 0) {
+          this.timeError = this.$t('workSpace.DaysPositive');
+        } else {
+          this.timeError = '';
+        }
+      } else if (type === 'hour') {
+        if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
+          this.timeError = this.$t('workSpace.HoursRange');
+        } else {
+          this.timeError = '';
+        }
+      } else if (type === 'minute') {
+        if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
+          this.timeError = this.$t('workSpace.MinutesRange');
+        } else {
+          this.timeError = '';
+        }
       }
-    } else if (type === 'hour') {
-      if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
-        this.timeError = this.$t('workSpace.HoursRange');
-      } else {
-        this.timeError = '';
-      }
-    } else if (type === 'minute') {
-      if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
-        this.timeError = this.$t('workSpace.MinutesRange');
-      } else {
-        this.timeError = '';
-      }
-    }
-  },
+    },
     showShareDialog(task) {
       this.selectedTask = task;
       this.shareForm = {
-        due_time: '',
-        permission: 'read'
+        day: 0,
+        hour: 0,
+        minute: 0,
+        accepter: '',
+        companyName: '',
+        password: ''
       };
       this.shareDialogVisible = true;
     },
     async confirmShare() {
-    // 验证输入
-    if (this.shareForm.day < 0) {
-      this.timeError = this.$t('workSpace.DaysPositive');
-      return;
-    }
-    
-    if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
-      this.timeError = this.$t('workSpace.HoursRange');
-      return;
-    }
-    
-    if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
-      this.timeError = this.$t('workSpace.MinutesRange');
-      return;
-    }
-    
-    try {
-      let userId = null;
-      let companyId = null;
+      // 验证输入
+      if (this.shareForm.day < 0) {
+        this.timeError = this.$t('workSpace.DaysPositive');
+        return;
+      }
       
-      // 验证接收者
-      if (this.shareForm.accepter) {
-        if (this.shareForm.accepter === this.userData.userName) {
-          ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
-          return;
+      if (this.shareForm.hour < 0 || this.shareForm.hour > 23) {
+        this.timeError = this.$t('workSpace.HoursRange');
+        return;
+      }
+      
+      if (this.shareForm.minute < 0 || this.shareForm.minute > 59) {
+        this.timeError = this.$t('workSpace.MinutesRange');
+        return;
+      }
+      
+      try {
+        let userId = null;
+        let companyId = null;
+        
+        // 验证接收者
+        if (this.shareForm.accepter) {
+          if (this.shareForm.accepter === this.userData.userName) {
+            ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
+            return;
+          }
+          
+          const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.shareForm.accepter}`);
+          const userData = userResponse.data.data; 
+          if (userData.state === 0) {
+            ElMessage.error(this.$t('workSpace.UserNotExist'));
+            return;
+          }
+          console.log(userData);
+          userId = userData.userId;
+          console.log(userId);
         }
         
-        const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.shareForm.accepter}`);
-        const userData = userResponse.data.data; 
-        if (userData.state === 0) {
-          ElMessage.error(this.$t('workSpace.UserNotExist'));
-          return;
+        // 验证公司
+        if (this.shareForm.companyName) {
+          const companyResponse = await axios.post(`/api/findCompanyByCompanyName?companyName=${this.shareForm.companyName}`);
+          const companyData = companyResponse.data.data;
+          if (companyData.state === 0) {
+            ElMessage.error(this.$t('workSpace.CompanyNotExist'));
+            return;
+          }
+          console.log(companyData);
+          companyId = companyData.userGroup.companyId;
+          console.log(companyId);
         }
-        userId = userData.userId;
-      }
-      console.log("1");
-      // 验证公司
-      if (this.shareForm.companyName) {
-        const companyResponse = await axios.post(`/api/findCompanyByName?companyName=${this.shareForm.companyName}`);
-        const companyData = companyResponse.data.data;
-        if (companyData.state === 0) {
-          ElMessage.error(this.$t('workSpace.CompanyNotExist'));
-          return;
+        
+        // 计算分享时间
+        const shareTime = new Date();
+        const dueTime = new Date(
+          shareTime.getTime() + 
+          (this.shareForm.day || 0) * 24 * 60 * 60 * 1000 + 
+          (this.shareForm.hour || 0) * 60 * 60 * 1000 + 
+          (this.shareForm.minute || 0) * 60 * 1000
+        );
+        
+        // 创建分享
+        const shareData = {
+          taskId: this.selectedTask.task_id,
+          sharerId: this.userData.userId,
+          sharedTime: shareTime,
+          dueTime: dueTime,
+          receiverId: userId ?? -2,
+          companyId: companyId ?? -2,
+          password: this.shareForm.password,
+        };
+        
+        // 发送请求
+        const response = await axios.post('/api/share/insertShare', [shareData]);
+        
+        if (response.data.code === 200) {
+          ElMessage.success(this.$t('workSpace.ShareSuccess'));
+          this.fetchShareList();
+        } else {
+          ElMessage.error(response.data.msg);
         }
-        companyId = companyData.companyId;
+        
+        this.shareDialogVisible = false;
+      } catch (error) {
+        console.error('Failed to share task:', error);
+        ElMessage.error(this.$t('workSpace.ShareFailed'));
       }
-      console.log("2");
-      // 计算分享时间
-      const shareTime = new Date();
-      const dueTime = new Date(
-        shareTime.getTime() + 
-        (this.shareForm.day || 0) * 24 * 60 * 60 * 1000 + 
-        (this.shareForm.hour || 0) * 60 * 60 * 1000 + 
-        (this.shareForm.minute || 0) * 60 * 1000
-      );
-      console.log("3");
-      // 创建分享
-      const shareData = {
-                    taskId: this.selectedTask.task_id,
-                    sharerId: this.userData.userId,
-                    sharedTime: shareTime,
-                    dueTime: dueTime,
-                    receiverId: userId ?? -2,
-                    companyId: companyId ?? -2,
-                    password: this.shareForm.password,
-                };
-      console.log("4");
-      // 发送请求
-      const response = await axios.post('/api/share/insertShare', [shareData]);
-      console.log("5");
-      if (response.data.code === 200) {
-        ElMessage.success(this.$t('workSpace.ShareSuccess'));
-        this.fetchShareList();
-      } else {
-        ElMessage.error(response.data.msg);
-      }
-      console.log("6");
-      this.shareDialogVisible = false;
-    } catch (error) {
-      console.error('Failed to share task:', error);
-      ElMessage.error(this.$t('workSpace.ShareFailed'));
-    }
-  },
-    
-    disabledDate(time) {
-      return time.getTime() < Date.now() - 8.64e7; // 不能选择今天之前的日期
     },
     
     copyShareLink(share) {
@@ -943,7 +1022,7 @@ export default {
           type: 'warning'
         });
         
-        const response = await axios.delete(`/api/share/delete/${share.share_id}`);
+        const response = await axios.post(`/api/share/deleteShareByShareId`,{shareId: share.share_id});
         if (response.data.code === 200) {
           ElMessage.success(this.$t('workSpace.UnshareSuccess'));
           this.fetchShareList(); // 刷新分享列表
@@ -958,14 +1037,7 @@ export default {
       }
     },
     
-    handleShareSizeChange(val) {
-      this.sharePageSize = val;
-    },
-    
-    handleShareCurrentChange(val) {
-      this.shareCurrentPage = val;
-    },
-     async fetchModelList() {
+    async fetchModelList() {
       try {
         this.modelLoading = true;
         const response = await axios.get("/api/models/findModelsByUserName?userName=" + this.userData.userName);
@@ -984,7 +1056,7 @@ export default {
     },
     editModel(model) {
       if (!this.isUserModel(model)) {
-        ElMessage.warning('You can only edit your own models');
+        ElMessage.warning(this.$t('modelPage.CanEditOwnModels'));
         return;
       }
       this.selectedData = model;
@@ -1014,12 +1086,12 @@ export default {
       const response = await axios.post('api/models/updateModelRemark', formData);
       if (response.data.code === 1) {
         ElMessage({
-          message: 'Model update successfully',
+          message: this.$t('modelPage.UpdateSuccess'),
           type: 'success',
         });
       } else {
         ElMessage({
-          message: 'Failed to update Model',
+          message: this.$t('modelPage.UpdateFailed'),
           type: 'error',
         });
       }
@@ -1030,7 +1102,7 @@ export default {
       try {
         const response = await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
         if (response.data.code === 1) {
-          ElMessage.success('Model deleted successfully');
+          ElMessage.success(this.$t('modelPage.DeleteSuccess'));
         } else {
           console.error('Failed to delete:', response.data.msg);
           ElMessage.error(response.data.msg);
@@ -1188,7 +1260,7 @@ export default {
     },
     showBatchDeleteDialog() {
       if (this.selectedTasks.length === 0) {
-        ElMessage.warning("Please select at least one task.");
+        ElMessage.warning(this.$t('workSpace.SelectAtLeastOneTask'));
         return;
       }
       this.batchDeleteDialogVisible = true;
@@ -1196,11 +1268,11 @@ export default {
     async deleteTask() {
       try {
         await axios.get("/api/deleteTaskByTaskName?userName="+ this.userData.userName +"&taskName=" + this.selectedTask.task_name);
-        ElMessage.success("Delete success.");
+        ElMessage.success(this.$t('workSpace.DeleteSuccess'));
         this.Refresh();
       } catch (error) {
         console.error("Delete failed:", error);
-        ElMessage.error("Delete failed.");
+        ElMessage.error(this.$t('workSpace.DeleteFailed'));
       }
     },
     async confirmBatchDelete() {
@@ -1208,7 +1280,7 @@ export default {
       for (const task of this.selectedTasks) {
         await this.deleteTaskByTaskName(task.task_name);
       }
-      ElMessage.success("Batch delete completed.");
+      ElMessage.success(this.$t('workSpace.BatchDeleteSuccess'));
       this.Refresh();
     },
     async deleteTaskByTaskName(taskName) {
@@ -1343,6 +1415,23 @@ export default {
       }
       
       return typeText || this.$t('taskType.Unknown');
+    },
+    
+    // 新增分页处理方法
+    handleMySharesSizeChange(val) {
+      this.mySharesPageSize = val;
+    },
+    
+    handleMySharesCurrentChange(val) {
+      this.mySharesCurrentPage = val;
+    },
+    
+    handleReceivedSharesSizeChange(val) {
+      this.receivedSharesPageSize = val;
+    },
+    
+    handleReceivedSharesCurrentChange(val) {
+      this.receivedSharesCurrentPage = val;
     },
   },
   mounted() {
@@ -1581,32 +1670,54 @@ export default {
   justify-content: center;
 }
 
-/* Accommodate to dark mode when active */
-:deep(.dark-mode) .dashboard-card,
-:deep(.dark) .dashboard-card {
-  background-color: #1d1e1f;
-  border-color: #3e3e3e;
-  color: #e0e0e0;
+/* TAB栏三列等分样式 */
+.right-column-tabs :deep(.el-tabs__item) {
+  width: 33.3%; /* 三列等宽 */
+  text-align: center;
 }
 
-:deep(.dark-mode) .success-task-details,
-:deep(.dark) .success-task-details {
-  color: #a0a0a0;
+/* 状态标签样式 */
+.share-status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-:deep(.dark-mode) .empty-state,
-:deep(.dark) .empty-state {
-  color: #a0a0a0;
+.share-status-indefinite {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
 }
 
-:deep(.dark-mode) .right-column,
-:deep(.dark) .right-column {
-  border-left-color: #3e3e3e;
+.share-status-expired {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
 }
 
-:deep(.dark-mode) .footer,
-:deep(.dark) .footer {
-  border-top-color: #3e3e3e;
+/* 时间输入组样式 */
+.time-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.time-input {
+  flex: 1;
+  max-width: 100px;
+}
+
+.time-error {
+  color: #f56c6c;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.password-hint {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 5px;
 }
 
 /* Mobile Responsive Styles */
@@ -1719,53 +1830,5 @@ export default {
 
 .el-scrollbar__view .el-row{
   margin-bottom: 0;
-}
-
-.share-status-badge {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.share-status-indefinite {
-  background: #e6f7ff;
-  color: #1890ff;
-  border: 1px solid #91d5ff;
-}
-
-.share-status-expired {
-  background: #fff2f0;
-  color: #ff4d4f;
-  border: 1px solid #ffccc7;
-}
-
-.right-column-tabs {
-  margin-top: 10px;
-}
-
-.right-column-tabs :deep(.el-tabs__header) {
-  margin: 0;
-}
-
-.right-column-tabs :deep(.el-tabs__content) {
-  padding: 0;
-}
-
-.time-input-group {
-  display: flex;
-  gap: 10px;
-}
-
-.time-input {
-  flex: 1;
-  max-width: 100px;
-}
-
-.time-error {
-  color: #f56c6c;
-  font-size: 12px;
-  margin-top: 5px;
 }
 </style>

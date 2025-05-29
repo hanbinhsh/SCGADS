@@ -177,6 +177,9 @@ const en = {
     Training: "Training",
   },
   workSpace: {
+    MyShares: "My Shares",
+    SharesReceived: "Shares Received",
+    Sharer: "Sharer",
     TaskStatus: "Task Status",
     MyShares: "My Shares",
     ShareReceived: "Share Received",
@@ -241,6 +244,10 @@ const en = {
       created_time: "Upload Time",
       pretrain_model: "Pretrain Model",
       base_model: "Base Model",
+    },
+    share: {
+      shared_time: "Shared Time",
+      due_time: "Due Time"
     },
     user: {
       user_id: "User ID",

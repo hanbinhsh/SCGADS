@@ -177,6 +177,9 @@ const zh =  {
     Training: "训练",
   },
   workSpace: {
+    MyShares: "我的分享",
+    SharesReceived: "收到的分享",
+    Sharer: "分享人",
     TaskStatus: "任务状态",
     MyShares: "我的分享",
     ShareReceived: "收到的分享",
@@ -241,6 +244,7 @@ const zh =  {
       created_time: "上传时间",
       pretrain_model: "预训练模型",
       base_model: "基础模型",
+
     },
     user: {
       user_id: "用户ID",
