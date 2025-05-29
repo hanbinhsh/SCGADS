@@ -121,7 +121,7 @@
             value-format="YYYY-MM-DD HH:mm:ss"
             clearable
           />
-          <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
             留空表示永久分享
           </div>
         </el-form-item>

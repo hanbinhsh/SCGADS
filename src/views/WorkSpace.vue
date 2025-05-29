@@ -95,10 +95,11 @@
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }} 
                 <span v-if="!data.due_time && !isRightColumnExpanded" class="share-status-badge share-status-indefinite"> {{ $t('workSpace.Indefinite') }} </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
-                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666; margin-left: auto">
+                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666; margin-left: auto;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
+                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded" class="share-status-badge share-status-expired" style="margin-left: 10px"> {{ $t('workSpace.Expired') }} </span>
+                
                 <el-progress 
                   v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
                   :percentage="getShareProgress(data.shared_time, data.due_time)" 
@@ -472,7 +473,7 @@
           value-format="YYYY-MM-DD HH:mm:ss"
           clearable
         />
-        <div style="color: #909399; font-size: 12px; margin-top: 5px;">
+        <div style="color: #909399; font-size: 12px; margin-left: 5px;">
           留空表示永久分享
         </div>
       </el-form-item>
@@ -1669,23 +1670,6 @@ export default {
   background: #fff2f0;
   color: #ff4d4f;
   border: 1px solid #ffccc7;
-}
-
-/* 时间输入组样式 */
-.time-input-group {
-  display: flex;
-  gap: 10px;
-}
-
-.time-input {
-  flex: 1;
-  max-width: 100px;
-}
-
-.time-error {
-  color: #f56c6c;
-  font-size: 12px;
-  margin-top: 5px;
 }
 
 .password-hint {
