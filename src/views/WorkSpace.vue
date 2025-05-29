@@ -107,7 +107,7 @@
                   style="font-size: 11px; color: #666; margin-left: auto;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded"
+                <span v-if="data.due_time && new Date() > new Date(data.due_time) && !isRightColumnExpanded"
                   class="share-status-badge share-status-expired" style="margin-left: 10px"> {{ $t('workSpace.Expired')
                   }}
                 </span>
@@ -186,12 +186,14 @@
 
               <div class="success-task-details">
                 {{ formatDate(data.shared_time) }}
-
+                <!-- 无限 -->
                 <span v-if="!data.due_time && !isRightColumnExpanded"
                   class="share-status-badge share-status-indefinite"> {{
                     $t('workSpace.Indefinite') }} </span>
-                <span v-if="new Date() > new Date(data.due_time) && !isRightColumnExpanded"
+                <!-- 过期 -->
+                <span v-if="data.due_time && new Date() > new Date(data.due_time) && !isRightColumnExpanded"
                   class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
+                <!-- 过期时间 -->
                 <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
@@ -315,15 +317,17 @@
 
             <!-- 我的分享 TAB -->
             <el-tab-pane :label="$t('workSpace.MyShares')" name="myShares">
-              <el-table :data="paginatedMySharesList" style="width: 100%" v-loading="shareLoading">
-                <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+              <el-table :data="paginatedMySharesList" style="width: 100%" @selection-change="handleSelectionChange"
+                @sort-change="handleSortChange" v-loading="shareLoading">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
                   <template #default="{ row }">
                     <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
                     {{ row.task_name }}
                   </template>
                 </el-table-column>
                 <!-- 新增：被分享者列 -->
-                <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')">
+                <el-table-column prop="accepter_name" :label="$t('workSpace.Recipient')" sortable>
                   <template #default="{ row }">
                     <span v-if="row.receiver_name">{{ row.receiver_name }}</span>
                     <span v-else-if="row.company_name" style="color: #409EFF;">{{ row.company_name }} (公司)</span>
@@ -332,7 +336,7 @@
                 </el-table-column>
 
                 <!-- 新增：任务类型列 -->
-                <el-table-column :label="$t('database.task.type')">
+                <el-table-column :label="$t('database.task.type')" sortable>
                   <template #default="{ row }">
                     {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
                       (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
@@ -344,24 +348,24 @@
                 </el-table-column>
 
 
-                <el-table-column prop="status" :label="$t('database.task.status')">
+                <el-table-column prop="status" :label="$t('database.task.status')" sortable>
                   <template #default="{ row }">
                     <el-tag :type="statusType(row.status)">
                       {{ statusText(row.status) }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
+                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" sortable>
                   <template #default="{ row }">
                     {{ formatDate(row.shared_time) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="due_time" :label="$t('database.share.due_time')">
+                <el-table-column prop="due_time" :label="$t('database.share.due_time')" sortable>
                   <template #default="{ row }">
                     {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="status" :label="$t('Status')">
+                <el-table-column prop="status" :label="$t('Status')" sortable>
                   <template #default="{ row }">
                     <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
                       {{ $t('workSpace.Indefinite') }}
@@ -415,14 +419,14 @@
             <!-- 收到的分享 TAB -->
             <el-tab-pane :label="$t('workSpace.SharesReceived')" name="receivedShares">
               <el-table :data="paginatedReceivedSharesList" style="width: 100%" v-loading="shareLoading">
-                <el-table-column prop="task_name" :label="$t('database.task.task_name')">
+                <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
                   <template #default="{ row }">
                     <font-awesome-icon :style="{ color: getStatusColor(row.status) }" :icon="['fas', 'circle']" />
                     {{ row.task_name }}
                   </template>
                 </el-table-column>
                 <!-- 新增：任务类型列 -->
-                <el-table-column :label="$t('database.task.type')">
+                <el-table-column :label="$t('database.task.type')" sortable>
                   <template #default="{ row }">
                     {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
                       (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
@@ -435,29 +439,29 @@
 
 
                 <!-- 新增：状态列（任务状态） -->
-                <el-table-column prop="status" :label="$t('database.task.status')">
+                <el-table-column prop="status" :label="$t('database.task.status')" sortable>
                   <template #default="{ row }">
                     <el-tag :type="statusType(row.status)">
                       {{ statusText(row.status) }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')">
+                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" sortable>
                   <template #default="{ row }">
                     {{ formatDate(row.shared_time) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="due_time" :label="$t('database.share.due_time')">
+                <el-table-column prop="due_time" :label="$t('database.share.due_time')" sortable>
                   <template #default="{ row }">
                     {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')">
+                <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')" sortable>
                   <template #default="{ row }">
                     {{ row.user_name || $t('workSpace.Unknown') }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="status" :label="$t('Status')">
+                <el-table-column prop="status" :label="$t('Status')" sortable>
                   <template #default="{ row }">
                     <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
                       {{ $t('workSpace.Indefinite') }}
@@ -515,13 +519,39 @@
         </el-form-item>
 
         <el-form-item :label="$t('workSpace.Recipient')">
-          <el-input v-model="shareForm.accepter" :placeholder="$t('workSpace.RecipientPlaceholder')" clearable>
-          </el-input>
+          <el-select
+            v-model="shareForm.accepter"
+            :placeholder="$t('workSpace.RecipientPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterUsers"
+            @clear="shareForm.accepter = ''"
+          >
+            <el-option
+              v-for="user in filteredUsers"
+              :key="user.user_id"
+              :label="user.user_name"
+              :value="user.user_name"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item :label="$t('workSpace.Company')">
-          <el-input v-model="shareForm.companyName" :placeholder="$t('workSpace.CompanyPlaceholder')" clearable>
-          </el-input>
+          <el-select
+            v-model="shareForm.companyName"
+            :placeholder="$t('workSpace.CompanyPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterCompanies"
+            @clear="shareForm.companyName = ''"
+          >
+            <el-option
+              v-for="company in filteredCompanies"
+              :key="company.company_id"
+              :label="company.company_name"
+              :value="company.company_name"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item :label="$t('workSpace.Password')">
@@ -548,14 +578,7 @@
       width="500px"
     >
       <el-form :model="editForm" label-width="120px">
-        <el-form-item label="密码设置">
-          <el-input
-            v-model="editForm.password"
-            placeholder="留空表示无密码保护"
-            show-password
-            clearable
-          ></el-input>
-        </el-form-item>
+        
         <el-form-item label="到期时间">
           <el-date-picker
             v-model="editForm.dueTime"
@@ -568,6 +591,51 @@
           <div style="color: #909399; font-size: 12px; margin-left: 5px;">
             留空表示永久分享
           </div>
+        </el-form-item>
+        <el-form-item :label="$t('workSpace.Recipient')">
+          <el-select
+            v-model="editForm.receiverName"
+            :placeholder="$t('workSpace.RecipientPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterUsers"
+            @clear="editForm.receiverName = ''"
+          >
+            <el-option
+              v-for="user in filteredUsers"
+              :key="user.user_id"
+              :label="user.user_name"
+              :value="user.user_name"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item :label="$t('workSpace.Company')">
+          <el-select
+            v-model="editForm.companyName"
+            :placeholder="$t('workSpace.CompanyPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterCompanies"
+            @clear="editForm.companyName = ''"
+          >
+            <el-option
+              v-for="company in filteredCompanies"
+              :key="company.company_id"
+              :label="company.company_name"
+              :value="company.company_name"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="密码设置">
+          <el-input
+          v-model="editForm.password"
+          placeholder="留空表示无密码保护"
+          show-password
+          clearable
+          ></el-input>
+          <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -875,8 +943,19 @@ export default {
       editForm: {
         shareId: null,
         password: '',
-        dueTime: null
-      }
+        dueTime: null,
+        receiverName: null,
+        companyName: null,
+      },
+
+      // 新增搜索相关属性
+      filteredUsers: [],
+      filteredCompanies: [],
+      userSearchKeyword: '',
+      companySearchKeyword: '',
+
+      allCompanysIdName: {},
+      allUsersIdName: {},
     };
   },
   computed: {
@@ -930,16 +1009,80 @@ export default {
     },
   },
   methods: {
+    // 初始化过滤列表
+    initializeFilteredLists() {
+      // 确保数据存在且不为空
+      if (this.allUsersIdName && Object.keys(this.allUsersIdName).length > 0) {
+        this.filteredUsers = Object.values(this.allUsersIdName).filter(user => 
+          user && user.user_name && user.user_id
+        );
+      } else {
+        this.filteredUsers = [];
+      }
+      
+      if (this.allCompanysIdName && Object.keys(this.allCompanysIdName).length > 0) {
+        this.filteredCompanies = Object.values(this.allCompanysIdName).filter(company => 
+          company && company.company_name && company.company_id
+        );
+      } else {
+        this.filteredCompanies = [];
+      }
+    },
+
+    // 过滤用户方法
+    filterUsers(query) {
+      this.userSearchKeyword = query;
+      if (!this.allUsersIdName || Object.keys(this.allUsersIdName).length === 0) {
+        this.filteredUsers = [];
+        return;
+      }
+      
+      const allUsers = Object.values(this.allUsersIdName).filter(user => 
+        user && user.user_name && user.user_id
+      );
+      
+      if (query) {
+        this.filteredUsers = allUsers.filter(user =>
+          user.user_name.toLowerCase().includes(query.toLowerCase())
+        );
+      } else {
+        this.filteredUsers = allUsers;
+      }
+    },
+
+    // 过滤公司方法
+    filterCompanies(query) {
+      this.companySearchKeyword = query;
+      if (!this.allCompanysIdName || Object.keys(this.allCompanysIdName).length === 0) {
+        this.filteredCompanies = [];
+        return;
+      }
+      
+      const allCompanies = Object.values(this.allCompanysIdName).filter(company => 
+        company && company.company_name && company.company_id
+      );
+      
+      if (query) {
+        this.filteredCompanies = allCompanies.filter(company =>
+          company.company_name.toLowerCase().includes(query.toLowerCase())
+        );
+      } else {
+        this.filteredCompanies = allCompanies;
+      }
+    },
     cancelEdit() {
       this.editDialogVisible = false;
       this.editForm = {
         shareId: null,
         password: '',
-        dueTime: null
+        dueTime: null,
+        receiverName: null,
+        companyName: null,
       };
     },
     async saveEdit() {
       try {
+        // TODO 用公司ID和用户ID替换editForm中的名字
         const response = await axios.put('/api/share/updateShare', this.editForm);
         
         if (response.data.code === 200) {
@@ -959,8 +1102,12 @@ export default {
       this.editForm = {
         shareId: share.share_id,
         password: share.password || '',
-        dueTime: share.due_time || null
+        dueTime: share.due_time || null,
+        receiverName: share.receiver_name || '',
+        companyName: share.company_name || '',
       };
+      // 重置过滤列表
+      this.initializeFilteredLists();
       this.editDialogVisible = true;
     },
     showShareDialog(task) {
@@ -971,6 +1118,8 @@ export default {
         companyName: '',
         password: ''
       };
+      // 重置过滤列表
+      this.initializeFilteredLists();
       this.shareDialogVisible = true;
     },
     async confirmShare() {
@@ -1180,6 +1329,7 @@ export default {
       this.fetchShareList();
       this.fetchTaskList();
       this.fetchModelList();
+      this.findAllUserAndCompanys();
     },
     // 切换右侧列表的展开/折叠状态
     toggleRightColumn() {
@@ -1482,6 +1632,30 @@ export default {
 
     handleReceivedSharesCurrentChange(val) {
       this.receivedSharesCurrentPage = val;
+    },
+
+    async findAllUserAndCompanys(){
+      try {
+        const response_c = await axios.get("/api/selectAllCompanyIdName");
+        const response_u = await axios.get("/api/selectAllUserIdName");
+        
+        // 确保数据结构正确
+        this.allCompanysIdName = response_c.data.data || {};
+        this.allUsersIdName = response_u.data.data || {};
+        
+        console.log('Companies data:', this.allCompanysIdName);
+        console.log('Users data:', this.allUsersIdName);
+        
+        // 初始化过滤列表
+        this.initializeFilteredLists();
+      } catch (error) {
+        console.error("Failed to fetch users and companies:", error);
+        // 设置默认空值以防错误
+        this.allCompanysIdName = {};
+        this.allUsersIdName = {};
+        this.filteredCompanies = [];
+        this.filteredUsers = [];
+      }
     },
   },
   mounted() {
