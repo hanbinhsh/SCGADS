@@ -78,18 +78,17 @@
                 <font-awesome-icon :style="{ color: getStatusColor(data.status) }" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <el-button link type="info" size="small" @click="" style="margin-left: auto"
-                  v-if="!isRightColumnExpanded">
-                  {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
+                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded" style="margin-left: auto">
                   {{ $t('workSpace.CopyLink') }}
+                </el-button>
+                <el-button link type="primary" size="small" @click="showDetailDialog(data)" v-if="!isRightColumnExpanded">
+                  {{ $t('Detail') }}
                 </el-button>
                 <el-button link type="success" size="small" @click="showCharts(data.task_name)"
                   :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
                   {{ $t('navigateBar.Virtualization') }}
                 </el-button>
-                <el-button link type="primary" size="small" @click="" v-if="!isRightColumnExpanded">
+                <el-button link type="warning" size="small" @click="showEditShareDialog(data)" v-if="!isRightColumnExpanded">
                   {{ $t('Edit') }}
                 </el-button>
                 <el-button link type="danger" size="small" @click="showUnshareDialog(data)"
@@ -334,25 +333,13 @@
                     <span v-else style="color: #67C23A;">公开分享</span>
                   </template>
                 </el-table-column>
-
-                <!-- 新增：任务类型列 -->
-                <!-- <el-table-column :label="$t('database.task.type')" sortable>
-                  <template #default="{ row }">
-                    {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
-                      (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
-                        (row.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
-                    {{ (row.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
-                      (row.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
-                        (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown')}}
-                  </template>
-                </el-table-column>
                 <el-table-column prop="status" :label="$t('database.task.status')" sortable>
                   <template #default="{ row }">
                     <el-tag :type="statusType(row.status)">
                       {{ statusText(row.status) }}
                     </el-tag>
                   </template>
-                </el-table-column> -->
+                </el-table-column>
                 <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" sortable width="160">
                   <template #default="{ row }">
                     {{ formatDate(row.shared_time) }}
@@ -460,7 +447,8 @@
                 </el-table-column>
                 <el-table-column prop="due_time" :label="$t('database.share.due_time')" sortable>
                   <template #default="{ row }">
-                    {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
+                    <span v-if="row.due_time">{{ formatDate(row.due_time) }}</span>
+                    <span v-else style="color: #67C23A;">{{ $t('workSpace.Indefinite') }}</span>
                   </template>
                 </el-table-column>
                 <el-table-column prop="sharer_name" :label="$t('workSpace.Sharer')" sortable>
@@ -484,12 +472,12 @@
                 </el-table-column>
                 <el-table-column fixed="right" :label="$t('Operations')" width="200">
                   <template #default="{ row }">
-                    <el-button link type="info" size="small" @click="copyShareLink(row)">
-                      {{ $t('workSpace.CopyLink') }}
-                    </el-button>
                     <el-button link type="success" size="small" @click="showCharts(row.task_name)"
                       :disabled="row.status !== 2">
                       {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                    <el-button link type="primary" size="small" @click="showDetailDialog(row)">
+                      {{ $t('Detail') }}
                     </el-button>
                   </template>
                 </el-table-column>

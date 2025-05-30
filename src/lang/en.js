@@ -222,6 +222,7 @@ const en = {
     Unshare: "Unshare",
     Unknown: "Unknown",
     TaskDetail: "Task Detail",
+    ConfirmUnshare: "Confirm Unshare",
   },
   taskManage: {
     Auto: "Auto",
