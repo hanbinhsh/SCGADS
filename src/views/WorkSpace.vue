@@ -960,6 +960,8 @@ export default {
 
       allCompanysIdName: {},
       allUsersIdName: {},
+
+      selectionError: false,
     };
   },
   computed: {
@@ -1013,7 +1015,7 @@ export default {
     },
   },
   methods: {
-        handleRecipientChange(field, isEdit = false) {
+    handleRecipientChange(field, isEdit = false) {
       this.selectionError = false;
       const form = isEdit ? this.editForm : this.shareForm;
         
@@ -1052,7 +1054,7 @@ export default {
       this.selectionError = false;
       return true;
     },
-       // 初始化过滤列表
+    // 初始化过滤列表
     initializeFilteredLists() {
       // 确保数据存在且不为空
       if (this.allUsersIdName && Object.keys(this.allUsersIdName).length > 0) {
@@ -1147,7 +1149,7 @@ export default {
         }
 
         // 验证公司
-        if (this.shareForm.companyName) {
+        if (this.editForm.companyName) {
           const companyResponse = await axios.post(`/api/findCompanyByCompanyName?companyName=${this.editForm.companyName}`);
           const companyData = companyResponse.data.data;
           if (companyData.state === 0) {
