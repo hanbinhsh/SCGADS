@@ -179,6 +179,10 @@ const en = {
     Training: "Training",
   },
   workSpace: {
+    BatchUnshare: "Batch Unshare",
+    BatchUnshareConfirm: "Are you sure you want to unshare the selected {count} tasks?",
+    SelectAtLeastOneShare: "Please select at least one share",
+    ConfirmUnshare: "Confirm Unshare",
     MyShares: "My Shares",
     SharesReceived: "Received",
     Sharer: "Sharer",
