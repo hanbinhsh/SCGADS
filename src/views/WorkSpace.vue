@@ -532,7 +532,8 @@
             filterable
             clearable
             :filter-method="filterUsers"
-            @clear="shareForm.accepter = ''"
+            @change="handleRecipientChange('accepter')"
+            @clear="clearRecipient('accepter')"
           >
             <el-option
               v-for="user in filteredUsers"
@@ -550,7 +551,8 @@
             filterable
             clearable
             :filter-method="filterCompanies"
-            @clear="shareForm.companyName = ''"
+            @change="handleRecipientChange('companyName')"
+            @clear="clearRecipient('companyName')"
           >
             <el-option
               v-for="company in filteredCompanies"
@@ -560,6 +562,10 @@
             />
           </el-select>
         </el-form-item>
+
+        <div v-if="selectionError" class="selection-error">
+          <el-alert :title="$t('workSpace.SelectOnlyOneError')" type="error" show-icon :closable="false" />
+        </div>
 
         <el-form-item :label="$t('workSpace.Password')">
           <el-input v-model="shareForm.password" type="password" :placeholder="$t('workSpace.PasswordPlaceholder')"
@@ -606,7 +612,8 @@
             filterable
             clearable
             :filter-method="filterUsers"
-            @clear="editForm.receiverName = ''"
+            @change="handleRecipientChange('receiverName', true)"
+            @clear="clearRecipient('receiverName', true)"
           >
             <el-option
               v-for="user in filteredUsers"
@@ -624,7 +631,8 @@
             filterable
             clearable
             :filter-method="filterCompanies"
-            @clear="editForm.companyName = ''"
+            @change="handleRecipientChange('companyName', true)"
+            @clear="clearRecipient('companyName', true)"
           >
             <el-option
               v-for="company in filteredCompanies"
@@ -634,6 +642,10 @@
             />
           </el-select>
         </el-form-item>
+
+        <div v-if="selectionError" class="selection-error">
+          <el-alert :title="$t('workSpace.SelectOnlyOneError')" type="error" show-icon :closable="false" />
+        </div>
 
         <el-form-item label="密码设置">
           <el-input
@@ -1016,7 +1028,46 @@ export default {
     },
   },
   methods: {
-    // 初始化过滤列表
+        handleRecipientChange(field, isEdit = false) {
+      this.selectionError = false;
+      const form = isEdit ? this.editForm : this.shareForm;
+        
+      if (field === 'accepter' || field === 'receiverName') {
+        if (form[field]) {
+          // 如果选择了用户，清空公司
+          if (isEdit) this.editForm.companyName = '';
+          else this.shareForm.companyName = '';
+        }
+      } else if (field === 'companyName') {
+        if (form[field]) {
+          // 如果选择了公司，清空用户
+          if (isEdit) this.editForm.receiverName = '';
+          else this.shareForm.accepter = '';
+        }
+      }
+    },
+
+    // 清空选择
+    clearRecipient(field, isEdit = false) {
+      const form = isEdit ? this.editForm : this.shareForm;
+      form[field] = '';
+      this.selectionError = false;
+    },
+
+    // 验证选择
+    validateSelection(form) {
+      const hasUser = form.accepter || form.receiverName;
+      const hasCompany = form.companyName;
+
+      if (hasUser && hasCompany) {
+        this.selectionError = true;
+        return false;
+      }
+
+      this.selectionError = false;
+      return true;
+    },
+       // 初始化过滤列表
     initializeFilteredLists() {
       // 确保数据存在且不为空
       if (this.allUsersIdName && Object.keys(this.allUsersIdName).length > 0) {
@@ -1088,6 +1139,9 @@ export default {
       };
     },
     async saveEdit() {
+      if (!this.validateSelection(this.editForm)) {
+          return;
+        }
       try {
         let userId = null;
         let companyId = null;
@@ -1166,6 +1220,9 @@ export default {
       this.shareDialogVisible = true;
     },
     async confirmShare() {
+      if (!this.validateSelection(this.shareForm)) {
+        return;
+        }
       try {
         let userId = null;
         let companyId = null;
@@ -2074,5 +2131,9 @@ export default {
 
 .el-scrollbar__view .el-row {
   margin-bottom: 0;
+}
+
+.selection-error {
+  margin: -10px 0 15px 120px;
 }
 </style>
