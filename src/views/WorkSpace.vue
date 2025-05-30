@@ -414,7 +414,7 @@
                     {{ $t('Refresh') }}
                   </el-button>
                   <el-button type="danger" @click="showBatchUnshareDialog" :disabled="selectedMyShares.length === 0">
-                    {{ $t('TODO BatchDelete') }}
+                    {{ $t('BatchDelete') }}
                   </el-button>
                 </div>
               </div>

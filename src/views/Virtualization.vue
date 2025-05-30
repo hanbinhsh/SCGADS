@@ -699,7 +699,7 @@ export default {
     SwitchTrueLabel(){
       this.trueLabel = !this.trueLabel
       if(this.isUserTask){
-        this.downloadResult(this.$route.query.taskName);
+        this.nextDownload(this.$route.query.taskName);
       }
     },
     toggleSidebar() {
@@ -861,7 +861,7 @@ export default {
     handleTaskSelect(task) {
       this.activeTask = task;
       if(this.isUserTask){
-        this.downloadResult(this.$route.query.taskName);
+        this.nextDownload(this.$route.query.taskName);
       }else{
         // TODO
       }
