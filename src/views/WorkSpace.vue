@@ -317,7 +317,7 @@
 
             <!-- 我的分享 TAB -->
             <el-tab-pane :label="$t('workSpace.MyShares')" name="myShares">
-              <el-table :data="paginatedMySharesList" style="width: 100%" @selection-change="handleSelectionChange"
+              <el-table :data="paginatedMySharesList" style="width: 100%" @selection-change="handleMySharesSelectionChange"
                 @sort-change="handleSortChange" v-loading="shareLoading">
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="task_name" :label="$t('database.task.task_name')" sortable>
@@ -412,13 +412,24 @@
                 :page-sizes="[5, 10, 20, 50]" :page-size="mySharesPageSize"
                 layout="total, sizes, prev, pager, next, jumper" :total="shareList.length">
               </el-pagination>
+              <!-- 批量取消分享对话框 -->
+              <el-dialog v-model="batchUnshareDialogVisible" :title="$t('Warning')" width="500" align-center>
+                <span>{{ $t('workSpace.BatchUnshareConfirm', { count: selectedMyShares.length }) }}</span>
+                <template #footer>
+                  <div class="dialog-footer">
+                    <el-button @click="batchUnshareDialogVisible = false">{{ $t('Cancel') }}</el-button>
+                    <el-button type="danger" @click="confirmBatchUnshare">{{ $t('Confirm') }}</el-button>
+                  </div>
+                </template>
+              </el-dialog>             
+
               <!-- Button Row -->
               <div class="footer">
                 <div class="footer-button-row">
                   <el-button type="success" @click="Refresh">
                     {{ $t('Refresh') }}
                   </el-button>
-                  <el-button type="danger" @click="" :disabled="selectedTasks.length === 0">
+                  <el-button type="danger" @click="showBatchUnshareDialog" :disabled="selectedMyShares.length === 0">
                     {{ $t('TODO BatchDelete') }}
                   </el-button>
                 </div>
@@ -975,6 +986,9 @@ export default {
 
       allCompanysIdName: {},
       allUsersIdName: {},
+
+      batchUnshareDialogVisible: false, // 批量取消分享对话框可见性
+      selectedMyShares: [], // 存储选中的分享项
     };
   },
   computed: {
@@ -1028,6 +1042,58 @@ export default {
     },
   },
   methods: {
+
+    // 处理"我的分享"TAB的选择变化
+    handleMySharesSelectionChange(selection) {
+      this.selectedMyShares = selection;
+    },
+    
+    // 显示批量取消分享对话框
+    showBatchUnshareDialog() {
+      if (this.selectedMyShares.length === 0) {
+        ElMessage.warning(this.$t('workSpace.SelectAtLeastOneShare'));
+        return;
+      }
+      this.batchUnshareDialogVisible = true;
+    },
+    
+    // 确认批量取消分享
+    async confirmBatchUnshare() {
+      this.batchUnshareDialogVisible = false;
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // 循环调用取消分享API
+      for (const share of this.selectedMyShares) {
+        try {
+          const response = await axios.post(`/api/share/deleteShareByShareId`, { 
+            shareId: share.share_id 
+          });
+          
+          if (response.data.code === 200) {
+            successCount++;
+          } else {
+            console.error(`Failed to unshare ${share.task_name}:`, response.data.msg);
+            errorCount++;
+          }
+        } catch (error) {
+          console.error(`Failed to unshare ${share.task_name}:`, error);
+          errorCount++;
+        }
+      }
+      
+      // 显示结果通知
+      if (successCount > 0) {
+        ElMessage.success(`成功取消分享 ${successCount} 个任务`);
+      }
+      if (errorCount > 0) {
+        ElMessage.error(`取消分享失败 ${errorCount} 个任务`);
+      }
+      
+      // 刷新分享列表
+      this.fetchShareList();
+      this.selectedMyShares = []; // 清空选择
+    },
         handleRecipientChange(field, isEdit = false) {
       this.selectionError = false;
       const form = isEdit ? this.editForm : this.shareForm;

@@ -179,6 +179,10 @@ const zh =  {
     Training: "训练",
   },
   workSpace: {
+    BatchUnshare: "批量取消分享",
+    BatchUnshareConfirm: "确定要取消分享选中的 {count} 个任务吗？",
+    SelectAtLeastOneShare: "请至少选择一项分享",
+    ConfirmUnshare: "确认取消分享",
     MyShares: "我的分享",
     SharesReceived: "收到的分享",
     Sharer: "分享人",
