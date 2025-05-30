@@ -249,7 +249,7 @@
         <el-input
           v-model="passwordInput"
           type="password"
-          placeholder="请输入上传者的登录密码"
+          placeholder="请输入分享密码或上传者的登录密码"
           show-password
         />
       </div>

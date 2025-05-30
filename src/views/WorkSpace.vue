@@ -186,13 +186,13 @@
                 <span v-if="!data.due_time && !isRightColumnExpanded"
                   class="share-status-badge share-status-indefinite"> {{
                     $t('workSpace.Indefinite') }} </span>
-                <!-- 过期 -->
-                <span v-if="data.due_time && new Date() > new Date(data.due_time) && !isRightColumnExpanded"
-                  class="share-status-badge share-status-expired"> {{ $t('workSpace.Expired') }} </span>
                 <!-- 过期时间 -->
-                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666;">
+                <span v-if="data.due_time && !isRightColumnExpanded" style="font-size: 11px; color: #666; margin-left: auto;">
                   {{ $t('workSpace.Expire') }}: {{ formatDate(data.due_time) }}
                 </span>
+                <!-- 过期 -->
+                <span v-if="data.due_time && new Date() > new Date(data.due_time) && !isRightColumnExpanded"
+                  class="share-status-badge share-status-expired" style="margin-left: 10px"> {{ $t('workSpace.Expired') }} </span>
                 <el-progress v-if="new Date() <= new Date(data.due_time) && !isRightColumnExpanded"
                   :percentage="getShareProgress(data.shared_time, data.due_time)" type="line"
                   style="margin-left: 10px; width: 80px;" :stroke-width="10" :show-text="false" />
