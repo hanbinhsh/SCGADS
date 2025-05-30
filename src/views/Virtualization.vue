@@ -120,7 +120,7 @@
         <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">{{ $t('Visualization.Settings') }}</el-button>
       </div>
       <div class="footer-button-row">
-        <el-button type="primary" class="footer-action-button" @click="" 
+        <el-button type="primary" class="footer-action-button" @click="downloadAllResults()" 
           :disabled="taskName===undefined">
           {{ $t('Visualization.DownloadData') }}
         </el-button>
@@ -337,6 +337,37 @@ export default {
     },
   },
   methods: {
+    async downloadAllResults() {
+      try {
+        this.loading = true;
+        this.taskName = this.$route.query.taskName; // 确保 taskName 被赋值
+        // data
+        const formData = new FormData();
+        formData.append('taskName', this.taskName);
+        formData.append('userName', this.userData.userName);
+        fetch('/api/downloadTask', formData)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.blob(); // 获取文件内容作为Blob对象
+          })
+          .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', this.taskName + ".zip"); // or any other extension
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          })
+          this.loading = false;
+      } catch (error) {
+        console.error("Download failed:", error);
+      }
+    },
+
     async showTrainResult(type) {
       try {
         if (type === 'pretrain') {

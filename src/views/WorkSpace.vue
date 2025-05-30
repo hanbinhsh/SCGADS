@@ -385,7 +385,7 @@
                   </template>
                 </el-table-column>
 
-                <el-table-column fixed="right" :label="$t('Operations')" width="320">
+                <el-table-column fixed="right" :label="$t('Operations')" width="330">
                   <template #default="{ row }">
                     <el-button link type="info" size="small" @click="copyShareLink(row)">
                       {{ $t('workSpace.CopyLink') }}

@@ -180,7 +180,7 @@ const en = {
   },
   workSpace: {
     MyShares: "My Shares",
-    SharesReceived: "Shares Received",
+    SharesReceived: "Received",
     Sharer: "Sharer",
     TaskStatus: "Task Status",
     MyShares: "My Shares",
