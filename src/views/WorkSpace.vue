@@ -1082,8 +1082,44 @@ export default {
     },
     async saveEdit() {
       try {
-        // TODO 用公司ID和用户ID替换editForm中的名字
-        const response = await axios.put('/api/share/updateShare', this.editForm);
+        let userId = null;
+        let companyId = null;
+        // 验证接收者
+        if (this.editForm.receiverName) {
+          if (this.editForm.receiverName === this.userData.userName) {
+            ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
+            return;
+          }
+
+          const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.editForm.receiverName}`);
+          const userData = userResponse.data.data;
+          if (userData.state === 0) {
+            ElMessage.error(this.$t('workSpace.UserNotExist'));
+            return;
+          }
+          userId = userData.userId;
+        }
+
+        // 验证公司
+        if (this.shareForm.companyName) {
+          const companyResponse = await axios.post(`/api/findCompanyByCompanyName?companyName=${this.editForm.companyName}`);
+          const companyData = companyResponse.data.data;
+          if (companyData.state === 0) {
+            ElMessage.error(this.$t('workSpace.CompanyNotExist'));
+            return;
+          }
+          companyId = companyData.userGroup.companyId;
+        }
+
+        const shareData = {
+          shareId: this.editForm.shareId,
+          dueTime: this.editForm.dueTime,
+          receiverId: userId ?? -2,
+          companyId: companyId ?? -2,
+          password: this.editForm.password,
+        };
+
+        const response = await axios.put('/api/share/updateShare', shareData);
         
         if (response.data.code === 200) {
           ElMessage.success('分享设置更新成功');
