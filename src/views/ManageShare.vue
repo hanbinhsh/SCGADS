@@ -41,7 +41,21 @@
         <el-table-column prop="due_time" :label="$t('database.share.due_time')" width="160" sortable>
           <template #default="{ row }">
             <span v-if="row.due_time">{{ formatDate(row.due_time) }}</span>
-            <span v-else style="color: #67C23A;">永久</span>
+            <span v-else style="color: #67C23A;">{{ $t('workSpace.Indefinite') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" :label="$t('Status')" sortable width="100">
+          <template #default="{ row }">
+            <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
+              {{ $t('workSpace.Indefinite') }}
+            </span>
+            <span v-else-if="new Date() > new Date(row.due_time)"
+              class="share-status-badge share-status-expired">
+              {{ $t('workSpace.Expired') }}
+            </span>
+            <span v-else class="share-status-badge share-status-active">
+              {{ $t('workSpace.Active') }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="password" :label="$t('database.share.password')" width="100">

@@ -336,7 +336,7 @@
                 </el-table-column>
 
                 <!-- 新增：任务类型列 -->
-                <el-table-column :label="$t('database.task.type')" sortable>
+                <!-- <el-table-column :label="$t('database.task.type')" sortable>
                   <template #default="{ row }">
                     {{ (row.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
                       (row.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
@@ -346,26 +346,25 @@
                         (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown')}}
                   </template>
                 </el-table-column>
-
-
                 <el-table-column prop="status" :label="$t('database.task.status')" sortable>
                   <template #default="{ row }">
                     <el-tag :type="statusType(row.status)">
                       {{ statusText(row.status) }}
                     </el-tag>
                   </template>
-                </el-table-column>
-                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" sortable>
+                </el-table-column> -->
+                <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" sortable width="160">
                   <template #default="{ row }">
                     {{ formatDate(row.shared_time) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="due_time" :label="$t('database.share.due_time')" sortable>
+                <el-table-column prop="due_time" :label="$t('database.share.due_time')" sortable width="160">
                   <template #default="{ row }">
-                    {{ row.due_time ? formatDate(row.due_time) : $t('workSpace.Indefinite') }}
+                    <span v-if="row.due_time">{{ formatDate(row.due_time) }}</span>
+                    <span v-else style="color: #67C23A;">{{ $t('workSpace.Indefinite') }}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="status" :label="$t('Status')" sortable>
+                <el-table-column prop="status" :label="$t('Status')" sortable width="100">
                   <template #default="{ row }">
                     <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
                       {{ $t('workSpace.Indefinite') }}
@@ -379,7 +378,14 @@
                     </span>
                   </template>
                 </el-table-column>
-                <el-table-column fixed="right" :label="$t('Operations')" width="300">
+                <el-table-column prop="password" :label="$t('database.share.password')" width="100">
+                  <template #default="{ row }">
+                    <el-tag v-if="row.password" type="warning" size="small">有密码</el-tag>
+                    <el-tag v-else type="success" size="small">无密码</el-tag>
+                  </template>
+                </el-table-column>
+
+                <el-table-column fixed="right" :label="$t('Operations')" width="320">
                   <template #default="{ row }">
                     <el-button link type="info" size="small" @click="copyShareLink(row)">
                       {{ $t('workSpace.CopyLink') }}
@@ -387,6 +393,9 @@
                     <el-button link type="success" size="small" @click="showCharts(row.task_name)"
                       :disabled="row.status !== 2">
                       {{ $t('navigateBar.Virtualization') }}
+                    </el-button>
+                    <el-button link type="primary" size="small" @click="showDetailDialog(row)">
+                      {{ $t('Detail') }}
                     </el-button>
                     <el-button link type="warning" size="small" @click="showEditShareDialog(row)">
                       {{ $t('Edit') }}
@@ -436,8 +445,6 @@
                         (row.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown')}}
                   </template>
                 </el-table-column>
-
-
                 <!-- 新增：状态列（任务状态） -->
                 <el-table-column prop="status" :label="$t('database.task.status')" sortable>
                   <template #default="{ row }">
@@ -1946,33 +1953,6 @@ export default {
   width: 33.3%;
   /* 三列等宽 */
   text-align: center;
-}
-
-/* 状态标签样式 */
-.share-status-badge {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.share-status-indefinite {
-  background: #e6f7ff;
-  color: #1890ff;
-  border: 1px solid #91d5ff;
-}
-
-.share-status-expired {
-  background: #fff2f0;
-  color: #ff4d4f;
-  border: 1px solid #ffccc7;
-}
-
-.share-status-active {
-  background: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
 }
 
 .password-hint {
