@@ -223,6 +223,7 @@ const en = {
     Unknown: "Unknown",
     TaskDetail: "Task Detail",
     ConfirmUnshare: "Confirm Unshare",
+    LinkCopied: "Link Copied",
   },
   taskManage: {
     Auto: "Auto",

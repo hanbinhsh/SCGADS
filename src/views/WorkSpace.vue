@@ -78,7 +78,7 @@
                 <font-awesome-icon :style="{ color: getStatusColor(data.status) }" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded" style="margin-left: auto">
+                <el-button link type="info" size="small" @click="copyShareLink(data)" v-if="!isRightColumnExpanded" style="margin-left: auto">
                   {{ $t('workSpace.CopyLink') }}
                 </el-button>
                 <el-button link type="primary" size="small" @click="showDetailDialog(data)" v-if="!isRightColumnExpanded">
@@ -170,12 +170,9 @@
                 <font-awesome-icon :style="{ color: getStatusColor(data.status) }" :icon="['fas', 'circle']" />
                 <span class="success-task-name">{{ data.task_name }}</span>
 
-                <el-button link type="info" size="small" @click="" style="margin-left: auto;"
+                <el-button link type="primary" size="small" @click="showDetailDialog(data)" style="margin-left: auto;"
                   v-if="!isRightColumnExpanded">
                   {{ $t('Detail') }}
-                </el-button>
-                <el-button link type="info" size="small" @click="" v-if="!isRightColumnExpanded">
-                  {{ $t('workSpace.CopyLink') }}
                 </el-button>
                 <el-button link type="success" size="small" @click="showCharts(data.task_name)"
                   :disabled="data.status !== 2" v-if="!isRightColumnExpanded">
@@ -1278,8 +1275,9 @@ export default {
       }
     },
 
-    copyShareLink(share) {
-      const link = `${window.location.origin}/shared/${share.share_id}`;
+    async copyShareLink(share) {
+      const response = await axios.post(`/api/findTaskByShareId?shareId=${share.share_id}`);
+      const link = `${window.location.origin}/Virtualization?taskName=${response.data.data.taskName}`;
       navigator.clipboard.writeText(link).then(() => {
         ElMessage.success(this.$t('workSpace.LinkCopied'));
       }).catch(() => {
