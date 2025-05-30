@@ -61,7 +61,7 @@
           </div>
         </el-card>
 
-        <!-- Card 2: MySha    res -->
+        <!-- Card 2: MyShares -->
         <el-card class="dashboard-card animate__animated animate__fadeInLeft"
           :body-style="{ height: '100%', overflow: 'auto' }" v-loading="shareLoading">
           <template #header>
@@ -842,7 +842,7 @@
       </el-drawer>
 
       <!-- Mobile Action Sheet -->
-      <el-dialog v-model="mobileActionSheetVisible" :title="selectedTask?.task_name" width="95%" class="mobile-action-dialog">
+      <el-dialog v-model="mobileActionSheetVisible" :title="selectedTask?.task_name" width="95%" class="mobile-action-dialog" align-center>
       <div class="mobile-task-details">
         <div class="detail-item">
           <span class="detail-label">{{ $t('Status') }}:</span>

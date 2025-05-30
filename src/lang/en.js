@@ -74,6 +74,7 @@ const en = {
     Edit: "Edit",
     Pretrain: "Pretrain",
     EditModel: "Edit Model",
+    ModelName: "Model Name",
   },
   SystemSettings:{
     tip: "Set Auto Progress OFF if you have not put models online.",

@@ -74,6 +74,7 @@ const zh =  {
     Edit: "编辑",
     Pretrain: "预训练",
     EditModel: "模型修改",
+    ModelName: "模型名称",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
