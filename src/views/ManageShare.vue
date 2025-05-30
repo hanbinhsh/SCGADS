@@ -126,7 +126,17 @@
       width="500px"
     >
       <el-form :model="editForm" label-width="120px">
-        
+        <el-form-item label="密码设置">
+          <el-input
+            v-model="editForm.password"
+            placeholder="留空表示无密码保护"
+            show-password
+            clearable
+          ></el-input>
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
+            {{ $t('workSpace.PasswordHint') }}
+          </div>
+        </el-form-item>
         <el-form-item label="到期时间">
           <el-date-picker
             v-model="editForm.dueTime"
