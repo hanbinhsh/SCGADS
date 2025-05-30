@@ -226,6 +226,8 @@ const zh =  {
     Unshare: "取消分享",
     Unknown: "未知",
     TaskDetail: "任务详情",
+    ConfirmUnshare: "确认要取消该分享吗？",
+    LinkCopied: "复制成功",
   },
   taskManage: {
     Auto: "自动处理",
