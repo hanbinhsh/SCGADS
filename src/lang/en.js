@@ -50,6 +50,7 @@ const en = {
 
     DownloadLogs: "Download Logs",
     ChooseDownloadFormat: "Choose Download Format",
+    LogDetail: "Log Detail",
   },
   modelPage:{
     SingleModality: "Single",

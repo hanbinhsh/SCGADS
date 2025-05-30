@@ -50,6 +50,7 @@ const zh =  {
 
     DownloadLogs: "下载日志",
     ChooseDownloadFormat: "请选择下载格式",
+    LogDetail: "日志详情",
   },
   modelPage:{
     SingleModality: "单模态模型",

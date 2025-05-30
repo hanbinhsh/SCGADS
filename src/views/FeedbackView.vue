@@ -218,11 +218,10 @@ export default {
     },
     showMessageDialog(row) {
       this.$alert(
-        `
-        ${row.replyContent ? `
-        <p><strong>${ this.$t('feedback.AdminReply') }:</strong></p>
-        <p>${row.replyContent}</p>` : ''}`,
-        
+        row.replyContent
+          ? `<p>${row.replyContent}</p>`
+          : this.$t('feedback.NoReply'),
+        this.$t('feedback.AdminReply'),
         {
           dangerouslyUseHTMLString: true,
           confirmButtonText: 'OK'
