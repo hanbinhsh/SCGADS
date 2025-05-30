@@ -212,7 +212,7 @@ const en = {
     CompanyPlaceholder: "Company name (empty for all companies)",
     Password: "Password",
     PasswordPlaceholder: "Set access password (optional)",
-    PasswordHint: "If set, recipients need to enter password to access",
+    PasswordHint: "If you don't set a password, your shares won't be publicly accessible",
     CannotShareToSelf: "Cannot share to yourself",
     UserNotExist: "User does not exist",
     CompanyNotExist: "Company does not exist",

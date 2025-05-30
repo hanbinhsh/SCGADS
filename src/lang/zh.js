@@ -212,7 +212,7 @@ const zh =  {
     CompanyPlaceholder: "公司名(空表示所有公司)",
     Password: "密码",
     PasswordPlaceholder: "设置访问密码(可选)",
-    PasswordHint: "如果设置密码，接收者需要输入密码才能访问",
+    PasswordHint: "如果不设置密码，无法公开访问",
     CannotShareToSelf: "不能分享给自己",
     UserNotExist: "用户不存在",
     CompanyNotExist: "公司不存在",

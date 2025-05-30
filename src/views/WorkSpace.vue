@@ -1027,7 +1027,33 @@ export default {
     },
   },
   methods: {
-
+    async verifyPassword(task, callback) {
+        if (!task.password) {
+          // 没有密码直接执行操作
+          callback();
+          return;
+        }
+      
+        try {
+          const { value } = await this.$prompt(this.$t('workSpace.EnterPassword'), this.$t('PasswordVerification'), {
+            inputType: 'password',
+            confirmButtonText: this.$t('Confirm'),
+            cancelButtonText: this.$t('Cancel'),
+            inputValidator: (value) => {
+              if (!value) return this.$t('workSpace.PasswordRequired');
+              return true;
+            }
+          });
+        
+          if (value === task.password) {
+            callback();
+          } else {
+            ElMessage.error(this.$t('workSpace.IncorrectPassword'));
+          }
+        } catch (error) {
+          // 用户取消输入
+      }
+      },    
     // 处理"我的分享"TAB的选择变化
     handleMySharesSelectionChange(selection) {
       this.selectedMyShares = selection;

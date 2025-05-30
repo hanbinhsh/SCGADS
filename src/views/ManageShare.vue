@@ -126,6 +126,9 @@
             show-password
             clearable
           ></el-input>
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
+            {{ $t('workSpace.PasswordHint') }}
+          </div>
         </el-form-item>
         <el-form-item label="到期时间">
           <el-date-picker
