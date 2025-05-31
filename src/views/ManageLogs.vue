@@ -77,7 +77,7 @@
     </div>
 
     <!-- 详情对话框 -->
-    <el-dialog v-model="detailDialogVisible" :title="$t('LogDetail')" width="500" align-center>
+    <el-dialog v-model="detailDialogVisible" :title="$t('managePage.LogDetail')" width="500" align-center>
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('database.user.user_name')">
           <div style="display: flex; align-items: center;">
@@ -105,41 +105,6 @@
         </div>
       </template>
     </el-dialog>
-
-    <!-- 移动端操作对话框 -->
-    <el-dialog v-model="optDialogVisible" :title="$t('LogDetail')" width="90%" align-center>
-      <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('database.user.user_name')">
-          <div style="display: flex; align-items: center;">
-            <el-avatar :size="24"
-              :src="currentRow.avatarBase64 ? 'data:image/jpeg;base64,' + currentRow.avatarBase64 : defaultAvatar">
-            </el-avatar>
-            <span style="margin-left: 8px;">{{ currentRow.user_name }}</span>
-          </div>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('database.log.action')">
-          {{ currentRow.action }}
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('database.log.importance')">
-          <el-tag :type="getImportanceType(currentRow.importance)">
-            {{ getImportanceLabel(currentRow.importance) }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item :label="$t('database.log.timestamp')">
-          {{ formatDate(currentRow.timestamp) }}
-        </el-descriptions-item>
-      </el-descriptions>
-      <div>
-        <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">
-          {{ $t('Delete') }}
-        </el-button>
-      </div>
-      <template #footer>
-        <div>
-          <el-button type="primary" @click="optDialogVisible = false">{{ $t('Close') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
   
@@ -161,7 +126,6 @@
         currentRow: {},
         logsList: [],
         paginatedLogsList: [], // 当前页的日志数据
-        optDialogVisible: false,
         detailDialogVisible: false,
         deleteDialogVisible: false,
         selectedLog: {},
@@ -196,10 +160,6 @@
       // 监听窗口大小变化
       handleResize() {
         this.windowWidth = window.innerWidth;
-      },
-      showOptDialog(row) {
-        this.currentRow = row;
-        this.optDialogVisible = true;
       },
       
       showDetailDialog(log) {

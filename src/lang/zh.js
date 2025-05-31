@@ -50,6 +50,7 @@ const zh =  {
 
     DownloadLogs: "下载日志",
     ChooseDownloadFormat: "请选择下载格式",
+    LogDetail: "日志详情",
   },
   modelPage:{
     SingleModality: "单模态模型",
@@ -73,6 +74,7 @@ const zh =  {
     Edit: "编辑",
     Pretrain: "预训练",
     EditModel: "模型修改",
+    ModelName: "模型名称",
   },
   SystemSettings:{
     tip: "如果您未将模型上传至服务器，请关闭自动处理功能。",
@@ -179,6 +181,10 @@ const zh =  {
     Training: "训练",
   },
   workSpace: {
+    BatchUnshare: "批量取消分享",
+    BatchUnshareConfirm: "确定要取消分享选中的 {count} 个任务吗？",
+    SelectAtLeastOneShare: "请至少选择一项分享",
+    ConfirmUnshare: "确认取消分享",
     MyShares: "我的分享",
     SharesReceived: "收到的分享",
     Sharer: "分享人",
@@ -208,7 +214,7 @@ const zh =  {
     CompanyPlaceholder: "公司名(空表示所有公司)",
     Password: "密码",
     PasswordPlaceholder: "设置访问密码(可选)",
-    PasswordHint: "如果设置密码，接收者需要输入密码才能访问",
+    PasswordHint: "如果不设置密码，无法公开访问",
     CannotShareToSelf: "不能分享给自己",
     UserNotExist: "用户不存在",
     CompanyNotExist: "公司不存在",
@@ -222,6 +228,8 @@ const zh =  {
     Unshare: "取消分享",
     Unknown: "未知",
     TaskDetail: "任务详情",
+    ConfirmUnshare: "确认要取消该分享吗？",
+    LinkCopied: "复制成功",
   },
   taskManage: {
     Auto: "自动处理",

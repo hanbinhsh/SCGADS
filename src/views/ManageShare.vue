@@ -33,6 +33,13 @@
             <span v-else style="color: #67C23A;">公开分享</span>
           </template>
         </el-table-column>
+        <el-table-column prop="status" :label="$t('database.task.status')" sortable>
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.task_status)">
+              {{ statusText(row.task_status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="shared_time" :label="$t('database.share.shared_time')" width="160" sortable>
           <template #default="{ row }">
             {{ formatDate(row.shared_time) }}
@@ -41,7 +48,21 @@
         <el-table-column prop="due_time" :label="$t('database.share.due_time')" width="160" sortable>
           <template #default="{ row }">
             <span v-if="row.due_time">{{ formatDate(row.due_time) }}</span>
-            <span v-else style="color: #67C23A;">永久</span>
+            <span v-else style="color: #67C23A;">{{ $t('workSpace.Indefinite') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" :label="$t('Status')" sortable width="100">
+          <template #default="{ row }">
+            <span v-if="!row.due_time" class="share-status-badge share-status-indefinite">
+              {{ $t('workSpace.Indefinite') }}
+            </span>
+            <span v-else-if="new Date() > new Date(row.due_time)"
+              class="share-status-badge share-status-expired">
+              {{ $t('workSpace.Expired') }}
+            </span>
+            <span v-else class="share-status-badge share-status-active">
+              {{ $t('workSpace.Active') }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column prop="password" :label="$t('database.share.password')" width="100">
@@ -56,7 +77,7 @@
             <el-button link type="primary" size="small" @click="showShareDetails(row)">
               {{ $t('Detail') }}
             </el-button>
-            <el-button link type="warning" size="small" @click="showEditDialog(row)">{{ $t('Edit') }}</el-button>
+            <el-button link type="warning" size="small" @click="showEditShareDialog(row)">{{ $t('Edit') }}</el-button>
             <el-button link type="danger" size="small" @click="showDeleteDialog(row)">{{ $t('Delete') }}</el-button>
           </template>
         </el-table-column>
@@ -100,7 +121,7 @@
     <!-- 编辑分享对话框 -->
     <el-dialog
       v-model="editDialogVisible" 
-      :title="`编辑分享设置`"
+      :title="`编辑分享设置`" 
       align-center
       width="500px"
     >
@@ -112,6 +133,9 @@
             show-password
             clearable
           ></el-input>
+          <div style="color: #909399; font-size: 12px; margin-left: 5px;">
+            {{ $t('workSpace.PasswordHint') }}
+          </div>
         </el-form-item>
         <el-form-item label="到期时间">
           <el-date-picker
@@ -125,6 +149,57 @@
           <div style="color: #909399; font-size: 12px; margin-left: 5px;">
             留空表示永久分享
           </div>
+        </el-form-item>
+        <el-form-item :label="$t('workSpace.Recipient')">
+          <el-select
+            v-model="editForm.receiverName"
+            :placeholder="$t('workSpace.RecipientPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterUsers"
+            @change="handleRecipientChange('receiverName', true)"
+            @clear="clearRecipient('receiverName', true)"
+          >
+            <el-option
+              v-for="user in filteredUsers"
+              :key="user.user_id"
+              :label="user.user_name"
+              :value="user.user_name"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item :label="$t('workSpace.Company')">
+          <el-select
+            v-model="editForm.companyName"
+            :placeholder="$t('workSpace.CompanyPlaceholder')"
+            filterable
+            clearable
+            :filter-method="filterCompanies"
+            @change="handleRecipientChange('companyName', true)"
+            @clear="clearRecipient('companyName', true)"
+          >
+            <el-option
+              v-for="company in filteredCompanies"
+              :key="company.company_id"
+              :label="company.company_name"
+              :value="company.company_name"
+            />
+          </el-select>
+        </el-form-item>
+
+        <div v-if="selectionError" class="selection-error">
+          <el-alert :title="$t('workSpace.SelectOnlyOneError')" type="error" show-icon :closable="false" />
+        </div>
+
+        <el-form-item label="密码设置">
+          <el-input
+          v-model="editForm.password"
+          placeholder="留空表示无密码保护"
+          show-password
+          clearable
+          ></el-input>
+          <div class="password-hint">{{ $t('workSpace.PasswordHint') }}</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -161,29 +236,54 @@
       </template>
     </el-dialog>
 
-    <!-- 详情对话框 -->
-    <el-dialog v-model="detailsDialogVisible" title="分享详情" width="600" align-center>
+    <el-dialog v-model="detailsDialogVisible" :title="$t('workSpace.TaskDetail')" width="550px" align-center>
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="分享者">{{ selectedShare.sharer_name }}</el-descriptions-item>
-        <el-descriptions-item label="任务名称">{{ selectedShare.task_name }}</el-descriptions-item>
-        <el-descriptions-item label="接收者">
-          <span v-if="selectedShare.receiver_name">{{ selectedShare.receiver_name }}</span>
-          <span v-else-if="selectedShare.company_name">{{ selectedShare.company_name }} (公司)</span>
-          <span v-else>公开分享</span>
+        <el-descriptions-item :label="$t('database.task.task_name')">
+          {{ selectedShare.task_name }}
         </el-descriptions-item>
-        <el-descriptions-item label="分享时间">{{ formatDate(selectedShare.shared_time) }}</el-descriptions-item>
-        <el-descriptions-item label="到期时间">
-          <span v-if="selectedShare.due_time">{{ formatDate(selectedShare.due_time) }}</span>
-          <span v-else style="color: #67C23A;">永久</span>
+
+        <el-descriptions-item :label="$t('database.task.details')">
+          {{ selectedShare.details }}
         </el-descriptions-item>
-        <el-descriptions-item label="密码保护">
-          <el-tag v-if="selectedShare.password" type="warning">有密码</el-tag>
-          <el-tag v-else type="success">无密码</el-tag>
+
+        <el-descriptions-item :label="$t('database.task.type')">
+          {{ (selectedShare.type?.split(':')[1] || "") === "single" ? $t('taskType.Singleomic') :
+            (selectedShare.type?.split(':')[1] || "") === "multi" ? $t('taskType.Multiomics') :
+              (selectedShare.type?.split(':')[1] || "") === "deno" ? $t('taskType.Denoising') : $t('taskType.Unknown') }}
+          {{ (selectedShare.type?.split(':')[0] || "") === "annotation" ? $t('taskType.Annotation') :
+            (selectedShare.type?.split(':')[0] || "") === "training" ? $t('taskType.Training') :
+              (selectedShare.type?.split(':')[0] || "") === "denoising" ? "" : $t('taskType.Unknown') }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.re_pretrain')"
+          v-if="(selectedShare.type?.split(':')[0] || '') === 'training'">
+          <el-tag :type="selectedShare.re_pretrain == true ? 'success' : 'warning'">
+            {{ selectedShare.re_pretrain == true ? $t('Yes') : $t('No') }}
+          </el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.models.model_name')">
+          {{ selectedShare.model_name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item :label="$t('database.task.parameters')">
+          <el-scrollbar max-height="150px">
+            <el-row
+              v-for="(param, index) in (selectedShare.parameters || selectedShare.default_parameters || '').split(',')"
+              :key="index">
+              <el-col :span="24">
+                <el-tag type="info" class="param-tag">
+                  {{ param.trim() }}
+                </el-tag>
+              </el-col>
+            </el-row>
+          </el-scrollbar>
         </el-descriptions-item>
       </el-descriptions>
+
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="detailsDialogVisible = false">确认</el-button>
+          <el-button type="primary" @click="detailsDialogVisible = false">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -218,6 +318,7 @@ export default {
   },
   data() {
     return {
+      userData: JSON.parse(sessionStorage.getItem("userData")) || {},
       currentRow: {},
       shareList: [],
       paginatedShareList: [], // 当前页的分享数据
@@ -238,8 +339,21 @@ export default {
       editForm: {
         shareId: null,
         password: '',
-        dueTime: null
-      }
+        dueTime: null,
+        receiverName: null,
+        companyName: null,
+      },
+
+      // 新增搜索相关属性
+      filteredUsers: [],
+      filteredCompanies: [],
+      userSearchKeyword: '',
+      companySearchKeyword: '',
+
+      allCompanysIdName: {},
+      allUsersIdName: {},
+
+      selectionError: false,
     };
   },
   computed: {
@@ -257,6 +371,95 @@ export default {
     },
   },
   methods: {
+    async findAllUserAndCompanys(){
+      try {
+        const response_c = await axios.get("/api/selectAllCompanyIdName");
+        const response_u = await axios.get("/api/selectAllUserIdName");
+        
+        // 确保数据结构正确
+        this.allCompanysIdName = response_c.data.data || {};
+        this.allUsersIdName = response_u.data.data || {};
+        
+        console.log('Companies data:', this.allCompanysIdName);
+        console.log('Users data:', this.allUsersIdName);
+        
+        // 初始化过滤列表
+        this.initializeFilteredLists();
+      } catch (error) {
+        console.error("Failed to fetch users and companies:", error);
+        // 设置默认空值以防错误
+        this.allCompanysIdName = {};
+        this.allUsersIdName = {};
+        this.filteredCompanies = [];
+        this.filteredUsers = [];
+      }
+    },
+    handleRecipientChange(field, isEdit = false) {
+      this.selectionError = false;
+      const form = isEdit ? this.editForm : this.shareForm;
+        
+      if (field === 'accepter' || field === 'receiverName') {
+        if (form[field]) {
+          // 如果选择了用户，清空公司
+          if (isEdit) this.editForm.companyName = '';
+          else this.shareForm.companyName = '';
+        }
+      } else if (field === 'companyName') {
+        if (form[field]) {
+          // 如果选择了公司，清空用户
+          if (isEdit) this.editForm.receiverName = '';
+          else this.shareForm.accepter = '';
+        }
+      }
+    },
+
+    // 清空选择
+    clearRecipient(field, isEdit = false) {
+      const form = isEdit ? this.editForm : this.shareForm;
+      form[field] = '';
+      this.selectionError = false;
+    },
+    // 验证选择
+    validateSelection(form) {
+      const hasUser = form.accepter || form.receiverName;
+      const hasCompany = form.companyName;
+
+      if (hasUser && hasCompany) {
+        this.selectionError = true;
+        return false;
+      }
+
+      this.selectionError = false;
+      return true;
+    },
+    statusType(status) {
+      switch (status) {
+        case 0:
+          return "info";
+        case 1:
+          return "warning";
+        case 2:
+          return "success";
+        case -1:
+          return "danger";
+        default:
+          return "";
+      }
+    },
+    statusText(status) {
+      switch (status) {
+        case 0:
+          return this.$t('status.Pending');
+        case 1:
+          return this.$t('status.Processing');
+        case 2:
+          return this.$t('status.Completed');
+        case -1:
+          return this.$t('status.Error');
+        default:
+          return this.$t('status.Unknown');
+      }
+    },
     // 监听窗口大小变化
     handleResize() {
       this.windowWidth = window.innerWidth;
@@ -266,32 +469,138 @@ export default {
       this.optDialogVisible = true;
     },
 
-    showEditDialog(share) {
+    showEditShareDialog(share) {
       this.selectedShare = share;
       this.editForm = {
         shareId: share.share_id,
         password: share.password || '',
-        dueTime: share.due_time || null
+        dueTime: share.due_time || null,
+        receiverName: share.receiver_name || '',
+        companyName: share.company_name || '',
       };
+      // 重置过滤列表
+      this.initializeFilteredLists();
       this.editDialogVisible = true;
     },
 
+    // 初始化过滤列表
+    initializeFilteredLists() {
+      // 确保数据存在且不为空
+      if (this.allUsersIdName && Object.keys(this.allUsersIdName).length > 0) {
+        this.filteredUsers = Object.values(this.allUsersIdName).filter(user => 
+          user && user.user_name && user.user_id
+        );
+      } else {
+        this.filteredUsers = [];
+      }
+      
+      if (this.allCompanysIdName && Object.keys(this.allCompanysIdName).length > 0) {
+        this.filteredCompanies = Object.values(this.allCompanysIdName).filter(company => 
+          company && company.company_name && company.company_id
+        );
+      } else {
+        this.filteredCompanies = [];
+      }
+    },
+
+    // 过滤用户方法
+    filterUsers(query) {
+      this.userSearchKeyword = query;
+      if (!this.allUsersIdName || Object.keys(this.allUsersIdName).length === 0) {
+        this.filteredUsers = [];
+        return;
+      }
+      
+      const allUsers = Object.values(this.allUsersIdName).filter(user => 
+        user && user.user_name && user.user_id
+      );
+      
+      if (query) {
+        this.filteredUsers = allUsers.filter(user =>
+          user.user_name.toLowerCase().includes(query.toLowerCase())
+        );
+      } else {
+        this.filteredUsers = allUsers;
+      }
+    },
+
+    // 过滤公司方法
+    filterCompanies(query) {
+      this.companySearchKeyword = query;
+      if (!this.allCompanysIdName || Object.keys(this.allCompanysIdName).length === 0) {
+        this.filteredCompanies = [];
+        return;
+      }
+      
+      const allCompanies = Object.values(this.allCompanysIdName).filter(company => 
+        company && company.company_name && company.company_id
+      );
+      
+      if (query) {
+        this.filteredCompanies = allCompanies.filter(company =>
+          company.company_name.toLowerCase().includes(query.toLowerCase())
+        );
+      } else {
+        this.filteredCompanies = allCompanies;
+      }
+    },
     cancelEdit() {
       this.editDialogVisible = false;
       this.editForm = {
         shareId: null,
         password: '',
-        dueTime: null
+        dueTime: null,
+        receiverName: null,
+        companyName: null,
       };
     },
-
     async saveEdit() {
+      if (!this.validateSelection(this.editForm)) {
+          return;
+        }
       try {
-        const response = await axios.put('/api/share/updateShare', this.editForm);
+        let userId = null;
+        let companyId = null;
+        // 验证接收者
+        if (this.editForm.receiverName) {
+          if (this.editForm.receiverName === this.userData.userName) {
+            ElMessage.error(this.$t('workSpace.CannotShareToSelf'));
+            return;
+          }
+
+          const userResponse = await axios.post(`/api/queryIfExistsUserByUserName?userName=${this.editForm.receiverName}`);
+          const userData = userResponse.data.data;
+          if (userData.state === 0) {
+            ElMessage.error(this.$t('workSpace.UserNotExist'));
+            return;
+          }
+          userId = userData.userId;
+        }
+
+        // 验证公司
+        if (this.editForm.companyName) {
+          const companyResponse = await axios.post(`/api/findCompanyByCompanyName?companyName=${this.editForm.companyName}`);
+          const companyData = companyResponse.data.data;
+          if (companyData.state === 0) {
+            ElMessage.error(this.$t('workSpace.CompanyNotExist'));
+            return;
+          }
+          companyId = companyData.userGroup.companyId;
+        }
+
+        const shareData = {
+          shareId: this.editForm.shareId,
+          dueTime: this.editForm.dueTime,
+          receiverId: userId ?? -2,
+          companyId: companyId ?? -2,
+          password: this.editForm.password,
+        };
+
+        const response = await axios.put('/api/share/updateShare', shareData);
         
         if (response.data.code === 200) {
           ElMessage.success('分享设置更新成功');
-          this.fetchShares();
+          this.fetchShares()
           this.editDialogVisible = false;
         } else {
           ElMessage.error(response.data.msg);
@@ -353,6 +662,7 @@ export default {
     },
     async fetchShares() {
       try {
+        this.findAllUserAndCompanys();
         this.loading = true;
         const response = await axios.get('/api/share/findAllShareWithDetails');
         if (response.data.code === 200) {
@@ -418,3 +728,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.param-tag {
+  margin: 2px 0;
+}
+</style>

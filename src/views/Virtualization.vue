@@ -120,7 +120,7 @@
         <el-button type="info" class="bottom-left-action-button" @click="settingVisible = true">{{ $t('Visualization.Settings') }}</el-button>
       </div>
       <div class="footer-button-row">
-        <el-button type="primary" class="footer-action-button" @click="" 
+        <el-button type="primary" class="footer-action-button" @click="downloadAllResults()" 
           :disabled="taskName===undefined">
           {{ $t('Visualization.DownloadData') }}
         </el-button>
@@ -237,6 +237,29 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="passwordDialogVisible"
+      title="权限验证"
+      width="30%"
+      :before-close="handleDialogClose"
+      align-center
+    >
+      <div>
+        <el-input
+          v-model="passwordInput"
+          type="password"
+          placeholder="请输入分享密码或上传者的登录密码"
+          show-password
+        />
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleDialogCancel">取消</el-button>
+          <el-button type="primary" @click="handleDialogConfirm">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -245,7 +268,7 @@ import MainHeader from "../components/MainHeader.vue";
 import { initializeChart } from "../assets/example_data/example.js";
 import { data } from "../assets/example_data/data.js";
 import { labels } from "../assets/example_data/label.js";
-import { ElTable, ElTableColumn, ElPagination } from 'element-plus';
+import { ElTable, ElTableColumn, ElPagination, ElMessage } from 'element-plus';
 import 'element-plus/theme-chalk/el-table.css';
 import 'element-plus/theme-chalk/el-pagination.css';
 import axios from 'axios';
@@ -315,6 +338,10 @@ export default {
       trainChart: null,
       currentTrainData: null,
       currentTrainType: '', // 'pretrain' 或 'train'
+
+      passwordDialogVisible: false,
+      passwordInput: '',
+      pendingCheck: null,
     };
   },
   computed: {
@@ -337,6 +364,48 @@ export default {
     },
   },
   methods: {
+    async downloadAllResults() {
+      try {
+        this.loading = true;
+        this.taskName = this.$route.query.taskName; // 确保 taskName 被赋值
+        console.log(this.taskName);
+        if (!this.taskName || !this.userName) {
+          throw new Error("The task name or user information is missing");
+        }
+        // data
+        const formData = new URLSearchParams();
+        formData.append('taskName', this.taskName);
+        formData.append('userName', this.userData.userName);
+        
+        const response = await fetch(`/api/downloadTask?${formData.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/zip'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Download failed: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${this.taskName}.zip`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+      } catch (error) {
+        console.error("Download error:", error);
+        this.$message.error('Download failed: ' + error.message);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async showTrainResult(type) {
       try {
         if (type === 'pretrain') {
@@ -641,7 +710,7 @@ export default {
     SwitchTrueLabel(){
       this.trueLabel = !this.trueLabel
       if(this.isUserTask){
-        this.downloadResult(this.$route.query.taskName);
+        this.nextDownload(this.$route.query.taskName);
       }
     },
     toggleSidebar() {
@@ -673,9 +742,48 @@ export default {
       this.applySorting();
     },
     async downloadResult(taskName) {
+      this.loading = true;
+      this.taskName = taskName; // 确保 taskName 被赋值
+
+      // 如果不是上传任务者或者分享接受者（分为公司分享和用户分享）访问任务，弹框输入上传者用户密码
+      // 查询该任务是否属于该用户，或者是否为接收者
+      const userId = this.userData.userId
+
+      // 请求后端判断访问权限
+      const { data: hasAccess } = await axios.get('/api/checkAccessRight', {
+        params: { userId, taskName }
+      })
+
+      let access = hasAccess
+
+      if(userId == undefined){
+        access = false
+      }
+
+      if (!access) {
+        this.passwordInput = '';
+        this.passwordDialogVisible = true;
+        this.pendingCheck = async () => {
+          const { data: valid } = await axios.post('/api/checkPassword', null, {
+            params: {
+              taskName: this.taskName,
+              password: this.passwordInput
+            }
+          });
+          if (!valid) {
+            ElMessage.error('密码错误，无法访问任务结果');
+            return;
+          }
+          // 成功逻辑：例如允许访问
+          ElMessage.success('验证成功，可以访问');
+          this.nextDownload(taskName);
+        };
+      }else{
+        this.nextDownload(taskName);
+      }
+    },
+    async nextDownload(taskName){
       try{
-        this.loading = true;
-        this.taskName = taskName; // 确保 taskName 被赋值
         // data
         const formData = new FormData();
         formData.append('taskName', taskName);
@@ -743,13 +851,28 @@ export default {
         console.log(e);
       }
     },
+    handleDialogConfirm() {
+      if (!this.passwordInput.trim()) {
+        ElMessage.error('密码不能为空');
+        return;
+      }
+      this.passwordDialogVisible = false;
+      this.pendingCheck?.();
+    },
+    handleDialogCancel() {
+      this.passwordDialogVisible = false;
+      ElMessage.info('已取消操作');
+    },
+    handleDialogClose(done) {
+      done();
+    },
     handlePageChange(page) {
       this.currentPage = page;
     },
     handleTaskSelect(task) {
       this.activeTask = task;
       if(this.isUserTask){
-        this.downloadResult(this.$route.query.taskName);
+        this.nextDownload(this.$route.query.taskName);
       }else{
         // TODO
       }
