@@ -368,30 +368,41 @@ export default {
       try {
         this.loading = true;
         this.taskName = this.$route.query.taskName; // 确保 taskName 被赋值
+        console.log(this.taskName);
+        if (!this.taskName || !this.userName) {
+          throw new Error("The task name or user information is missing");
+        }
         // data
-        const formData = new FormData();
+        const formData = new URLSearchParams();
         formData.append('taskName', this.taskName);
         formData.append('userName', this.userData.userName);
-        fetch('/api/downloadTask', formData)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.blob(); // 获取文件内容作为Blob对象
-          })
-          .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', this.taskName + ".zip"); // or any other extension
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          })
-          this.loading = false;
+        
+        const response = await fetch(`/api/downloadTask?${formData.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/zip'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Download failed: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${this.taskName}.zip`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
       } catch (error) {
-        console.error("Download failed:", error);
+        console.error("Download error:", error);
+        this.$message.error('Download failed: ' + error.message);
+      } finally {
+        this.loading = false;
       }
     },
 
