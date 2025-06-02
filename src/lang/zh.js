@@ -31,6 +31,11 @@ const zh =  {
   Empty: "空",
   Share: "分享",
   Status: "状态",
+  Task: "任务",
+
+  BDTip: "确定要删除选中的",
+  BDTask: "个任务吗？",
+  willbedeleted: "将会被删除",
 
   managePage:{
     EditUser: "编辑用户",
@@ -56,7 +61,7 @@ const zh =  {
     Thefollowingfilesfrom: "",
     folderareoptionalbutcanbeuploaded: "文件夹中的文件可选是否上传：",
     EditTaskStatus: "编辑任务状态",
-    EditNote: "当设置状态为已完成时，结束时间会被自动设置。",
+    EditNote: "当设置状态为已完成时，结束时间会被自动设置",
     Pleaseinputdetails: "任务详情",
     UploadRequiredFiles: "上传结果文件",
     Task: "任务：",
@@ -64,7 +69,13 @@ const zh =  {
     Type: "类型：",
     Pretrain: "预训练：",
     AutoProgress: "自动处理",
-    willbeautoprogressed: "将会被自动处理。",
+    willbeautoprogressed: "将会被自动处理",
+    willbedownloaded: "将会被下载",
+    BEditNote: "批量编辑将不会上传文件",
+    BET: "批量编辑任务",
+    SelectStatus: "选择状态",
+    NewStatus: "新状态",
+    BDownloadTip: "确定要下载选中的"
   },
   modelPage:{
     SingleModality: "单模态模型",

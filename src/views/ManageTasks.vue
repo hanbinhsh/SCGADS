@@ -150,8 +150,8 @@
     </el-dialog>
 
     <!-- 批量下载确认对话框 -->
-    <el-dialog v-model="batchDownloadDialogVisible" :title="$t('Download')" width="500">
-      <span>The selected tasks will be downloaded. Are you sure?</span>
+    <el-dialog v-model="batchDownloadDialogVisible" :title="$t('Download')" width="500" align-center>
+      <span>{{ $t('managePage.BDownloadTip') }} <strong style="color: #e74c3c;">{{ selectedTasks.length }}</strong> {{ $t('BDTask') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDownloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -162,7 +162,7 @@
 
     <!-- 单个下载确认对话框 -->
     <el-dialog v-model="downloadDialogVisible" :title="$t('Download')" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be downloaded</span>
+      <span>{{ $t('Task') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('managePage.willbedownloaded') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="downloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -172,8 +172,8 @@
     </el-dialog>
 
     <!-- 批量删除确认对话框 -->
-    <el-dialog v-model="batchDeleteDialogVisible" title="Batch Delete Confirmation" width="500" align-center>
-      <span>Are you sure you want to delete the selected tasks?</span>
+    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('BatchDeleteConfirmation')" width="500" align-center>
+      <span>{{ $t('BDTip') }} <strong style="color: #e74c3c;">{{ selectedTasks.length }}</strong> {{ $t('BDTask') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -182,15 +182,30 @@
       </template>
     </el-dialog>
 
+    <!-- 删除确认对话框 -->
+    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
+      <span>{{ $t('Task') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('willbedeleted') }}</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 批量编辑对话框 -->
-    <el-dialog v-model="batchEditDialogVisible" title="Batch Edit Tasks" width="500" align-center>
+    <el-dialog v-model="batchEditDialogVisible" :title="$t('managePage.BET')" width="500" align-center>
+      <!-- 提示信息 -->
+      <div class="card-alart">
+        {{ $t('managePage.BEditNote') }}
+      </div>
       <el-form :model="batchEditData" label-width="120px">
-        <el-form-item label="New Status">
-          <el-select v-model="batchEditData.status" placeholder="Select Status">
-            <el-option label="Pending" :value="0"></el-option>
-            <el-option label="Processing" :value="1"></el-option>
-            <el-option label="Completed" :value="2"></el-option>
-            <el-option label="Error" :value="-1"></el-option>
+        <el-form-item :label="$t('managePage.NewStatus')">
+          <el-select v-model="batchEditData.status" :placeholder="$t('managePage.SelectStatus')">
+            <el-option :label="$t('status.Pending')" :value="0"></el-option>
+            <el-option :label="$t('status.Processing')" :value="1"></el-option>
+            <el-option :label="$t('status.Completed')" :value="2"></el-option>
+            <el-option :label="$t('status.Error')" :value="-1"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -198,17 +213,6 @@
         <div class="dialog-footer">
           <el-button @click="batchEditDialogVisible = false">{{ $t('Cancel') }}</el-button>
           <el-button type="primary" @click="confirmBatchEdit">{{ $t('Save') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be deleted</span>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -265,7 +269,7 @@
 
     <!-- 编辑任务对话框 -->
     <el-dialog v-model="editDialogVisible" :title="$t('managePage.EditTaskStatus')" width="500" align-center>
-      <!-- 添加提示信息 -->
+      <!-- 提示信息 -->
       <div class="card-alart">
         {{ $t('managePage.EditNote') }}
       </div>
@@ -274,7 +278,7 @@
           <el-input v-model="selectedTask.task_name" disabled></el-input>
         </el-form-item>
         <el-form-item :label="$t('database.task.status')">
-          <el-select v-model="selectedTask.status" placeholder="Select Status" @change="handleStatusChange">
+          <el-select v-model="selectedTask.status" :placeholder="$t('managePage.SelectStatus')" @change="handleStatusChange">
             <el-option :label="$t('status.Pending')" :value="0"></el-option>
             <el-option :label="$t('status.Processing')" :value="1"></el-option>
             <el-option :label="$t('status.Completed')" :value="2"></el-option>

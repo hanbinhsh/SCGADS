@@ -661,8 +661,9 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('Warning')" width="500">
-      <span>{{ $t('workSpace.BatchDeleteConfirm') }}</span>
+    <!-- 批量删除确认对话框 -->
+    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('BatchDeleteConfirmation')" width="500" align-center>
+      <span>{{ $t('BDTip') }} <strong style="color: #e74c3c;">{{ selectedTasks.length }}</strong> {{ $t('BDTask') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -671,15 +672,13 @@
       </template>
     </el-dialog>
 
+    <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
-      <span>{{ $t('workSpace.DeleteConfirm') }} <strong style="color: #e74c3c;">{{ selectedTask?.task_name
-          }}</strong></span>
+      <span>{{ $t('Task') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('willbedeleted') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">
-            {{ $t('Confirm') }}
-          </el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>

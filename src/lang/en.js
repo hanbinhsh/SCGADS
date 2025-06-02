@@ -31,6 +31,11 @@ const en = {
   Empty: "Empty",
   Share: "Share",
   Status: "Status",
+  Task: "Task",
+
+  BDTip: "Are you sure you want to delete the selected",
+  BDTask: "tasks?",
+  willbedeleted: "will be deleted",
 
   managePage:{
     EditUser: "Edit User",
@@ -65,6 +70,12 @@ const en = {
     Pretrain: "Pre-train:",
     AutoProgress: "Auto Progress",
     willbeautoprogressed: "will be auto progressed",
+    willbedownloaded: "will be downloaded",
+    BEditNote: "Batch Edit Will NOT Upload Files",
+    BET: "Batch Edit Tasks",
+    SelectStatus: "Select Status",
+    NewStatus: "New Status",
+    BDownloadTip: "Are you sure to download the selected"
   },
   modelPage:{
     SingleModality: "Single",
