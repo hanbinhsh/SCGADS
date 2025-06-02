@@ -139,8 +139,8 @@
     </div>
 
     <!-- 自动处理对话框 -->
-    <el-dialog v-model="autoProgressDialogVisible" title="Auto Progress" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be auto progressed</span>
+    <el-dialog v-model="autoProgressDialogVisible" :title="$t('managePage.AutoProgress')" width="500" align-center>
+      <span>{{ $t('managePage.Task1') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('managePage.willbeautoprogressed') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="autoProgressDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -150,7 +150,7 @@
     </el-dialog>
 
     <!-- 批量下载确认对话框 -->
-    <el-dialog v-model="batchDownloadDialogVisible" title="Download" width="500">
+    <el-dialog v-model="batchDownloadDialogVisible" :title="$t('Download')" width="500">
       <span>The selected tasks will be downloaded. Are you sure?</span>
       <template #footer>
         <div class="dialog-footer">
@@ -161,7 +161,7 @@
     </el-dialog>
 
     <!-- 单个下载确认对话框 -->
-    <el-dialog v-model="downloadDialogVisible" title="Download" width="500" align-center>
+    <el-dialog v-model="downloadDialogVisible" :title="$t('Download')" width="500" align-center>
       <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be downloaded</span>
       <template #footer>
         <div class="dialog-footer">
@@ -203,7 +203,7 @@
     </el-dialog>
 
     <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
+    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
       <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be deleted</span>
       <template #footer>
         <div class="dialog-footer">
@@ -264,25 +264,25 @@
     </el-dialog>
 
     <!-- 编辑任务对话框 -->
-    <el-dialog v-model="editDialogVisible" title="Edit Task Status" width="500" align-center>
+    <el-dialog v-model="editDialogVisible" :title="$t('managePage.EditTaskStatus')" width="500" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
-        Note: When setting status completed, end time will be automatically updated.
+        {{ $t('managePage.EditNote') }}
       </div>
       <el-form :model="selectedTask" label-width="120px">
-        <el-form-item label="Task Name">
+        <el-form-item :label="$t('database.task.task_name')">
           <el-input v-model="selectedTask.task_name" disabled></el-input>
         </el-form-item>
-        <el-form-item label="Status">
+        <el-form-item :label="$t('database.task.status')">
           <el-select v-model="selectedTask.status" placeholder="Select Status" @change="handleStatusChange">
-            <el-option label="Pending" :value="0"></el-option>
-            <el-option label="Processing" :value="1"></el-option>
-            <el-option label="Completed" :value="2"></el-option>
-            <el-option label="Error" :value="-1"></el-option>
+            <el-option :label="$t('status.Pending')" :value="0"></el-option>
+            <el-option :label="$t('status.Processing')" :value="1"></el-option>
+            <el-option :label="$t('status.Completed')" :value="2"></el-option>
+            <el-option :label="$t('status.Error')" :value="-1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Detail">
-          <el-input v-model="selectedTask.details" type="textarea" placeholder="Please input" />
+        <el-form-item :label="$t('database.task.details')">
+          <el-input v-model="selectedTask.details" type="textarea" :placeholder="$t('managePage.Pleaseinputdetails')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -293,14 +293,14 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="uploadDialogVisible" title="Upload Required Files" width="600" align-center
+    <el-dialog v-model="uploadDialogVisible" :title="$t('managePage.UploadRequiredFiles')" width="600" align-center
       @close="closeUploadDialog">
       <el-form>
         <!-- 显示任务信息 -->
         <el-alert 
-          :title="`Task: ${selectedTask.task_name}`" 
-          type="info" 
-          :description="`Type: ${getTaskTypeText()} | Pre-train: ${selectedTask.re_pretrain ? 'Yes' : 'No'}`"
+          :title="$t('managePage.Task') + `${selectedTask.task_name}`" 
+          type="info"
+          :description="$t('managePage.Type') + `${getTaskTypeText()}` + ' | ' + $t('managePage.Pretrain') + `${selectedTask.re_pretrain ? $t('Yes') : $t('No')}`"
           show-icon
           :closable="false"
           style="margin-bottom: 16px;">
@@ -319,7 +319,7 @@
             <UploadFilled />
           </el-icon>
           <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
+            {{ $t('uploadPage.Dropfilehereor') }} <em>{{ $t('uploadPage.clicktoupload') }}</em>
           </div>
           <template #tip>
             <div class="el-upload__tip" v-html="uploadTipText">
@@ -330,12 +330,12 @@
         <!-- 可选文件说明 -->
         <el-alert 
           v-if="selectedTask?.type?.split(':')[0] === 'training'"
-          title="Optional Files" 
+          :title="$t('managePage.OptionalFiles')" 
           type="warning" 
           :closable="false"
           style="margin-top: 16px;">
           <template #default>
-            <p>The following files from <strong>data_split</strong> folder are optional but can be uploaded:</p>
+            <p>{{ $t('managePage.Thefollowingfilesfrom') }} <strong>data_split</strong> {{ $t('managePage.folderareoptionalbutcanbeuploaded') }}</p>
             <ul style="margin: 8px 0; padding-left: 20px;">
               <li>cell_types.npy</li>
               <li>x_atac_test.npy, x_atac_train.npy</li>
@@ -657,28 +657,6 @@ export default {
       
       return false;
     },
-    getFileTypeIcon(fileName) {
-      const ext = fileName.split('.').pop().toLowerCase();
-      switch (ext) {
-        case 'js':
-          return 'document';
-        case 'npy':
-          return 'data-line';
-        case 'csv':
-          return 'table';
-        case 'ckpt':
-          return 'cpu';
-        case 'txt':
-          return 'document-text';
-        default:
-          return 'document';
-      }
-    },
-    handleUploadSuccess(response, file, fileList) {
-      // 当文件上传成功时，更新文件列表并检查是否所有文件都已上传
-      this.fileList[file.name] = fileList;
-      this.checkAllFilesUploaded();
-    },
     // 检查是否可以上传
     async confirmUpload() {
       try {
@@ -697,7 +675,6 @@ export default {
         return false;
       }
     },
-
     async confirmAnnotationUpload() {
       // 保持原有的注释任务文件上传逻辑
       const fileGroups = {
