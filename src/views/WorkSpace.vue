@@ -1935,10 +1935,6 @@ export default {
       }
     },
 
-    showMobileActionSheet(task) {
-      this.selectedTask = task;
-      this.mobileActionSheetVisible = true;
-    },
 
     getTaskType(row) {
       if (!row) return '';
