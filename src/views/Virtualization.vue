@@ -369,13 +369,12 @@ export default {
         this.loading = true;
         this.taskName = this.$route.query.taskName; // 确保 taskName 被赋值
         console.log(this.taskName);
-        if (!this.taskName || !this.userName) {
+        if (!this.taskName) {
           throw new Error("The task name or user information is missing");
         }
         // data
         const formData = new URLSearchParams();
         formData.append('taskName', this.taskName);
-        formData.append('userName', this.userData.userName);
         
         const response = await fetch(`/api/downloadTask?${formData.toString()}`, {
           method: 'GET',

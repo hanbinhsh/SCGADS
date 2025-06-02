@@ -234,6 +234,7 @@ export default {
         this.loading = true;
         const response = await axios.get('/api/models/findAllModels'); // 调用后端API
         this.models = response.data;
+        this.models.sort((a, b) => a.modelId - b.modelId);
 
         // 设置默认选中的模型
         if (this.models.length > 0) {
