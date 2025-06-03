@@ -278,7 +278,7 @@ const zh =  {
       created_time: "上传时间",
       pretrain_model: "预训练模型",
       base_model: "基础模型",
-
+      pretrain_model_path: "预训练模型路径",
     },
     user: {
       user_id: "用户ID",

@@ -278,6 +278,7 @@ const en = {
       created_time: "Upload Time",
       pretrain_model: "Pretrain Model",
       base_model: "Base Model",
+      pretrain_model_path: "Pretrain Model Path",
     },
     share: {
       shared_time: "Shared Time",
