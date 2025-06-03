@@ -273,15 +273,15 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="addDialogVisible = false; modelAddingReset()">Cancel</el-button>
-          <el-button type="warning" @click="modelAddingReset()">Reset</el-button>
-          <el-button type="primary" @click="modelSave()">Save</el-button>
+          <el-button @click="addDialogVisible = false; modelAddingReset()">{{ $t('Cancel') }}</el-button>
+          <el-button type="warning" @click="modelAddingReset()">{{ $t('Reset') }}</el-button>
+          <el-button type="primary" @click="modelSave()">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 参数对话框 -->
-    <el-dialog v-model="parametersDialogVisible" title="Parameters" width="500" align-center>
+    <el-dialog v-model="parametersDialogVisible" :title="$t('modelPage.DefaultParameters')" width="500" align-center>
       <el-form label-width="150px" label-position="left" disabled>
         <!-- 参数输入框 -->
         <el-form-item v-for="(param, index) in parameters" :key="index" :label="param.name">
@@ -290,30 +290,30 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="parametersDialogVisible = false;">Confirm</el-button>
+          <el-button type="primary" @click="parametersDialogVisible = false;">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 模型图对话框 -->
-    <el-dialog v-model="figureDialogVisible" title="Figure" align-center>
+    <el-dialog v-model="figureDialogVisible" :title="$t('ModelManage.Figure')" align-center>
       <el-row justify="center" class="image-container" id="image-row" style="margin-top: 0;">
         <img :src="figure" alt="Model" class="example-image" />
       </el-row>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="figureDialogVisible = false;">Confirm</el-button>
+          <el-button type="primary" @click="figureDialogVisible = false;">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 详情对话框 -->
-    <el-dialog v-model="detailsDialogVisible" title="Model Storage Details" width="600px" align-center>
+    <el-dialog v-model="detailsDialogVisible" :title="$t('managePage.ModelDetails')" width="600px" align-center>
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="Model Name">
+        <el-descriptions-item :label="$t('database.models.model_name')">
           <span style="font-weight: bold; color: #409eff;">{{ selectedData.modelName }}</span>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('database.models.model_name')">
+        <el-descriptions-item :label="$t('database.models.model_type')">
           <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
             {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
               selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}

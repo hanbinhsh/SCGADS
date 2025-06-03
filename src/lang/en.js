@@ -75,7 +75,9 @@ const en = {
     BET: "Batch Edit Tasks",
     SelectStatus: "Select Status",
     NewStatus: "New Status",
-    BDownloadTip: "Are you sure to download the selected"
+    BDownloadTip: "Are you sure to download the selected",
+  
+    ModelDetails: "Model Details"
   },
   modelPage:{
     SingleModality: "Single",

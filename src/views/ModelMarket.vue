@@ -160,15 +160,15 @@
   <el-dialog v-model="showModelDetails" :title="selectedData.modelName" width="550px" align-center>
     <div class="model-details-info" style="width: 100%;">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="Model Type">
+        <el-descriptions-item :label="$t('database.models.model_type')">
           <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
             {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
               selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Pretrain Model">
+        <el-descriptions-item :label="$t('database.models.pretrain_model')">
           <el-tag :type="selectedData.pretrainModel == true ? 'success' : 'warning'">
-            {{ selectedData.pretrainModel == true ? 'Yes' : 'No' }}
+            {{ selectedData.pretrainModel == true ? $t('Yes') : $t('No') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item :label="$t('database.models.user_name')">{{ selectedData.userName }}</el-descriptions-item>
@@ -203,16 +203,16 @@
   </el-dialog>
 
   <!-- 修改对话框 -->
-  <el-dialog v-model="showEditDialog" title="Edit Model" width="500px" align-center>
+  <el-dialog v-model="showEditDialog" :title="$t('modelPage.EditModel')" width="500px" align-center>
     <!-- 添加提示信息 -->
     <el-form :model="selectedData" label-width="120px" label-position="left">
       <div style="display: flex; gap: 20px;">
         <!-- 左侧：现有输入框 -->
         <div style="flex: 1;">
-          <el-form-item label="Model Name">
+          <el-form-item :label="$t('database.models.model_name')">
             <el-input v-model="selectedData.modelName" disabled></el-input>
           </el-form-item>
-          <el-form-item label="Remark">
+          <el-form-item :label="$t('database.models.remark')">
             <el-input v-model="selectedData.remark"></el-input>
           </el-form-item>
         </div>
@@ -741,7 +741,10 @@ export default {
   }
   
   .dialog-footer {
-    text-align: center;
+    padding: 10px 0 0;
+    display: block !important;
+    justify-content: flex-end;
+    gap: 12px;
   }
 
   .fullscreen-section{
