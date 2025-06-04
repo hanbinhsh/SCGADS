@@ -31,6 +31,11 @@ const zh =  {
   Empty: "空",
   Share: "分享",
   Status: "状态",
+  Task: "任务",
+
+  BDTip: "确定要删除选中的",
+  BDTask: "个任务吗？",
+  willbedeleted: "将会被删除",
 
   managePage:{
     EditUser: "编辑用户",
@@ -51,6 +56,28 @@ const zh =  {
     DownloadLogs: "下载日志",
     ChooseDownloadFormat: "请选择下载格式",
     LogDetail: "日志详情",
+
+    OptionalFiles: "可选文件",
+    Thefollowingfilesfrom: "",
+    folderareoptionalbutcanbeuploaded: "文件夹中的文件可选是否上传：",
+    EditTaskStatus: "编辑任务状态",
+    EditNote: "当设置状态为已完成时，结束时间会被自动设置",
+    Pleaseinputdetails: "任务详情",
+    UploadRequiredFiles: "上传结果文件",
+    Task: "任务：",
+    Task1: "任务",
+    Type: "类型：",
+    Pretrain: "预训练：",
+    AutoProgress: "自动处理",
+    willbeautoprogressed: "将会被自动处理",
+    willbedownloaded: "将会被下载",
+    BEditNote: "批量编辑将不会上传文件",
+    BET: "批量编辑任务",
+    SelectStatus: "选择状态",
+    NewStatus: "新状态",
+    BDownloadTip: "确定要下载选中的",
+
+    ModelDetails: "模型详情",
   },
   modelPage:{
     SingleModality: "单模态模型",
@@ -253,7 +280,7 @@ const zh =  {
       created_time: "上传时间",
       pretrain_model: "预训练模型",
       base_model: "基础模型",
-
+      pretrain_model_path: "预训练模型路径",
     },
     user: {
       user_id: "用户ID",
@@ -287,15 +314,15 @@ const zh =  {
       model_id: "模型ID",
       re_pretrain: "重新预训练",
     },
-    "share": {
-      "share_id": "分享ID",
-      "task_id": "任务ID",
-      "sharer_id": "分享者ID",
-      "receiver_id": "接收者ID",
-      "company_id": "接收公司ID",
-      "password": "密码",
-      "shared_time": "分享时间",
-      "due_time": "到期时间",
+    share: {
+      share_id: "分享ID",
+      task_id: "任务ID",
+      sharer_id: "分享者ID",
+      receiver_id: "接收者ID",
+      company_id: "接收公司ID",
+      password: "密码",
+      shared_time: "分享时间",
+      due_time: "到期时间",
       sharer_name: "分享者",
       task_name: "任务名",
       receiver_name: "接收者",
@@ -374,7 +401,7 @@ const zh =  {
               然而，如何高效利用单细胞多组学数据进行细胞类型注释和解析，以及如何赋予模型自适应泛化能力以高效识别稀有细胞类型，仍然是亟待解决的挑战。',
     p34text: '我们提出了 scLTH，一种基于单细胞多组学数据的细胞类型注释方法。该方法利用预训练的跨注意力（cross-attention）网络，实现单细胞多组学数据中遗传与表观遗传特征的高效互学习与融合，从而实现精准的细胞类型注释。\
               在 scRNA-seq 和 scATAC-seq 数据上的预测结果表明，scLTH 通过 预训练特征融合提取并基于融合数据训练分类器，展现出卓越的泛化能力，特别是在稀有细胞类型识别方面表现突出。',
-    p35text: '在 四个经过严格筛选的基准数据集 上进行的实验表明，scLTH 在整体性能上超越了4种最先进的基准模型。此外，scLTH 通过多组学数据融合提高了聚类评分，并在单细胞数据的下游分析中展现了显著优势，进一步证明了本模型在细胞类型注释中的增强能力如何促进生物医学研究的深入发展。',
+    p35text: '在四个经过严格筛选的基准数据集上进行的实验表明，scLTH 在整体性能上超越了4种最先进的基准模型。此外，scLTH 通过多组学数据融合提高了聚类评分，并在单细胞数据的下游分析中展现了显著优势，进一步证明了本模型在细胞类型注释中的增强能力如何促进生物医学研究的深入发展。',
     p41title: 'scLTH 工作流程',
     p411text: 'SCLTH 模型采用跨模态潜在空间对齐策略，提升多组学细胞类型注释的准确性。\
                第一阶段：通过引入 KL 散度对齐机制，将 scRNA-seq 和 scATAC-seq 的潜在空间映射到共享表示，从而增强不同组学间的协同表达关系建模。',

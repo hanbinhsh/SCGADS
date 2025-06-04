@@ -31,6 +31,11 @@ const en = {
   Empty: "Empty",
   Share: "Share",
   Status: "Status",
+  Task: "Task",
+
+  BDTip: "Are you sure you want to delete the selected",
+  BDTask: "tasks?",
+  willbedeleted: "will be deleted",
 
   managePage:{
     EditUser: "Edit User",
@@ -51,6 +56,28 @@ const en = {
     DownloadLogs: "Download Logs",
     ChooseDownloadFormat: "Choose Download Format",
     LogDetail: "Log Detail",
+
+    OptionalFiles: "Optional Files",
+    Thefollowingfilesfrom: "The following files from",
+    folderareoptionalbutcanbeuploaded: "folder are optional but can be uploaded:",
+    EditTaskStatus: "Edit Task Status",
+    EditNote: "Note: When setting status completed, end time will be automatically updated.",
+    Pleaseinputdetails: "Task details",
+    UploadRequiredFiles: "Upload Required Files",
+    Task: "Task:",
+    Task1: "Task",
+    Type: "Type:",
+    Pretrain: "Pre-train:",
+    AutoProgress: "Auto Progress",
+    willbeautoprogressed: "will be auto progressed",
+    willbedownloaded: "will be downloaded",
+    BEditNote: "Batch Edit Will NOT Upload Files",
+    BET: "Batch Edit Tasks",
+    SelectStatus: "Select Status",
+    NewStatus: "New Status",
+    BDownloadTip: "Are you sure to download the selected",
+  
+    ModelDetails: "Model Details"
   },
   modelPage:{
     SingleModality: "Single",
@@ -253,6 +280,7 @@ const en = {
       created_time: "Upload Time",
       pretrain_model: "Pretrain Model",
       base_model: "Base Model",
+      pretrain_model_path: "Pretrain Model Path",
     },
     share: {
       shared_time: "Shared Time",

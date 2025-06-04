@@ -118,10 +118,10 @@
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->
           <div style="flex: 1;">
-            <el-form-item label="Model Name">
+            <el-form-item :label="$t('database.models.model_name')">
               <el-input v-model="selectedData.modelName"></el-input>
             </el-form-item>
-            <el-form-item label="Model Type">
+            <el-form-item :label="$t('database.models.model_type')">
               <el-select v-model="selectedData.modelType">
                 <el-option label="Single-omic Annotation" value="single" />
                 <el-option label="Multi-omics Annotation" value="multi" />
@@ -131,22 +131,22 @@
             <el-form-item :label="$t('database.models.pretrain_model')">
               <el-switch v-model="selectedData.pretrainModel" style="margin-left: auto;"></el-switch>
             </el-form-item>
-            <el-form-item label="Model Path">
+            <el-form-item :label="$t('database.models.model_path')">
               <el-input v-model="selectedData.modelPath"></el-input>
             </el-form-item>
-            <el-form-item label="Pretrain Model Path" v-if="selectedData.pretrainModel">
+            <el-form-item :label="$t('database.models.pretrain_model_path')" v-if="selectedData.pretrainModel">
               <el-input v-model="selectedData.pretrainModelPath"></el-input>
             </el-form-item>
-            <el-form-item label="Predict File Path">
+            <el-form-item :label="$t('database.models.predict_file_path')">
               <el-input v-model="selectedData.predictFilePath"></el-input>
             </el-form-item>
-            <el-form-item label="Train File Path">
+            <el-form-item :label="$t('database.models.train_file_path')">
               <el-input v-model="selectedData.trainFilePath"></el-input>
             </el-form-item>
-            <el-form-item label="Labels Path">
+            <el-form-item :label="$t('database.models.extract_labels')">
               <el-input v-model="selectedData.extractLabels"></el-input>
             </el-form-item>
-            <el-form-item label="Figure Path">
+            <el-form-item :label="$t('database.models.figure_path')">
               <el-input v-model="selectedData.figurePath"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.user_name')">
@@ -161,7 +161,7 @@
             <el-form-item :label="$t('database.models.company_name')">
               <el-input v-model="selectedData.companyName" :disabled="true"></el-input>
             </el-form-item>
-            <el-form-item label="Remark">
+            <el-form-item :label="$t('database.models.remark')">
               <el-input v-model="selectedData.remark"></el-input>
             </el-form-item>
           </div>
@@ -204,10 +204,10 @@
         <div style="display: flex; gap: 20px;">
           <!-- 左侧：现有输入框 -->
           <div style="flex: 1;">
-            <el-form-item label="Model Name">
+            <el-form-item :label="$t('database.models.model_name')">
               <el-input v-model="modelAdding.modelName"></el-input>
             </el-form-item>
-            <el-form-item label="Model Type">
+            <el-form-item :label="$t('database.models.model_type')">
               <el-select v-model="modelAdding.modelType">
                 <el-option label="Single-omic Annotation" value="single" />
                 <el-option label="Multi-omics Annotation" value="multi" />
@@ -217,22 +217,22 @@
             <el-form-item :label="$t('database.models.pretrain_model')">
               <el-switch v-model="modelAdding.pretrainModel" style="margin-left: auto;"></el-switch>
             </el-form-item>
-            <el-form-item label="Model Path">
+            <el-form-item :label="$t('database.models.model_path')">
               <el-input v-model="modelAdding.modelPath"></el-input>
             </el-form-item>
-            <el-form-item label="Pretrain Model Path" v-if="modelAdding.pretrainModel">
+            <el-form-item :label="$t('database.models.pretrain_model_path')" v-if="modelAdding.pretrainModel">
               <el-input v-model="modelAdding.pretrainModelPath"></el-input>
             </el-form-item>
-            <el-form-item label="Predict File Path">
+            <el-form-item :label="$t('database.models.predict_file_path')">
               <el-input v-model="modelAdding.predictFilePath"></el-input>
             </el-form-item>
-            <el-form-item label="Train File Path">
+            <el-form-item :label="$t('database.models.train_file_path')">
               <el-input v-model="modelAdding.trainFilePath"></el-input>
             </el-form-item>
-            <el-form-item label="Labels Path">
+            <el-form-item :label="$t('database.models.extract_labels')">
               <el-input v-model="modelAdding.extractLabels"></el-input>
             </el-form-item>
-            <el-form-item label="Figure Path">
+            <el-form-item :label="$t('database.models.figure_path')">
               <el-input v-model="modelAdding.figurePath"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.user_name')">
@@ -247,7 +247,7 @@
             <el-form-item :label="$t('database.models.company_name')">
               <el-input v-model="modelAdding.companyName" :disabled="true"></el-input>
             </el-form-item>
-            <el-form-item label="Remark">
+            <el-form-item :label="$t('database.models.remark')">
               <el-input v-model="modelAdding.remark"></el-input>
             </el-form-item>
           </div>
@@ -273,15 +273,15 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="addDialogVisible = false; modelAddingReset()">Cancel</el-button>
-          <el-button type="warning" @click="modelAddingReset()">Reset</el-button>
-          <el-button type="primary" @click="modelSave()">Save</el-button>
+          <el-button @click="addDialogVisible = false; modelAddingReset()">{{ $t('Cancel') }}</el-button>
+          <el-button type="warning" @click="modelAddingReset()">{{ $t('Reset') }}</el-button>
+          <el-button type="primary" @click="modelSave()">{{ $t('Save') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 参数对话框 -->
-    <el-dialog v-model="parametersDialogVisible" title="Parameters" width="500" align-center>
+    <el-dialog v-model="parametersDialogVisible" :title="$t('modelPage.DefaultParameters')" width="500" align-center>
       <el-form label-width="150px" label-position="left" disabled>
         <!-- 参数输入框 -->
         <el-form-item v-for="(param, index) in parameters" :key="index" :label="param.name">
@@ -290,30 +290,30 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="parametersDialogVisible = false;">Confirm</el-button>
+          <el-button type="primary" @click="parametersDialogVisible = false;">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 模型图对话框 -->
-    <el-dialog v-model="figureDialogVisible" title="Figure" align-center>
+    <el-dialog v-model="figureDialogVisible" :title="$t('ModelManage.Figure')" align-center>
       <el-row justify="center" class="image-container" id="image-row" style="margin-top: 0;">
         <img :src="figure" alt="Model" class="example-image" />
       </el-row>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="figureDialogVisible = false;">Confirm</el-button>
+          <el-button type="primary" @click="figureDialogVisible = false;">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <!-- 详情对话框 -->
-    <el-dialog v-model="detailsDialogVisible" title="Model Storage Details" width="600px" align-center>
+    <el-dialog v-model="detailsDialogVisible" :title="$t('managePage.ModelDetails')" width="600px" align-center>
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="Model Name">
+        <el-descriptions-item :label="$t('database.models.model_name')">
           <span style="font-weight: bold; color: #409eff;">{{ selectedData.modelName }}</span>
         </el-descriptions-item>
-        <el-descriptions-item label="Model Type">
+        <el-descriptions-item :label="$t('database.models.model_type')">
           <el-tag :type="selectedData.modelType === 'single' ? 'success' : selectedData.modelType === 'multi' ? 'warning' : 'info'">
             {{ selectedData.modelType === 'single' ? 'Single-omic Annotation' : 
               selectedData.modelType === 'multi' ? 'Multi-omics Annotation' : 'Denoising' }}
@@ -324,51 +324,51 @@
             {{ selectedData.baseModel == 0 ? 'None' : listData[selectedData.baseModel-1]?.modelName || 'None' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Pretrain Model">
+        <el-descriptions-item :label="$t('database.models.pretrain_model')">
           <el-tag :type="selectedData.pretrainModel == true ? 'success' : 'warning'">
             {{ selectedData.pretrainModel == true ? 'Yes' : 'No' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Model Storage Path">
+        <el-descriptions-item :label="$t('database.models.model_path')">
           <div class="path-item">
             {{ selectedData.modelPath || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Pretrain Model Path" v-if="selectedData.pretrainModel">
+        <el-descriptions-item :label="$t('database.models.pretrain_model_path')" v-if="selectedData.pretrainModel">
           <div class="path-item">
             {{ selectedData.pretrainModelPath || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Prediction File Storage Path">
+        <el-descriptions-item :label="$t('database.models.predict_file_path')">
           <div class="path-item">
             {{ selectedData.predictFilePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Training File Storage Path">
+        <el-descriptions-item :label="$t('database.models.train_file_path')">
           <div class="path-item">
             {{ selectedData.trainFilePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Extract Labels Path">
+        <el-descriptions-item :label="$t('database.models.extract_labels')">
           <div class="path-item">
             {{ selectedData.extractLabels || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Model Image Storage Path">
+        <el-descriptions-item :label="$t('database.models.figure_path')">
           <div class="path-item">
             {{ selectedData.figurePath || 'Not specified' }}
           </div>
         </el-descriptions-item>
-        <el-descriptions-item label="Created Time">
+        <el-descriptions-item :label="$t('database.models.created_time')">
           {{ selectedData.createdTime }}
         </el-descriptions-item>
-        <el-descriptions-item label="User Name" v-if="selectedData.userName">
+        <el-descriptions-item :label="$t('database.models.user_name')" v-if="selectedData.userName">
           {{ selectedData.userName }}
         </el-descriptions-item>
-        <el-descriptions-item label="Company Name" v-if="selectedData.companyName">
+        <el-descriptions-item :label="$t('database.models.company_name')" v-if="selectedData.companyName">
           {{ selectedData.companyName }}
         </el-descriptions-item>
-        <el-descriptions-item label="Remark" v-if="selectedData.remark">
+        <el-descriptions-item :label="$t('database.models.remark')" v-if="selectedData.remark">
           {{ selectedData.remark }}
         </el-descriptions-item>
       </el-descriptions>
@@ -497,12 +497,15 @@ export default {
         const response = await axios.get(`/api/findCompanyByUserID?userId=${item.userId}`);
         if (response.data.code === 200 && response.data.data) {
           this.selectedData.companyName = response.data.data.companyName;
+          this.modelAdding.companyName = response.data.data.companyName;
         } else {
           this.selectedData.companyName = '';
+          this.modelAdding.companyName = '';
         }
       } catch (error) {
         console.error('获取公司信息失败', error);
         this.selectedData.companyName = '';
+        this.modelAdding.companyName = '';
       }
     },
 
@@ -598,7 +601,7 @@ export default {
       this.modelAdding.companyName = "";
       this.modelAdding.userName = "";
       this.modelAdding.pretrainModel = false;
-      pretrain_model_path = "";
+      this.modelAdding.pretrainModelPath = "";
     },
     async modelSave() {
       // console.log("Saving model:", this.modelAdding);

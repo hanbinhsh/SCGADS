@@ -291,9 +291,9 @@
     <el-dialog v-model="optDialogVisible" title="分享操作" width="90%" align-center>
       <div class="operation-buttons">
         <el-button link type="primary" size="small" @click="showShareDetails(currentRow)">
-          {{ $t('Details') }}
+          {{ $t('Detail') }}
         </el-button>
-        <el-button link type="warning" size="small" @click="showEditDialog(currentRow)">
+        <el-button link type="warning" size="small" @click="showEditShareDialog(currentRow)">
           {{ $t('Edit') }}
         </el-button>
         <el-button link type="danger" size="small" @click="showDeleteDialog(currentRow)">

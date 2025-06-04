@@ -139,8 +139,8 @@
     </div>
 
     <!-- 自动处理对话框 -->
-    <el-dialog v-model="autoProgressDialogVisible" title="Auto Progress" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be auto progressed</span>
+    <el-dialog v-model="autoProgressDialogVisible" :title="$t('managePage.AutoProgress')" width="500" align-center>
+      <span>{{ $t('managePage.Task1') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('managePage.willbeautoprogressed') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="autoProgressDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -150,8 +150,8 @@
     </el-dialog>
 
     <!-- 批量下载确认对话框 -->
-    <el-dialog v-model="batchDownloadDialogVisible" title="Download" width="500">
-      <span>The selected tasks will be downloaded. Are you sure?</span>
+    <el-dialog v-model="batchDownloadDialogVisible" :title="$t('Download')" width="500" align-center>
+      <span>{{ $t('managePage.BDownloadTip') }} <strong style="color: #e74c3c;">{{ selectedTasks.length }}</strong> {{ $t('BDTask') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDownloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -161,8 +161,8 @@
     </el-dialog>
 
     <!-- 单个下载确认对话框 -->
-    <el-dialog v-model="downloadDialogVisible" title="Download" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be downloaded</span>
+    <el-dialog v-model="downloadDialogVisible" :title="$t('Download')" width="500" align-center>
+      <span>{{ $t('Task') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('managePage.willbedownloaded') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="downloadDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -172,8 +172,8 @@
     </el-dialog>
 
     <!-- 批量删除确认对话框 -->
-    <el-dialog v-model="batchDeleteDialogVisible" title="Batch Delete Confirmation" width="500" align-center>
-      <span>Are you sure you want to delete the selected tasks?</span>
+    <el-dialog v-model="batchDeleteDialogVisible" :title="$t('BatchDeleteConfirmation')" width="500" align-center>
+      <span>{{ $t('BDTip') }} <strong style="color: #e74c3c;">{{ selectedTasks.length }}</strong> {{ $t('BDTask') }}</span>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="batchDeleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
@@ -182,15 +182,30 @@
       </template>
     </el-dialog>
 
+    <!-- 删除确认对话框 -->
+    <el-dialog v-model="deleteDialogVisible" :title="$t('Warning')" width="500" align-center>
+      <span>{{ $t('Task') }} <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> {{ $t('willbedeleted') }}</span>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
+          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 批量编辑对话框 -->
-    <el-dialog v-model="batchEditDialogVisible" title="Batch Edit Tasks" width="500" align-center>
+    <el-dialog v-model="batchEditDialogVisible" :title="$t('managePage.BET')" width="500" align-center>
+      <!-- 提示信息 -->
+      <div class="card-alart">
+        {{ $t('managePage.BEditNote') }}
+      </div>
       <el-form :model="batchEditData" label-width="120px">
-        <el-form-item label="New Status">
-          <el-select v-model="batchEditData.status" placeholder="Select Status">
-            <el-option label="Pending" :value="0"></el-option>
-            <el-option label="Processing" :value="1"></el-option>
-            <el-option label="Completed" :value="2"></el-option>
-            <el-option label="Error" :value="-1"></el-option>
+        <el-form-item :label="$t('managePage.NewStatus')">
+          <el-select v-model="batchEditData.status" :placeholder="$t('managePage.SelectStatus')">
+            <el-option :label="$t('status.Pending')" :value="0"></el-option>
+            <el-option :label="$t('status.Processing')" :value="1"></el-option>
+            <el-option :label="$t('status.Completed')" :value="2"></el-option>
+            <el-option :label="$t('status.Error')" :value="-1"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -198,17 +213,6 @@
         <div class="dialog-footer">
           <el-button @click="batchEditDialogVisible = false">{{ $t('Cancel') }}</el-button>
           <el-button type="primary" @click="confirmBatchEdit">{{ $t('Save') }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
-      <span>Task <strong style="color: #e74c3c;">{{ selectedTask.task_name }}</strong> will be deleted</span>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="deleteDialogVisible = false">{{ $t('Cancel') }}</el-button>
-          <el-button type="danger" @click="deleteDialogVisible = false; deleteTask()">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -264,25 +268,25 @@
     </el-dialog>
 
     <!-- 编辑任务对话框 -->
-    <el-dialog v-model="editDialogVisible" title="Edit Task Status" width="500" align-center>
-      <!-- 添加提示信息 -->
+    <el-dialog v-model="editDialogVisible" :title="$t('managePage.EditTaskStatus')" width="500" align-center>
+      <!-- 提示信息 -->
       <div class="card-alart">
-        Note: When setting status completed, end time will be automatically updated.
+        {{ $t('managePage.EditNote') }}
       </div>
       <el-form :model="selectedTask" label-width="120px">
-        <el-form-item label="Task Name">
+        <el-form-item :label="$t('database.task.task_name')">
           <el-input v-model="selectedTask.task_name" disabled></el-input>
         </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="selectedTask.status" placeholder="Select Status" @change="handleStatusChange">
-            <el-option label="Pending" :value="0"></el-option>
-            <el-option label="Processing" :value="1"></el-option>
-            <el-option label="Completed" :value="2"></el-option>
-            <el-option label="Error" :value="-1"></el-option>
+        <el-form-item :label="$t('database.task.status')">
+          <el-select v-model="selectedTask.status" :placeholder="$t('managePage.SelectStatus')" @change="handleStatusChange">
+            <el-option :label="$t('status.Pending')" :value="0"></el-option>
+            <el-option :label="$t('status.Processing')" :value="1"></el-option>
+            <el-option :label="$t('status.Completed')" :value="2"></el-option>
+            <el-option :label="$t('status.Error')" :value="-1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="Detail">
-          <el-input v-model="selectedTask.details" type="textarea" placeholder="Please input" />
+        <el-form-item :label="$t('database.task.details')">
+          <el-input v-model="selectedTask.details" type="textarea" :placeholder="$t('managePage.Pleaseinputdetails')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -293,37 +297,65 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="uploadDialogVisible" title="Upload Required Files" width="500" align-center
+    <el-dialog v-model="uploadDialogVisible" :title="$t('managePage.UploadRequiredFiles')" width="600" align-center
       @close="closeUploadDialog">
       <el-form>
+        <!-- 显示任务信息 -->
+        <el-alert 
+          :title="$t('managePage.Task') + `${selectedTask.task_name}`" 
+          type="info"
+          :description="$t('managePage.Type') + `${getTaskTypeText()}` + ' | ' + $t('managePage.Pretrain') + `${selectedTask.re_pretrain ? $t('Yes') : $t('No')}`"
+          show-icon
+          :closable="false"
+          style="margin-bottom: 16px;">
+        </el-alert>
+        
         <!-- 文件上传组件 -->
-        <el-upload v-model:file-list="uploadedFiles" class="upload" drag action="" multiple
-        :auto-upload="false" :accept="'.js,.npy'">
+        <el-upload 
+          v-model:file-list="uploadedFiles" 
+          class="upload" 
+          drag 
+          action="" 
+          multiple
+          :auto-upload="false" 
+          :accept="acceptedFileTypes">
           <el-icon class="el-icon--upload">
             <UploadFilled />
           </el-icon>
           <div class="el-upload__text">
-            Drop file here or <em>click to upload</em>
+            {{ $t('uploadPage.Dropfilehereor') }} <em>{{ $t('uploadPage.clicktoupload') }}</em>
           </div>
           <template #tip>
-            <div class="el-upload__tip">
-              Required files pattern: <br>
-              • data_tsne.js<br>
-              • data_umap.js<br>
-              • config_tsne.js<br>
-              • config_umap.js<br>
-              • label_pred_tsne.js<br>
-              • label_pred_umap.js<br>
-              • output.npy
+            <div class="el-upload__tip" v-html="uploadTipText">
             </div>
           </template>
         </el-upload>
+        
+        <!-- 可选文件说明 -->
+        <el-alert 
+          v-if="selectedTask?.type?.split(':')[0] === 'training'"
+          :title="$t('managePage.OptionalFiles')" 
+          type="warning" 
+          :closable="false"
+          style="margin-top: 16px;">
+          <template #default>
+            <p>{{ $t('managePage.Thefollowingfilesfrom') }} <strong>data_split</strong> {{ $t('managePage.folderareoptionalbutcanbeuploaded') }}</p>
+            <ul style="margin: 8px 0; padding-left: 20px;">
+              <li>cell_types.npy</li>
+              <li>x_atac_test.npy, x_atac_train.npy</li>
+              <li>x_rna_test.npy, x_rna_train.npy</li>
+              <li>y_test.npy, y_test_str.npy</li>
+              <li>y_train.npy, y_train_str.npy</li>
+            </ul>
+          </template>
+        </el-alert>
       </el-form>
+      
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="closeUploadDialog">{{ $t('Cancel') }}</el-button>
           <el-button type="warning" class="action-button" @click="handleResetClick">{{ $t('Reset') }}</el-button>
-          <el-button type="primary" @click="confirmUpload" :disabled="!canUpload">{{ $t('Confirm') }}</el-button>
+          <el-button type="primary" @click="confirmUpload" :disabled="uploadedFiles.length === 0">{{ $t('Confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -370,6 +402,36 @@ export default {
       loading:false,
       systemSettings: {}, // 系统设置
       windowWidth: window.innerWidth,
+      requiredFiles: [], // 动态计算的必需文件列表
+      fileCategories: {
+        annotation: {
+          required: [
+            'data_tsne.js', 'data_umap.js', 'config_tsne.js', 'config_umap.js',
+            'label_pred_tsne.js', 'label_pred_umap.js', 'output.npy'
+          ]
+        },
+        training: {
+          pretrain: {
+            required: [
+              'extract_labels.csv', 'pretrain_best.ckpt', 'pretrainresult.txt',
+              'train_best.ckpt', 'trainresult.txt', 'trainresult_pred.txt',
+              'config_tsne.js', 'config_umap.js', 'data_tsne.js', 'data_umap.js',
+              'label_pred_tsne.js', 'label_pred_umap.js', 'label_tsne.js', 'label_umap.js',
+              'output.npy'
+            ],
+            optional: ['data_split'] // 整个文件夹作为可选
+          },
+          train: {
+            required: [
+              'extract_labels.csv', 'train_best.ckpt', 'trainresult.txt', 'trainresult_pred.txt',
+              'config_tsne.js', 'config_umap.js', 'data_tsne.js', 'data_umap.js',
+              'label_pred_tsne.js', 'label_pred_umap.js', 'label_tsne.js', 'label_umap.js',
+              'output.npy'
+            ],
+            optional: ['data_split']
+          }
+        }
+      },
     };
   },
   computed: {
@@ -387,6 +449,67 @@ export default {
         // 桌面端：显示完整功能
         return "total, sizes, prev, pager, next, jumper";
       }
+    },
+    // 获取当前任务的文件上传提示
+    uploadTipText() {
+      const taskType = this.selectedTask?.type?.split(':')[0] || '';
+      const taskSubType = this.selectedTask?.type?.split(':')[1] || '';
+      const isPreTrain = this.selectedTask?.re_pretrain;
+      
+      if (taskType === 'annotation') {
+        return `Required files for Annotation task:<br>
+          • data_tsne.js<br>
+          • data_umap.js<br>
+          • config_tsne.js<br>
+          • config_umap.js<br>
+          • label_pred_tsne.js<br>
+          • label_pred_umap.js<br>
+          • output.npy`;
+      } else if (taskType === 'training') {
+        if (isPreTrain) {
+          return `Required files for Pre-training task:<br>
+            <strong>Result files:</strong><br>
+            • extract_labels.csv<br>
+            • pretrain_best.ckpt<br>
+            • pretrainresult.txt<br>
+            • train_best.ckpt<br>
+            • trainresult.txt<br>
+            • trainresult_pred.txt<br>
+            <strong>Visualization files:</strong><br>
+            • config_tsne.js, config_umap.js<br>
+            • data_tsne.js, data_umap.js<br>
+            • label_pred_tsne.js, label_pred_umap.js<br>
+            • label_tsne.js, label_umap.js<br>
+            • output.npy<br>
+            <strong>Optional:</strong> data_split folder contents`;
+        } else {
+          return `Required files for Training task:<br>
+            <strong>Result files:</strong><br>
+            • extract_labels.csv<br>
+            • train_best.ckpt<br>
+            • trainresult.txt<br>
+            • trainresult_pred.txt<br>
+            <strong>Visualization files:</strong><br>
+            • config_tsne.js, config_umap.js<br>
+            • data_tsne.js, data_umap.js<br>
+            • label_pred_tsne.js, label_pred_umap.js<br>
+            • label_tsne.js, label_umap.js<br>
+            • output.npy<br>
+            <strong>Optional:</strong> data_split folder contents`;
+        }
+      }
+      return 'Please select appropriate files for upload.';
+    },
+    
+    // 获取当前任务允许的文件扩展名
+    acceptedFileTypes() {
+      const taskType = this.selectedTask?.type?.split(':')[0] || '';
+      if (taskType === 'annotation') {
+        return '.js,.npy';
+      } else if (taskType === 'training') {
+        return '.js,.npy,.csv,.ckpt,.txt';
+      }
+      return '.js,.npy,.csv,.ckpt,.txt';
     },
   },
   methods: {
@@ -414,6 +537,7 @@ export default {
     },
     handleResetClick() {
       this.uploadedFiles = [];
+      this.validFiles = [];
       ElMessage.success('Reset success.');
     },
     showCharts(taskName) {  
@@ -421,114 +545,290 @@ export default {
     },
     handleStatusChange(value) {
       if (value === 2) { // 当选择Completed状态时
+        this.calculateRequiredFiles(); // 计算需要的文件
         this.uploadDialogVisible = true; // 显示文件上传对话框
       }
       this.value = 1;
     },
-    handleUploadSuccess(response, file, fileList) {
-      // 当文件上传成功时，更新文件列表并检查是否所有文件都已上传
-      this.fileList[file.name] = fileList;
-      this.checkAllFilesUploaded();
+    beforeUpload(file) {
+      const taskType = this.selectedTask?.type?.split(':')[0] || '';
+      const isPreTrain = this.selectedTask?.re_pretrain;
+      
+      const isValid = this.validateFileName(file.name, taskType, isPreTrain);
+      
+      if (!isValid) {
+        ElMessage.error(`Invalid file for current task type: ${file.name}`);
+        return false;
+      }
+      
+      // 检查文件大小（例如限制为100MB）
+      const isLt100M = file.size / 1024 / 1024 < 100;
+      if (!isLt100M) {
+        ElMessage.error('File size should be less than 100MB!');
+        return false;
+      }
+      
+      return true;
+    },
+    calculateRequiredFiles() {
+      const taskType = this.selectedTask?.type?.split(':')[0] || '';
+      const isPreTrain = this.selectedTask?.re_pretrain;
+      
+      if (taskType === 'annotation') {
+        this.requiredFiles = [...this.fileCategories.annotation.required];
+      } else if (taskType === 'training') {
+        if (isPreTrain) {
+          this.requiredFiles = [...this.fileCategories.training.pretrain.required];
+        } else {
+          this.requiredFiles = [...this.fileCategories.training.train.required];
+        }
+      } else {
+        this.requiredFiles = [];
+      }
+    },
+    getTaskTypeText() {
+      if (!this.selectedTask?.type) return 'Unknown';
+      
+      const [mainType, subType] = this.selectedTask.type.split(':');
+      
+      let typeText = '';
+      if (mainType === 'annotation') {
+        typeText = this.$t('taskType.Annotation');
+      } else if (mainType === 'training') {
+        typeText = this.$t('taskType.Training');
+      } else if (mainType === 'denoising') {
+        typeText = this.$t('taskType.Denoising');
+      } else {
+        typeText = this.$t('taskType.Unknown');
+      }
+      
+      if (subType === 'single') {
+        typeText += ' - ' + this.$t('taskType.Singleomic');
+      } else if (subType === 'multi') {
+        typeText += ' - ' + this.$t('taskType.Multiomics');
+      }
+      
+      return typeText;
+    },
+    validateFileName(fileName, taskType, isPreTrain) {
+      const lowerFileName = fileName.toLowerCase();
+      
+      // 通用可视化文件
+      const visualizationFiles = [
+        'config_tsne.js', 'config_umap.js', 'data_tsne.js', 'data_umap.js',
+        'label_pred_tsne.js', 'label_pred_umap.js', 'label_tsne.js', 'label_umap.js',
+        'output.npy'
+      ];
+      
+      // 注释任务文件
+      const annotationFiles = [
+        'data_tsne.js', 'data_umap.js', 'config_tsne.js', 'config_umap.js',
+        'label_pred_tsne.js', 'label_pred_umap.js', 'output.npy'
+      ];
+      
+      // 训练任务基础文件
+      const trainingBaseFiles = [
+        'extract_labels.csv', 'train_best.ckpt', 'trainresult.txt', 'trainresult_pred.txt'
+      ];
+      
+      // 预训练专有文件
+      const pretrainFiles = [
+        'pretrain_best.ckpt', 'pretrainresult.txt'
+      ];
+      
+      // data_split 文件夹中的可选文件
+      const dataSplitFiles = [
+        'cell_types.npy', 'x_atac_test.npy', 'x_atac_train.npy',
+        'x_rna_test.npy', 'x_rna_train.npy', 'y_test.npy', 'y_test_str.npy',
+        'y_train.npy', 'y_train_str.npy'
+      ];
+      
+      if (taskType === 'annotation') {
+        return annotationFiles.includes(lowerFileName);
+      } else if (taskType === 'training') {
+        const validFiles = [
+          ...trainingBaseFiles,
+          ...visualizationFiles,
+          ...dataSplitFiles
+        ];
+        
+        if (isPreTrain) {
+          validFiles.push(...pretrainFiles);
+        }
+        
+        return validFiles.includes(lowerFileName);
+      }
+      
+      return false;
     },
     // 检查是否可以上传
     async confirmUpload() {
       try {
-        // 初始化数据结构
-        const fileGroups = {
-          tsne: { data: null, label: [], config: [] },
-          umap: { data: null, label: [], config: [] }
-        };
-        let outputFile = null;
-        const errors = [];
-
-        const allFiles = this.uploadedFiles;
-
-        allFiles.forEach(file => {
-          const fileName = file.name.toLowerCase();
-          const rawFile = file.raw || file;
-          
-          const dataMatch = fileName.match(/^data_(tsne|umap)\.js$/);
-          const labelMatch = fileName.match(/^label_pred_(tsne|umap)\.js$/);
-          const configMatch = fileName.match(/^config_(tsne|umap)\.js$/);
-          const outputMatch = fileName.match(/^output\.npy$/);
-          
-          if (dataMatch) {
-            const algo = dataMatch[1];
-            if (fileGroups[algo].data) {
-              errors.push(`Duplicate data file for ${algo}: ${fileName}`);
-            }
-            fileGroups[algo].data = rawFile;
-          } else if (labelMatch) {
-            const algo = labelMatch[1];
-            fileGroups[algo].label.push({
-              file: rawFile,
-              isPred: true
-            });
-          } else if (configMatch) {
-            const algo = configMatch[1];
-            fileGroups[algo].config.push({
-              file: rawFile,
-              isPred: false
-            });
-          } else if (outputMatch) {
-            if (outputFile) {
-              errors.push(`Duplicate output.npy file`);
-            }
-            outputFile = rawFile;
-          } else {
-            errors.push(`Invalid file name: ${fileName}`);
-          }
-        });
-
-        // 校验完整性 - 检查所有必需的7个文件
-        if (!fileGroups.tsne.data) {
-          errors.push("Missing required file: data_tsne.js");
-        }
+        const taskType = this.selectedTask?.type?.split(':')[0] || '';
         
-        if (!fileGroups.umap.data) {
-          errors.push("Missing required file: data_umap.js");
-        }
-
-        if (fileGroups.tsne.label.length !== 1) {
-          errors.push("Missing required file: label_pred_tsne.js");
-        }
-
-        if (fileGroups.umap.label.length !== 1) {
-          errors.push("Missing required file: label_pred_umap.js");
-        }
-
-        if (fileGroups.tsne.config.length !== 1) {
-          errors.push("Missing required file: config_tsne.js");
-        }
-
-        if (fileGroups.umap.config.length !== 1) {
-          errors.push("Missing required file: config_umap.js");
-        }
-
-        if (!outputFile) {
-          errors.push("Missing required file: output.npy");
-        }
-
-        if (errors.length > 0) {
-          ElMessage.error(`File validation failed:\n${errors.join('\n')}`);
+        if (taskType === 'annotation') {
+          return await this.confirmAnnotationUpload();
+        } else if (taskType === 'training') {
+          return await this.confirmTrainingUpload();
+        } else {
+          ElMessage.error('Unknown task type');
           return false;
         }
-
-        // 加入 output 文件
-        fileGroups.output = outputFile;
-
-        // 执行上传
-        await this.UploadFiles(fileGroups);
-
-        this.updateTaskStatus(this.selectedTask.task_id, 2);
-        this.uploadDialogVisible = false;
-        this.editDialogVisible = false;
-
-        ElMessage.success('The file was uploaded successfully');
-        window.location.reload();
       } catch (error) {
         ElMessage.error(`Upload failed: ${error.message}`);
+        return false;
       }
+    },
+    async confirmAnnotationUpload() {
+      // 保持原有的注释任务文件上传逻辑
+      const fileGroups = {
+        tsne: { data: null, label: [], config: [] },
+        umap: { data: null, label: [], config: [] }
+      };
+      let outputFile = null;
+      const errors = [];
+      
+      const allFiles = this.uploadedFiles;
+      
+      allFiles.forEach(file => {
+        const fileName = file.name.toLowerCase();
+        const rawFile = file.raw || file;
+        
+        const dataMatch = fileName.match(/^data_(tsne|umap)\.js$/);
+        const labelMatch = fileName.match(/^label_pred_(tsne|umap)\.js$/);
+        const configMatch = fileName.match(/^config_(tsne|umap)\.js$/);
+        const outputMatch = fileName.match(/^output\.npy$/);
+        
+        if (dataMatch) {
+          const algo = dataMatch[1];
+          if (fileGroups[algo].data) {
+            errors.push(`Duplicate data file for ${algo}: ${fileName}`);
+          }
+          fileGroups[algo].data = rawFile;
+        } else if (labelMatch) {
+          const algo = labelMatch[1];
+          fileGroups[algo].label.push({
+            file: rawFile,
+            isPred: true
+          });
+        } else if (configMatch) {
+          const algo = configMatch[1];
+          fileGroups[algo].config.push({
+            file: rawFile,
+            isPred: false
+          });
+        } else if (outputMatch) {
+          if (outputFile) {
+            errors.push(`Duplicate output.npy file`);
+          }
+          outputFile = rawFile;
+        } else {
+          errors.push(`Invalid file name: ${fileName}`);
+        }
+      });
+      
+      // 验证完整性检查
+      if (!fileGroups.tsne.data) errors.push("Missing required file: data_tsne.js");
+      if (!fileGroups.umap.data) errors.push("Missing required file: data_umap.js");
+      if (fileGroups.tsne.label.length !== 1) errors.push("Missing required file: label_pred_tsne.js");
+      if (fileGroups.umap.label.length !== 1) errors.push("Missing required file: label_pred_umap.js");
+      if (fileGroups.tsne.config.length !== 1) errors.push("Missing required file: config_tsne.js");
+      if (fileGroups.umap.config.length !== 1) errors.push("Missing required file: config_umap.js");
+      if (!outputFile) errors.push("Missing required file: output.npy");
+      
+      if (errors.length > 0) {
+        ElMessage.error(`File validation failed:\n${errors.join('\n')}`);
+        return false;
+      }
+      
+      fileGroups.output = outputFile;
+      await this.UploadFiles(fileGroups);
+      
+      this.updateTaskStatus(this.selectedTask.task_id, 2);
+      this.uploadDialogVisible = false;
+      this.editDialogVisible = false;
+      
+      ElMessage.success('The file was uploaded successfully');
+      window.location.reload();
+      return true;
+    },
+    
+    // 新增：训练任务文件上传验证
+    async confirmTrainingUpload() {
+      const isPreTrain = this.selectedTask?.re_pretrain;
+      const errors = [];
+      const uploadedFileNames = this.uploadedFiles.map(f => f.name.toLowerCase());
+      
+      // 定义必需文件
+      let requiredFiles = [
+        'extract_labels.csv', 'train_best.ckpt', 'trainresult.txt', 'trainresult_pred.txt',
+        'config_tsne.js', 'config_umap.js', 'data_tsne.js', 'data_umap.js',
+        'label_pred_tsne.js', 'label_pred_umap.js', 'label_tsne.js', 'label_umap.js',
+        'output.npy'
+      ];
+      
+      if (isPreTrain) {
+        requiredFiles.push('pretrain_best.ckpt', 'pretrainresult.txt');
+      }
+      
+      // 检查必需文件
+      for (const requiredFile of requiredFiles) {
+        if (!uploadedFileNames.includes(requiredFile.toLowerCase())) {
+          errors.push(`Missing required file: ${requiredFile}`);
+        }
+      }
+      
+      // 检查不应该存在的文件（对于非预训练任务）
+      if (!isPreTrain) {
+        const shouldNotExist = ['pretrain_best.ckpt', 'pretrainresult.txt'];
+        for (const file of shouldNotExist) {
+          if (uploadedFileNames.includes(file.toLowerCase())) {
+            errors.push(`File should not be present for training task: ${file}`);
+          }
+        }
+      }
+      
+      if (errors.length > 0) {
+        ElMessage.error(`File validation failed:\n${errors.join('\n')}`);
+        return false;
+      }
+      
+      // 上传所有文件
+      await this.uploadTrainingFiles();
+      
+      this.updateTaskStatus(this.selectedTask.task_id, 2);
+      this.uploadDialogVisible = false;
+      this.editDialogVisible = false;
+      
+      ElMessage.success('Training files uploaded successfully');
+      window.location.reload();
+      return true;
+    },
+
+    async uploadTrainingFiles() {
+      const uploadTasks = [];
+      
+      this.uploadedFiles.forEach(fileItem => {
+        const file = fileItem.raw || fileItem;
+        uploadTasks.push(this.uploadSingleFile(file));
+      });
+      
+      await Promise.all(uploadTasks);
+      this.uploadedFiles = [];
+    },
+
+    async uploadSingleFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('taskName', this.selectedTask.task_name);
+      formData.append('userName', this.selectedTask.user_name);
+      
+      const response = await axios.post('/api/uploadResult', formData);
+      
+      if (response.data.code !== 200) {
+        throw new Error(`${file.name} Upload failed`);
+      }
+      return response;
     },
 
     async UploadFiles(fileGroups) {
@@ -868,5 +1168,3 @@ export default {
   margin: 2px 0;
 }
 </style>
-
-
