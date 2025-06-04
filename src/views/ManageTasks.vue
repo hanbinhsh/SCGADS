@@ -600,7 +600,7 @@ export default {
       
       const response = await axios.post('/api/uploadResult', formData);
       console.log(response.data);
-      if (response.data.code !== 1) {
+      if (response.data.code !== 200) {
         throw new Error(`${file.name} Upload failed`);
       }
       return response;
