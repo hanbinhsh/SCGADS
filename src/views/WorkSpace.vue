@@ -897,6 +897,12 @@
           {{ $t('workSpace.CopyLink') }}
         </el-button>
         
+       <!-- 编辑按钮（我的分享TAB显示） -->
+        <el-button v-if="currentMobileTab === 'myShares'" type="warning" 
+                  @click="showEditShareDialog(selectedTask)" block>
+          {{ $t('Edit') }}
+        </el-button>      
+
         <!-- 详情按钮 -->
         <el-button type="primary" @click="showDetailDialog(selectedTask)" block>
           {{ $t('Detail') }}

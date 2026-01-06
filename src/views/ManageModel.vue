@@ -5,6 +5,7 @@
       <h1 class="page-name">{{ $t('navigateBar.ManageModel') }}</h1>
       <el-divider />
       
+      <!-- ================= 列表表格 ================= -->
       <el-table 
         :data="paginatedListData" 
         style="width: 100%"
@@ -12,7 +13,6 @@
         @sort-change="handleSortChange"
         v-loading="loading"
       >
-        <!-- 多选功能 -->
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="modelName" :label="$t('database.models.model_name')" sortable min-width="140"></el-table-column>
         <el-table-column prop="modelType" :label="$t('database.models.model_type')" sortable width="130"></el-table-column>
@@ -43,22 +43,22 @@
         </el-table-column>
       </el-table>
       
-      <!-- 分页组件 -->
-        <el-pagination 
-          class="pagination" 
-          @size-change="handleSizeChange" 
-          @current-change="handleCurrentChange"
-          :current-page="currentPage" 
-          :page-sizes="[5, 10, 20, 50]" 
-          :page-size="pageSize"
-          :layout="paginationLayout"
-          :total="listData.length"
-          :small="isMobile"
-          :hide-on-single-page="false">
-        </el-pagination>
+      <!-- ================= 分页组件 ================= -->
+      <el-pagination 
+        class="pagination" 
+        @size-change="handleSizeChange" 
+        @current-change="handleCurrentChange"
+        :current-page="currentPage" 
+        :page-sizes="[5, 10, 20, 50]" 
+        :page-size="pageSize"
+        :layout="paginationLayout"
+        :total="listData.length"
+        :small="isMobile"
+        :hide-on-single-page="false">
+      </el-pagination>
     </el-main>
 
-    <!-- 按钮行 -->
+    <!-- ================= 底部按钮行 ================= -->
     <div class="footer">
       <div class="footer-button-row">
         <el-button type="success" @click="fetchListData">
@@ -73,7 +73,9 @@
       </div>
     </div>
 
-    <!-- 移动端详情对话框 -->
+    <!-- ================= 各类对话框 ================= -->
+
+    <!-- 1. 移动端操作对话框 -->
     <el-dialog v-model="optDialogVisible" title="Model Details" width="90%" align-center :label="$t('Operations')">
       <div class="operation-buttons">
         <el-button link type="info" size="small" @click="showDetailsDialog(currentRow)">{{ $t('Detail') }}</el-button>
@@ -82,7 +84,7 @@
       </div>
     </el-dialog>
 
-    <!-- 删除确认对话框 -->
+    <!-- 2. 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="Warning" width="500" align-center>
       <span>Model <strong style="color: #e74c3c;">{{ selectedData.modelName }}</strong> will be deleted</span>
       <template #footer>
@@ -95,7 +97,7 @@
       </template>
     </el-dialog>
 
-    <!-- 批量删除确认对话框 -->
+    <!-- 3. 批量删除确认对话框 -->
     <el-dialog v-model="batchDeleteDialogVisible" title="Batch Delete Confirmation" width="500" align-center>
       <span>Are you sure you want to delete the selected models?</span>
       <template #footer>
@@ -108,15 +110,14 @@
       </template>
     </el-dialog>
 
-    <!-- 修改对话框 -->
+    <!-- 4. 修改对话框 -->
     <el-dialog v-model="editDialogVisible" title="Edit Model" width="850px" align-center>
-      <!-- 添加提示信息 -->
       <div class="card-alart">
-        Note: Upload the models into the algorithm folder of back-end.
+        Note: Model files are stored on the server backend.
       </div>
       <el-form :model="selectedData" label-width="150px" label-position="left">
         <div style="display: flex; gap: 20px;">
-          <!-- 左侧：现有输入框 -->
+          <!-- 左侧：基础信息 -->
           <div style="flex: 1;">
             <el-form-item :label="$t('database.models.model_name')">
               <el-input v-model="selectedData.modelName"></el-input>
@@ -194,18 +195,18 @@
       </template>
     </el-dialog>
 
-    <!-- 添加对话框 -->
+    <!-- 5. 【核心】添加模型对话框 -->
     <el-dialog v-model="addDialogVisible" title="Add Model" width="850px" align-center>
       <!-- 添加提示信息 -->
       <div class="card-alart">
-        Note: Upload the models into the algorithm folder of back-end.
+        Note: The uploaded zip file will be decompressed to 'algorithm/{modelType}/{modelName}' folder.
       </div>
       <el-form :model="modelAdding" label-width="150px" label-position="left">
         <div style="display: flex; gap: 20px;">
-          <!-- 左侧：现有输入框 -->
+          <!-- 左侧：基础信息输入框 -->
           <div style="flex: 1;">
             <el-form-item :label="$t('database.models.model_name')">
-              <el-input v-model="modelAdding.modelName"></el-input>
+              <el-input v-model="modelAdding.modelName" placeholder="Required for folder naming"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.model_type')">
               <el-select v-model="modelAdding.modelType">
@@ -218,7 +219,7 @@
               <el-switch v-model="modelAdding.pretrainModel" style="margin-left: auto;"></el-switch>
             </el-form-item>
             <el-form-item :label="$t('database.models.model_path')">
-              <el-input v-model="modelAdding.modelPath"></el-input>
+              <el-input v-model="modelAdding.modelPath" placeholder="Auto-generated if file uploaded"></el-input>
             </el-form-item>
             <el-form-item :label="$t('database.models.pretrain_model_path')" v-if="modelAdding.pretrainModel">
               <el-input v-model="modelAdding.pretrainModelPath"></el-input>
@@ -252,13 +253,37 @@
             </el-form-item>
           </div>
 
-          <!-- 右侧：参数输入框 -->
+          <!-- 右侧：【新增】上传区域 + 参数输入框 -->
           <div style="flex: 1; border-left: 1px solid #ddd; padding-left: 20px;">
+            
+            <!-- 【新增】压缩包上传组件 -->
+            <div style="margin-bottom: 20px; border-bottom: 1px dashed #ddd; padding-bottom: 20px;">
+              <div style="font-weight: bold; margin-bottom: 10px;">Upload Algorithm Package (.zip)</div>
+              <!-- auto-upload=false: 阻止组件自动上传，等点击 Save 再处理 -->
+              <el-upload
+                ref="uploadRef"
+                action="#"
+                :auto-upload="false"
+                :limit="1"
+                :on-change="handleFileChange"
+                :on-remove="handleFileRemove"
+                accept=".zip,.tar,.gz"
+                drag
+              >
+                <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+                <div class="el-upload__text">
+                  Drop file here or <em>click to upload</em>
+                </div>
+              </el-upload>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: bold;">Parameters</span>
               <el-button type="primary" icon="plus" @click="addParameter">Add</el-button>
             </div>
-            <div style="max-height: 550px; overflow-y: auto; margin-top: 10px;">
+            
+            <!-- 参数列表 -->
+            <div style="max-height: 350px; overflow-y: auto; margin-top: 10px;">
               <el-form-item v-for="(param, index) in modelAdding.parameters" :key="index" label-width="0px">
                 <div style="display: flex; align-items: center; width: 100%;">
                   <span style="width: 30px; text-align: center; font-weight: bold;">{{ index + 1 }}</span>
@@ -280,10 +305,9 @@
       </template>
     </el-dialog>
 
-    <!-- 参数对话框 -->
+    <!-- 6. 参数对话框 -->
     <el-dialog v-model="parametersDialogVisible" :title="$t('modelPage.DefaultParameters')" width="500" align-center>
       <el-form label-width="150px" label-position="left" disabled>
-        <!-- 参数输入框 -->
         <el-form-item v-for="(param, index) in parameters" :key="index" :label="param.name">
           <el-input v-model="parameters[index].value" :placeholder="param.value.toString()" />
         </el-form-item>
@@ -295,7 +319,7 @@
       </template>
     </el-dialog>
 
-    <!-- 模型图对话框 -->
+    <!-- 7. 模型图对话框 -->
     <el-dialog v-model="figureDialogVisible" :title="$t('ModelManage.Figure')" align-center>
       <el-row justify="center" class="image-container" id="image-row" style="margin-top: 0;">
         <img :src="figure" alt="Model" class="example-image" />
@@ -307,9 +331,10 @@
       </template>
     </el-dialog>
 
-    <!-- 详情对话框 -->
+    <!-- 8. 详情对话框 -->
     <el-dialog v-model="detailsDialogVisible" :title="$t('managePage.ModelDetails')" width="600px" align-center>
       <el-descriptions :column="1" border>
+        <!-- 详情内容保持不变 -->
         <el-descriptions-item :label="$t('database.models.model_name')">
           <span style="font-weight: bold; color: #409eff;">{{ selectedData.modelName }}</span>
         </el-descriptions-item>
@@ -388,16 +413,18 @@
 import MainHeader from "../components/MainHeader.vue";
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { UploadFilled } from '@element-plus/icons-vue';
 
 export default {
   name: 'ModelsPage',
   components: {
-    MainHeader
+    MainHeader,
+    UploadFilled
   },
   data() {
     return {
       listData: [],
-      paginatedListData: [], // 当前页的反馈数据
+      paginatedListData: [],
       deleteDialogVisible: false,
       editDialogVisible: false,
       batchDeleteDialogVisible: false,
@@ -405,7 +432,7 @@ export default {
       figureDialogVisible: false,
       figure: "",
       addDialogVisible: false,
-      detailsDialogVisible: false, // 详情对话框可见性
+      detailsDialogVisible: false,
       
       selectedDatas: [],
       selectedDataDefault: {},
@@ -417,10 +444,9 @@ export default {
 
       windowWidth: window.innerWidth,
       
-      // 模型编辑
       selectedData: {},
-      parameters: [], // 选中的模型参数
-      allUsers: [], // 所有用户数据列表
+      parameters: [],
+      allUsers: [],
 
       modelAdding: {
         modelName: "",
@@ -429,13 +455,15 @@ export default {
         predictFilePath: "pred.py",
         trainFilePath: "train.py",
         figurePath: "model.png",
-        parameters: [], // 存储参数列表
+        parameters: [],
         remark: "",
         extractLabels: "extract_labels.csv",
         companyName: "",
         userName: "",
         pretrainModel: false,
         pretrainModelPath: "",
+        // 【新增】暂存文件对象
+        file: null
       },
 
       currentRow: {},
@@ -448,28 +476,20 @@ export default {
     },
     paginationLayout() {
       if (this.windowWidth <= 480) {
-        // 小屏手机：只显示基本的分页器
         return "prev, pager, next";
       } else if (this.windowWidth <= 768) {
-        // 平板/大屏手机：显示总数和基本分页
         return "total, prev, pager, next";
       } else {
-        // 桌面端：显示完整功能
         return "total, sizes, prev, pager, next, jumper";
       }
     },
   },
   methods: {
-    showOptDialog(row) {
-      this.currentRow = row;
-      this.optDialogVisible = true;
-    },
-    // 监听窗口大小变化
+    // 监听窗口
     handleResize() {
       this.windowWidth = window.innerWidth;
     },
-    // 用户筛选和公司自动填写
-    // 获取所有用户
+    // 用户与公司查询
     async fetchUsers() {
       try {
         const response = await axios.get('/api/findUsers');
@@ -480,114 +500,81 @@ export default {
         console.error('获取用户列表失败', error);
       }
     },
-    // 自动补全查询用户
     querySearchUsers(queryString, cb) {
       const results = this.allUsers
         .filter(user => user.userName.toLowerCase().includes(queryString.toLowerCase()))
-        .map(user => ({
-          value: user.userName,
-          userId: user.userId
-        }));
+        .map(user => ({ value: user.userName, userId: user.userId }));
       cb(results);
     },
-    // 用户选中后的回调，获取其公司信息
     async handleUserSelect(item) {
       this.selectedData.userName = item.value;
+      this.modelAdding.userName = item.value; 
       try {
         const response = await axios.get(`/api/findCompanyByUserID?userId=${item.userId}`);
         if (response.data.code === 200 && response.data.data) {
           this.selectedData.companyName = response.data.data.companyName;
           this.modelAdding.companyName = response.data.data.companyName;
-        } else {
-          this.selectedData.companyName = '';
-          this.modelAdding.companyName = '';
         }
-      } catch (error) {
-        console.error('获取公司信息失败', error);
-        this.selectedData.companyName = '';
-        this.modelAdding.companyName = '';
-      }
+      } catch (error) { console.error(error); }
     },
 
-    // 模型修改
-    addEditingParameter() {
-      this.parameters.push({ name: "", value: "" });
-    },
-    removeEditingParameter(index) {
-      this.parameters.splice(index, 1);
-    },
-    modelEditingReset(){
-      this.selectedData = {}
-      this.paramTrans(this.selectedDataDefault)
-    },
+    // ----------------- 编辑模型相关 -----------------
+    addEditingParameter() { this.parameters.push({ name: "", value: "" }); },
+    removeEditingParameter(index) { this.parameters.splice(index, 1); },
+    modelEditingReset(){ this.selectedData = {}; this.paramTrans(this.selectedDataDefault); },
     async modelEditingSave() {
-      const formData = new FormData();
-      const data = this.selectedData;
-      const paramString = this.parameters.map(param => {
-        // 如果值是数字，不需要转换，否则使用 toString()
+       const formData = new FormData();
+       const data = this.selectedData;
+       const paramString = this.parameters.map(param => {
         const value = typeof param.value === 'number' ? param.value : param.value.toString();
         return `${param.name}:${value}`;
-      }).join(',');
-      formData.append('modelId', data.modelId);
-      formData.append('modelName', data.modelName);
-      formData.append('modelType', data.modelType);
-      formData.append('modelPath', data.modelPath);
-      formData.append('predictFilePath', data.predictFilePath);
-      formData.append('trainFilePath', data.trainFilePath);
-      formData.append('figurePath', data.figurePath);
-      formData.append('remark', data.remark);
-      formData.append('extractLabels', data.extractLabels);
-      formData.append('defaultParameters', paramString);
-      formData.append('companyName', data.companyName);
-      formData.append('userName', data.userName);
-      formData.append('pretrainModel', data.pretrainModel);
-      formData.append('pretrainModelPath', data.pretrainModelPath);
-      const response = await axios.post('api/models/updateModel', formData);
-      if (response.data.code === 1) {
-        ElMessage({
-          message: 'Model update successfully',
-          type: 'success',
-        });
-      } else {
-        ElMessage({
-          message: 'Failed to update Model',
-          type: 'error',
-        });
-      }
-      this.editDialogVisible = false;
-      this.fetchListData();
-      this.modelAddingReset();
-    },
-    paramTrans(data) {
-      if (!data || !data.defaultParameters) {
-        this.parameters = [];
-        return;
-      }
+       }).join(',');
+       
+       formData.append('modelId', data.modelId);
+       formData.append('modelName', data.modelName);
+       formData.append('modelType', data.modelType);
+       formData.append('modelPath', data.modelPath);
+       formData.append('predictFilePath', data.predictFilePath);
+       formData.append('trainFilePath', data.trainFilePath);
+       formData.append('figurePath', data.figurePath);
+       formData.append('remark', data.remark);
+       formData.append('extractLabels', data.extractLabels);
+       formData.append('defaultParameters', paramString);
+       formData.append('companyName', data.companyName);
+       formData.append('userName', data.userName);
+       formData.append('pretrainModel', data.pretrainModel);
+       formData.append('pretrainModelPath', data.pretrainModelPath);
 
-      const paramArray = data.defaultParameters
-        .split(',')
-        .map(param => {
-          const [key, value] = param.split(':');
-          if (!key || !value) return null; // 忽略无效项
-          return {
-            name: key.trim(),
-            value: isNaN(value) ? value.trim() : parseFloat(value)
-          };
-        })
-        .filter(p => p !== null); // 过滤掉不合法的
-
-      this.parameters = paramArray;
-      this.selectedData = JSON.parse(JSON.stringify(data)); // 防止表单不更新
-      this.selectedDataDefault = data;
+       const response = await axios.post('api/models/updateModel', formData);
+       if(response.data.code === 1) {
+          ElMessage.success('Model updated successfully');
+       } else {
+          ElMessage.error('Failed to update Model');
+       }
+       this.editDialogVisible = false;
+       this.fetchListData();
     },
 
-    // 增加模型
+    // ----------------- 新增模型相关 (核心修改) -----------------
+    
+    // 1. 监听文件选择
+    handleFileChange(file) {
+      this.modelAdding.file = file.raw;
+    },
+    // 2. 监听文件移除
+    handleFileRemove() {
+      this.modelAdding.file = null;
+    },
+    
+    // 3. 增加参数
     addParameter() {
       this.modelAdding.parameters.push({ name: "", value: "" });
     },
     removeParameter(index) {
       this.modelAdding.parameters.splice(index, 1);
     },
+
+    // 4. 重置表单
     modelAddingReset(){
       this.modelAdding.parameters = [];
       this.modelAdding.modelName = "";
@@ -602,15 +589,46 @@ export default {
       this.modelAdding.userName = "";
       this.modelAdding.pretrainModel = false;
       this.modelAdding.pretrainModelPath = "";
+      
+      // 清空文件
+      this.modelAdding.file = null;
+      if (this.$refs.uploadRef) this.$refs.uploadRef.clearFiles();
     },
+
+    // 5. 【核心逻辑】单独上传解压文件
+    async uploadAlgorithmFile() {
+      // 如果没有选择文件，直接结束
+      if (!this.modelAdding.file) return;
+
+      const formData = new FormData();
+      formData.append('file', this.modelAdding.file);
+      formData.append('modelName', this.modelAdding.modelName);
+      formData.append('modelType', this.modelAdding.modelType);
+      
+      try {
+        await axios.post('api/models/uploadPackage', formData);
+        console.log("Algorithm package uploaded successfully.");
+      } catch (error) {
+        console.error("File upload failed:", error);
+        ElMessage.warning("Model info saved, but file upload failed.");
+      }
+    },
+
+    // 6. 【核心逻辑】保存模型
     async modelSave() {
-      // console.log("Saving model:", this.modelAdding);
+      if(!this.modelAdding.modelName) {
+        ElMessage.error("Model Name is required");
+        return;
+      }
+      
       const data = this.modelAdding;
+      // 参数转字符串
       const paramString = data.parameters.map(param => {
-        // 如果值是数字，不需要转换，否则使用 toString()
         const value = typeof param.value === 'number' ? param.value : param.value.toString();
         return `${param.name}:${value}`;
       }).join(',');
+      
+      // 构造 FormData (仅发送文本数据)
       const formData = new FormData();
       formData.append('modelName', data.modelName);
       formData.append('modelType', data.modelType);
@@ -625,62 +643,41 @@ export default {
       formData.append('userName', data.userName);
       formData.append('pretrainModel', data.pretrainModel);
       formData.append('pretrainModelPath', data.pretrainModelPath);
+      
+      // 第一步：保存基础信息
       const response = await axios.post('api/models/addModel', formData);
+      
       if (response.data.code === 1) {
-        ElMessage({
-          message: 'Model add successfully',
-          type: 'success',
-        });
+        // 第二步：保存成功后，调用文件上传
+        await this.uploadAlgorithmFile();
+        
+        ElMessage.success('Model added successfully');
+        
+        this.addDialogVisible = false;
+        this.fetchListData();
+        this.modelAddingReset();
       } else {
-        ElMessage({
-          message: 'Failed to add Model',
-          type: 'error',
-        });
+        ElMessage.error('Failed to add Model');
       }
-      this.addDialogVisible = false;
-      this.fetchListData();
-      this.modelAddingReset();
     },
-    showDeleteDialog(data) {
-      this.deleteDialogVisible = true;
-      this.selectedData = data;
-    },
-    showEditDialog(data) {
-      this.paramTrans(data)
-      this.selectedData = data;
-      this.editDialogVisible = true;
-    },
-    showParametersDialog(data) {
-      this.paramTrans(data)
-      this.parametersDialogVisible = true;
-    },
-    showFigureDialog(data){
-      this.figureDialogVisible = true;
-      const base64Image = `data:image/png;base64,${data.figureByte}`;  // 这里假设返回的是base64编码的图像字节流
-      this.figure = base64Image;
-    },
+
+    // ----------------- 通用辅助方法 -----------------
+    showDeleteDialog(data) { this.deleteDialogVisible = true; this.selectedData = data; },
+    showEditDialog(data) { this.paramTrans(data); this.selectedData = data; this.editDialogVisible = true; },
+    showParametersDialog(data) { this.paramTrans(data); this.parametersDialogVisible = true; },
+    showFigureDialog(data){ this.figureDialogVisible = true; this.figure = `data:image/png;base64,${data.figureByte}`; },
+    showOptDialog(row) { this.currentRow = row; this.optDialogVisible = true; },
+    showDetailsDialog(data) { this.selectedData = data; this.detailsDialogVisible = true; },
     
-    handleSelectionChange(data) {
-      this.selectedDatas = data;
-    },
-    handleSortChange({ prop, order }) {
-      this.sortProp = prop;
-      this.sortOrder = order;
-      this.applySorting();
-    },
+    handleSelectionChange(data) { this.selectedDatas = data; },
+    handleSortChange({ prop, order }) { this.sortProp = prop; this.sortOrder = order; this.applySorting(); },
+    
     applySorting() {
       if (this.sortProp && this.sortOrder) {
         this.listData.sort((a, b) => {
           const valueA = a[this.sortProp];
           const valueB = b[this.sortProp];
-
-          if (this.sortOrder === 'ascending') {
-            return valueA > valueB ? 1 : -1;
-          } else if (this.sortOrder === 'descending') {
-            return valueA < valueB ? 1 : -1;
-          } else {
-            return 0;
-          }
+          return this.sortOrder === 'ascending' ? (valueA > valueB ? 1 : -1) : (valueA < valueB ? 1 : -1);
         });
       }
       this.updatePaginatedDataList();
@@ -690,25 +687,19 @@ export default {
       const end = start + this.pageSize;
       this.paginatedListData = this.listData.slice(start, end);
     },
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.updatePaginatedDataList();
+    handleSizeChange(val) { this.pageSize = val; this.updatePaginatedDataList(); },
+    handleCurrentChange(val) { this.currentPage = val; this.updatePaginatedDataList(); },
+    
+    async fetchListData() { 
+        this.loading = true; 
+        try {
+            const res = await axios.get('/api/models/findAllModels'); 
+            this.listData = res.data; 
+            this.applySorting(); 
+        } catch(e) { console.error(e); }
+        this.loading = false; 
     },
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.updatePaginatedDataList();
-    },
-    async fetchListData() {
-      try {
-        this.loading = true;
-        const response = await axios.get('/api/models/findAllModels'); // 调用后端API
-        this.listData = response.data;
-        this.applySorting();
-        this.loading = false;
-      } catch (error) {
-        console.error('Failed to fetch models:', error);
-      }
-    },
+    
     async deleteData(dataId) {
       try {
         const response = await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
@@ -716,20 +707,15 @@ export default {
           ElMessage.success('Model deleted successfully');
           this.fetchListData();
         } else {
-          console.error('Failed to delete:', response.data.msg);
           ElMessage.error(response.data.msg);
         }
-      } catch (error) {
-        console.error('Failed to delete:', error);
-      }
+      } catch (error) { console.error(error); }
     },
+    
     async deleteDataID(dataId) {
-      try {
-        await axios.delete(`/api/models/deleteModel?modelId=${dataId}`);
-      } catch (error) {
-        console.error("Delete failed:", error);
-      }
+      try { await axios.delete(`/api/models/deleteModel?modelId=${dataId}`); } catch (error) { console.error(error); }
     },
+    
     async confirmBatchDelete() {
       this.batchDeleteDialogVisible = false;
       for (const data of this.selectedDatas) {
@@ -738,13 +724,23 @@ export default {
       ElMessage.success('Batch delete success.');
       this.fetchListData();
     },
-    showDetailsDialog(data) {
-      this.selectedData = data;
-      this.detailsDialogVisible = true;
+    
+    paramTrans(data) {
+      if (!data || !data.defaultParameters) {
+        this.parameters = [];
+        return;
+      }
+      const paramArray = data.defaultParameters.split(',').map(param => {
+          const [key, value] = param.split(':');
+          if (!key || !value) return null;
+          return { name: key.trim(), value: isNaN(value) ? value.trim() : parseFloat(value) };
+        }).filter(p => p !== null);
+      this.parameters = paramArray;
+      this.selectedData = JSON.parse(JSON.stringify(data));
+      this.selectedDataDefault = data;
     },
     formatDate(dateString) {
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-      return new Date(dateString).toLocaleString(undefined, options);
+      return new Date(dateString).toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
     }
   },
   mounted() {
@@ -766,7 +762,6 @@ export default {
   padding: 5px;
   border-radius: 4px;
 }
-
 .dark-mode .path-item {
   background-color: #333333;
 }
